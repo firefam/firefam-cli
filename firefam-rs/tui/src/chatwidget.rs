@@ -1572,12 +1572,24 @@ impl ChatWidget {
         }
     }
 
-    pub(crate) fn set_work_log_visible_and_notify(&mut self, visible: bool) {
-        self.set_work_log_visible(visible);
+    pub(crate) fn add_work_log_visibility_notice(&mut self) {
+        if self.bottom_pane.is_task_running()
+            || self.has_active_agent_stream()
+            || self.has_active_plan_stream()
+        {
+            self.request_redraw();
+            return;
+        }
+
         self.add_info_message(
-            Self::work_log_visibility_notice(visible).to_string(),
+            Self::work_log_visibility_notice(self.work_log_visible).to_string(),
             /*hint*/ None,
         );
+    }
+
+    pub(crate) fn set_work_log_visible_and_notify(&mut self, visible: bool) {
+        self.set_work_log_visible(visible);
+        self.add_work_log_visibility_notice();
     }
 
     pub(crate) fn toggle_work_log_visibility_and_notify(&mut self) -> bool {

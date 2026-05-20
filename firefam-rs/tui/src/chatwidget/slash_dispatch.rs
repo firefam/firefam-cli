@@ -626,12 +626,7 @@ impl ChatWidget {
                     self.set_work_log_visible_and_notify(/*visible*/ false);
                     self.emit_work_log_visibility_changed(/*visible*/ false);
                 }
-                "status" => {
-                    self.add_info_message(
-                        Self::work_log_visibility_notice(self.work_log_visible()).to_string(),
-                        /*hint*/ None,
-                    );
-                }
+                "status" => self.add_work_log_visibility_notice(),
                 _ => self.add_error_message(WORKLOG_USAGE.to_string()),
             },
             SlashCommand::Rename if !trimmed.is_empty() => {
