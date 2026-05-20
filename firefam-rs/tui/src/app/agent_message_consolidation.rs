@@ -28,6 +28,7 @@ impl App {
         cwd: PathBuf,
         scrollback_reflow: ConsolidationScrollbackReflow,
         deferred_history_cell: Option<Box<dyn HistoryCell>>,
+        work_log: bool,
     ) -> Result<()> {
         // Some finalize paths must preserve a last provisional stream cell long
         // enough for queue ordering, then fold it into the canonical
@@ -52,8 +53,9 @@ impl App {
             tracing::debug!(
                 "ConsolidateAgentMessage: replacing cells [{start}..{end}] with AgentMarkdownCell"
             );
-            let consolidated: Arc<dyn HistoryCell> =
-                Arc::new(history_cell::AgentMarkdownCell::new(source, &cwd));
+            let consolidated: Arc<dyn HistoryCell> = Arc::new(
+                history_cell::AgentMarkdownCell::new_with_work_log(source, &cwd, work_log),
+            );
             self.transcript_cells
                 .splice(start..end, std::iter::once(consolidated.clone()));
 
@@ -62,7 +64,12 @@ impl App {
                 tui.frame_requester().schedule_frame();
             }
 
-            self.finish_agent_message_consolidation(tui, scrollback_reflow)?;
+            let reflow = if work_log && !self.chat_widget.work_log_visible() {
+                ConsolidationScrollbackReflow::Required
+            } else {
+                scrollback_reflow
+            };
+            self.finish_agent_message_consolidation(tui, reflow)?;
         } else {
             tracing::debug!(
                 "ConsolidateAgentMessage: no cells to consolidate(start={start}, end={end})",

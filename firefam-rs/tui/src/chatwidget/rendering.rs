@@ -6,18 +6,22 @@ impl ChatWidget {
     pub(super) fn as_renderable(&self) -> RenderableItem<'_> {
         let active_cell_right_reserve = self.ambient_pet_wrap_reserved_cols();
         let active_cell_renderable = match &self.transcript.active_cell {
-            Some(cell) => RenderableItem::Owned(Box::new(TranscriptAreaRenderable {
-                child: cell.as_ref(),
-                top: 1,
-                right: active_cell_right_reserve,
-            })),
-            None => RenderableItem::Owned(Box::new(())),
+            Some(cell) if self.work_log_visible || !cell.is_work_log() => {
+                RenderableItem::Owned(Box::new(TranscriptAreaRenderable {
+                    child: cell.as_ref(),
+                    top: 0,
+                    right: active_cell_right_reserve,
+                }))
+            }
+            _ => RenderableItem::Owned(Box::new(())),
         };
         let active_hook_cell_renderable = match &self.active_hook_cell {
-            Some(cell) if cell.should_render() => {
+            Some(cell)
+                if cell.should_render() && (self.work_log_visible || !cell.is_work_log()) =>
+            {
                 RenderableItem::Owned(Box::new(TranscriptAreaRenderable {
                     child: cell,
-                    top: 1,
+                    top: 0,
                     right: active_cell_right_reserve,
                 }))
             }
@@ -33,7 +37,7 @@ impl ChatWidget {
                 right_reserve: active_cell_right_reserve,
             }))
             .inset(Insets::tlbr(
-                /*top*/ 1, /*left*/ 0, /*bottom*/ 0, /*right*/ 0,
+                /*top*/ 0, /*left*/ 0, /*bottom*/ 0, /*right*/ 0,
             )),
         );
         RenderableItem::Owned(Box::new(flex))

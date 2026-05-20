@@ -189,6 +189,11 @@ pub(crate) enum AppEvent {
         enabled: bool,
     },
 
+    /// Re-render the transcript with completed agent work-log cells shown or hidden.
+    WorkLogVisibilityChanged {
+        visible: bool,
+    },
+
     /// Clear the current context, start a fresh session, and submit an initial user message.
     ///
     /// This is the Plan Mode handoff path: the previous thread remains resumable, but the model
@@ -585,6 +590,7 @@ pub(crate) enum AppEvent {
         cwd: PathBuf,
         scrollback_reflow: ConsolidationScrollbackReflow,
         deferred_history_cell: Option<Box<dyn HistoryCell>>,
+        work_log: bool,
     },
 
     /// Replace the contiguous run of streaming `ProposedPlanStreamCell`s at the

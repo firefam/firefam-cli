@@ -1,4 +1,4 @@
-//! Private transport for fetching IDE context for TUI `/ide` support.
+//! Private transport for fetching IDE context for TUI prompt injection.
 
 use std::path::Path;
 use std::path::PathBuf;
@@ -56,28 +56,6 @@ pub(crate) enum IdeContextError {
 
 impl IdeContextError {
     #[cfg(any(unix, windows))]
-    pub(crate) fn user_facing_hint(&self) -> String {
-        match self {
-            IdeContextError::Connect(_) => OPEN_IDE_HINT.to_string(),
-            IdeContextError::RequestFailed(error) if error == "no-client-found" => {
-                OPEN_IDE_HINT.to_string()
-            }
-            IdeContextError::RequestFailed(_) => {
-                format!("{IDE_DID_NOT_PROVIDE_CONTEXT_HINT} Try /ide again.")
-            }
-            IdeContextError::ResponseTooLarge => {
-                "The selected IDE context is too large. Clear any large selection in your IDE and try /ide again.".to_string()
-            }
-            IdeContextError::Send(_) => {
-                "Firefam could not request IDE context. Try /ide again.".to_string()
-            }
-            IdeContextError::Read(_) | IdeContextError::InvalidResponse(_) => {
-                "Firefam could not read IDE context. Try /ide again.".to_string()
-            }
-        }
-    }
-
-    #[cfg(any(unix, windows))]
     pub(crate) fn prompt_skip_hint(&self) -> String {
         match self {
             IdeContextError::ResponseTooLarge => {
@@ -114,11 +92,6 @@ impl IdeContextError {
             IdeContextError::RequestFailed(_) => hint_with_retry(IDE_DID_NOT_PROVIDE_CONTEXT_HINT),
             IdeContextError::Read(_) => hint_with_retry("Firefam could not read IDE context."),
         }
-    }
-
-    #[cfg(not(any(unix, windows)))]
-    pub(crate) fn user_facing_hint(&self) -> String {
-        self.to_string()
     }
 
     #[cfg(not(any(unix, windows)))]

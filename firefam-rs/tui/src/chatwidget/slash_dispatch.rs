@@ -37,6 +37,7 @@ const SIDE_SLASH_COMMAND_UNAVAILABLE_HINT: &str =
 const GOAL_USAGE: &str = "Usage: /goal <objective>";
 const GOAL_USAGE_HINT: &str = "Example: /goal improve benchmark coverage";
 const RAW_USAGE: &str = "Usage: /raw [on|off]";
+const WORKLOG_USAGE: &str = "Usage: /worklog [on|off|status]";
 
 impl ChatWidget {
     /// Dispatch a bare slash command and record its staged local-history entry.
@@ -126,6 +127,11 @@ impl ChatWidget {
     fn emit_raw_output_mode_changed(&self, enabled: bool) {
         self.app_event_tx
             .send(AppEvent::RawOutputModeChanged { enabled });
+    }
+
+    fn emit_work_log_visibility_changed(&self, visible: bool) {
+        self.app_event_tx
+            .send(AppEvent::WorkLogVisibilityChanged { visible });
     }
 
     pub(super) fn dispatch_command(&mut self, cmd: SlashCommand) {
@@ -381,8 +387,9 @@ impl ChatWidget {
                     );
                 }
             }
-            SlashCommand::Ide => {
-                self.handle_ide_command();
+            SlashCommand::Worklog => {
+                let visible = self.toggle_work_log_visibility_and_notify();
+                self.emit_work_log_visibility_changed(visible);
             }
             SlashCommand::DebugConfig => {
                 self.add_debug_config_output();
@@ -581,9 +588,6 @@ impl ChatWidget {
         } = prepared;
         let trimmed = args.trim();
         match cmd {
-            SlashCommand::Ide => {
-                self.handle_ide_command_args(trimmed);
-            }
             SlashCommand::Mcp => match trimmed.to_ascii_lowercase().as_str() {
                 "verbose" => self.add_mcp_output(McpServerStatusDetail::Full),
                 _ => self.add_error_message("Usage: /mcp [verbose]".to_string()),
@@ -612,6 +616,23 @@ impl ChatWidget {
                     self.emit_raw_output_mode_changed(/*enabled*/ false);
                 }
                 _ => self.add_error_message(RAW_USAGE.to_string()),
+            },
+            SlashCommand::Worklog => match trimmed.to_ascii_lowercase().as_str() {
+                "on" => {
+                    self.set_work_log_visible_and_notify(/*visible*/ true);
+                    self.emit_work_log_visibility_changed(/*visible*/ true);
+                }
+                "off" => {
+                    self.set_work_log_visible_and_notify(/*visible*/ false);
+                    self.emit_work_log_visibility_changed(/*visible*/ false);
+                }
+                "status" => {
+                    self.add_info_message(
+                        Self::work_log_visibility_notice(self.work_log_visible()).to_string(),
+                        /*hint*/ None,
+                    );
+                }
+                _ => self.add_error_message(WORKLOG_USAGE.to_string()),
             },
             SlashCommand::Rename if !trimmed.is_empty() => {
                 if !self.ensure_thread_rename_allowed() {
@@ -925,8 +946,7 @@ impl ChatWidget {
             return QueueDrain::Stop;
         }
         match cmd {
-            SlashCommand::Ide
-            | SlashCommand::Status
+            SlashCommand::Status
             | SlashCommand::DebugConfig
             | SlashCommand::Ps
             | SlashCommand::Stop
@@ -938,6 +958,7 @@ impl ChatWidget {
             | SlashCommand::Rollout
             | SlashCommand::Copy
             | SlashCommand::Raw
+            | SlashCommand::Worklog
             | SlashCommand::Vim
             | SlashCommand::Diff
             | SlashCommand::Rename

@@ -248,6 +248,10 @@ impl HistoryCell for ExecCell {
     fn raw_lines(&self) -> Vec<Line<'static>> {
         plain_lines(self.transcript_lines(u16::MAX))
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }
 
 impl ExecCell {

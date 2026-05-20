@@ -152,6 +152,9 @@ use ratatui::style::Stylize;
 use ratatui::text::Line;
 use ratatui::text::Span;
 use ratatui::widgets::Block;
+use ratatui::widgets::BorderType;
+use ratatui::widgets::Borders;
+use ratatui::widgets::Clear;
 use ratatui::widgets::Paragraph;
 use ratatui::widgets::StatefulWidgetRef;
 use ratatui::widgets::WidgetRef;
@@ -211,7 +214,6 @@ use crate::render::Insets;
 use crate::render::RectExt;
 use crate::render::renderable::Renderable;
 use crate::slash_command::SlashCommand;
-use crate::style::user_message_style;
 use firefam_protocol::ThreadId;
 use firefam_protocol::user_input::ByteRange;
 use firefam_protocol::user_input::MAX_USER_INPUT_TEXT_CHARS;
@@ -417,6 +419,7 @@ enum SlashValidation {
 }
 
 const FOOTER_SPACING_HEIGHT: u16 = 0;
+const COMPOSER_TEXTAREA_LEFT_INSET: u16 = LIVE_PREFIX_COLS;
 
 /// Builds the one-line nudge that replaces the ambient footer without adding layout height.
 fn plan_mode_nudge_line() -> Line<'static> {
@@ -751,7 +754,7 @@ impl ChatComposer {
             Layout::vertical([Constraint::Min(3), popup_constraint]).areas(area);
         let mut textarea_rect = composer_rect.inset(Insets::tlbr(
             /*top*/ 1,
-            LIVE_PREFIX_COLS,
+            COMPOSER_TEXTAREA_LEFT_INSET,
             /*bottom*/ 1,
             /*right*/ 1u16.saturating_add(textarea_right_reserve),
         ));
@@ -4327,7 +4330,7 @@ impl ChatComposer {
             .unwrap_or_else(|| footer_height(&footer_props));
         let footer_spacing = Self::footer_spacing(footer_hint_height);
         let footer_total_height = footer_hint_height + footer_spacing;
-        const COLS_WITH_MARGIN: u16 = LIVE_PREFIX_COLS + 1;
+        const COLS_WITH_MARGIN: u16 = COMPOSER_TEXTAREA_LEFT_INSET + 1;
         let inner_width =
             width.saturating_sub(COLS_WITH_MARGIN.saturating_add(textarea_right_reserve));
         let remote_images_height: u16 = self
@@ -4609,11 +4612,14 @@ impl ChatComposer {
                 }
             }
         }
-        let style = user_message_style();
-        Block::default().style(style).render_ref(composer_rect, buf);
+        Clear.render_ref(composer_rect, buf);
+        Block::default()
+            .borders(Borders::TOP | Borders::BOTTOM)
+            .border_type(BorderType::Rounded)
+            .border_style(Style::default().dim())
+            .render_ref(composer_rect, buf);
         if !remote_images_rect.is_empty() {
             Paragraph::new(self.attachments.remote_image_lines())
-                .style(style)
                 .render_ref(remote_images_rect, buf);
         }
         if !textarea_rect.is_empty() {

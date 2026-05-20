@@ -118,6 +118,10 @@ impl HistoryCell for WebSearchCell {
             vec![Line::from(format!("{header} {detail}"))]
         }
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }
 
 pub(crate) fn new_active_web_search_call(

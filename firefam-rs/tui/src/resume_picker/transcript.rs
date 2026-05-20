@@ -11,6 +11,7 @@ use firefam_app_server_protocol::Thread;
 use firefam_app_server_protocol::ThreadItem;
 use firefam_protocol::ThreadId;
 use firefam_protocol::items::UserMessageItem;
+use firefam_protocol::models::MessagePhase;
 use ratatui::style::Stylize as _;
 use ratatui::text::Line;
 
@@ -61,12 +62,14 @@ pub(crate) fn thread_to_transcript_cells(
                     remote_image_urls: item.image_urls(),
                 }));
             }
-            ThreadItem::AgentMessage { text, .. } => {
+            ThreadItem::AgentMessage { text, phase, .. } => {
                 let parsed = parse_assistant_markdown(text);
                 if !parsed.visible_markdown.trim().is_empty() {
-                    cells.push(Arc::new(AgentMarkdownCell::new(
+                    let work_log = matches!(phase, Some(MessagePhase::Commentary));
+                    cells.push(Arc::new(AgentMarkdownCell::new_with_work_log(
                         parsed.visible_markdown,
                         cwd,
+                        work_log,
                     )));
                 }
             }

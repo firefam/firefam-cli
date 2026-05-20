@@ -13,7 +13,6 @@ pub enum SlashCommand {
     // DO NOT ALPHA-SORT! Enum order is presentation order in the popup, so
     // more frequently used commands should be listed first.
     Model,
-    Ide,
     Permissions,
     Keymap,
     Vim,
@@ -40,6 +39,7 @@ pub enum SlashCommand {
     Side,
     Copy,
     Raw,
+    Worklog,
     Diff,
     Mention,
     Status,
@@ -90,6 +90,7 @@ impl SlashCommand {
             SlashCommand::Quit | SlashCommand::Exit => "exit Firefam",
             SlashCommand::Copy => "copy last response as markdown",
             SlashCommand::Raw => "toggle raw scrollback mode for copy-friendly terminal selection",
+            SlashCommand::Worklog => "toggle completed agent work log visibility",
             SlashCommand::Diff => "show git diff (including untracked files)",
             SlashCommand::Mention => "mention a file",
             SlashCommand::Skills => "use skills to improve how Firefam performs specific tasks",
@@ -105,9 +106,6 @@ impl SlashCommand {
             SlashCommand::MemoryDrop => "DO NOT USE",
             SlashCommand::MemoryUpdate => "DO NOT USE",
             SlashCommand::Model => "choose what model and reasoning effort to use",
-            SlashCommand::Ide => {
-                "include current selection, open files, and other context from your IDE"
-            }
             SlashCommand::Personality => "choose a communication style for Firefam",
             SlashCommand::Realtime => "toggle realtime voice mode (experimental)",
             SlashCommand::Settings => "configure realtime microphone/speaker",
@@ -148,10 +146,10 @@ impl SlashCommand {
                 | SlashCommand::Rename
                 | SlashCommand::Plan
                 | SlashCommand::Goal
-                | SlashCommand::Ide
                 | SlashCommand::Keymap
                 | SlashCommand::Mcp
                 | SlashCommand::Raw
+                | SlashCommand::Worklog
                 | SlashCommand::Pets
                 | SlashCommand::Side
                 | SlashCommand::Resume
@@ -165,10 +163,10 @@ impl SlashCommand {
             self,
             SlashCommand::Copy
                 | SlashCommand::Raw
+                | SlashCommand::Worklog
                 | SlashCommand::Diff
                 | SlashCommand::Mention
                 | SlashCommand::Status
-                | SlashCommand::Ide
         )
     }
 
@@ -198,6 +196,7 @@ impl SlashCommand {
             SlashCommand::Diff
             | SlashCommand::Copy
             | SlashCommand::Raw
+            | SlashCommand::Worklog
             | SlashCommand::Rename
             | SlashCommand::Mention
             | SlashCommand::Skills
@@ -214,7 +213,6 @@ impl SlashCommand {
             | SlashCommand::Statusline
             | SlashCommand::AutoReview
             | SlashCommand::Feedback
-            | SlashCommand::Ide
             | SlashCommand::Quit
             | SlashCommand::Exit
             | SlashCommand::Side => true,
@@ -271,12 +269,14 @@ mod tests {
     #[test]
     fn certain_commands_are_available_during_task() {
         assert!(SlashCommand::Goal.available_during_task());
-        assert!(SlashCommand::Ide.available_during_task());
         assert!(SlashCommand::Title.available_during_task());
         assert!(SlashCommand::Statusline.available_during_task());
         assert!(SlashCommand::Raw.available_during_task());
         assert!(SlashCommand::Raw.available_in_side_conversation());
         assert!(SlashCommand::Raw.supports_inline_args());
+        assert!(SlashCommand::Worklog.available_during_task());
+        assert!(SlashCommand::Worklog.available_in_side_conversation());
+        assert!(SlashCommand::Worklog.supports_inline_args());
     }
 
     #[test]

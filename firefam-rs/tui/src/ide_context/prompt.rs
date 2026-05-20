@@ -58,10 +58,6 @@ pub(crate) fn apply_ide_context_to_user_input(
     true
 }
 
-pub(crate) fn has_prompt_context(context: &IdeContext) -> bool {
-    render_prompt_context(context).is_some()
-}
-
 pub(crate) fn extract_prompt_request_with_offset(message: &str) -> (&str, usize) {
     let Some((before_request, request)) = message.rsplit_once(PROMPT_REQUEST_BEGIN) else {
         return (message, 0);

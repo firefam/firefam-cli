@@ -7,7 +7,7 @@ use super::*;
 
 impl ChatWidget {
     pub(super) fn on_hook_started(&mut self, run: firefam_app_server_protocol::HookRunSummary) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.flush_completed_hook_output();
         match self.active_hook_cell.as_mut() {
             Some(cell) => {

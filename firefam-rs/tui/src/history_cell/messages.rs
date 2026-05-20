@@ -81,6 +81,51 @@ fn remote_image_display_line(style: Style, index: usize) -> Line<'static> {
     Line::from(local_image_label_text(index)).style(style)
 }
 
+fn user_message_rounded_content_line(
+    line: Line<'static>,
+    content_width: usize,
+    style: Style,
+) -> Line<'static> {
+    let padding = content_width.saturating_sub(line.width());
+    let mut spans = Vec::with_capacity(line.spans.len() + 4);
+    spans.extend(
+        line.spans
+            .into_iter()
+            .map(|span| span.patch_style(line.style).patch_style(style)),
+    );
+    if padding > 0 {
+        spans.push(Span::styled(" ".repeat(padding), style));
+    }
+    spans.push(Span::styled(" ", style));
+    Line::from(spans)
+}
+
+fn user_message_rounded_cap_line(content_width: usize, style: Style) -> Line<'static> {
+    let body_width = content_width.saturating_add(1);
+    if body_width < 2 {
+        return Line::from(Span::styled(" ".repeat(body_width), style));
+    }
+
+    Line::from(vec![
+        Span::from(" "),
+        Span::styled(" ".repeat(body_width.saturating_sub(2)), style),
+        Span::from(" "),
+    ])
+}
+
+fn user_message_rounded_lines(lines: Vec<Line<'static>>, style: Style) -> Vec<Line<'static>> {
+    let content_width = lines.iter().map(Line::width).max().unwrap_or(0);
+    let mut bubble = Vec::with_capacity(lines.len() + 2);
+    bubble.push(user_message_rounded_cap_line(content_width, style));
+    bubble.extend(
+        lines
+            .into_iter()
+            .map(|line| user_message_rounded_content_line(line, content_width, style)),
+    );
+    bubble.push(user_message_rounded_cap_line(content_width, style));
+    bubble
+}
+
 fn trim_trailing_blank_lines(mut lines: Vec<Line<'static>>) -> Vec<Line<'static>> {
     while lines
         .last()
@@ -95,7 +140,7 @@ impl HistoryCell for UserHistoryCell {
     fn display_lines(&self, width: u16) -> Vec<Line<'static>> {
         let wrap_width = width
             .saturating_sub(
-                LIVE_PREFIX_COLS + 1, /* keep a one-column right margin for wrapping */
+                LIVE_PREFIX_COLS + 1, /* message prefix plus right padding */
             )
             .max(1);
 
@@ -151,7 +196,7 @@ impl HistoryCell for UserHistoryCell {
             return Vec::new();
         }
 
-        let mut lines: Vec<Line<'static>> = vec![Line::from("").style(style)];
+        let mut lines: Vec<Line<'static>> = Vec::new();
 
         if let Some(wrapped_remote_images) = wrapped_remote_images {
             lines.extend(prefix_lines(
@@ -172,8 +217,7 @@ impl HistoryCell for UserHistoryCell {
             ));
         }
 
-        lines.push(Line::from("").style(style));
-        lines
+        user_message_rounded_lines(lines, style)
     }
 
     fn raw_lines(&self) -> Vec<Line<'static>> {
@@ -264,6 +308,10 @@ impl HistoryCell for ReasoningSummaryCell {
             raw_lines_from_source(self.content.trim())
         }
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }
 
 #[derive(Debug)]
@@ -319,6 +367,7 @@ impl HistoryCell for AgentMessageCell {
 pub(crate) struct AgentMarkdownCell {
     markdown_source: String,
     cwd: PathBuf,
+    work_log: bool,
 }
 
 impl AgentMarkdownCell {
@@ -327,10 +376,16 @@ impl AgentMarkdownCell {
     /// `markdown_source` must be the raw source accumulated by the stream controller, not already
     /// wrapped terminal lines. Passing rendered lines here would make future resize reflow preserve
     /// stale wrapping instead of repairing it.
+    #[cfg(test)]
     pub(crate) fn new(markdown_source: String, cwd: &Path) -> Self {
+        Self::new_with_work_log(markdown_source, cwd, /*work_log*/ false)
+    }
+
+    pub(crate) fn new_with_work_log(markdown_source: String, cwd: &Path, work_log: bool) -> Self {
         Self {
             markdown_source,
             cwd: cwd.to_path_buf(),
+            work_log,
         }
     }
 }
@@ -357,6 +412,10 @@ impl HistoryCell for AgentMarkdownCell {
 
     fn raw_lines(&self) -> Vec<Line<'static>> {
         raw_lines_from_source(&self.markdown_source)
+    }
+
+    fn is_work_log(&self) -> bool {
+        self.work_log
     }
 }
 

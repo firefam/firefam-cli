@@ -358,6 +358,10 @@ impl HistoryCell for HookCell {
             .elapsed();
         Some(elapsed.as_millis() as u64 / 600)
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }
 
 impl Renderable for HookCell {

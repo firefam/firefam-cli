@@ -11,7 +11,7 @@ impl ChatWidget {
     }
 
     pub(super) fn on_view_image_tool_call(&mut self, path: AbsolutePathBuf) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.add_to_history(history_cell::new_view_image_tool_call(
             path,
             &self.config.cwd,
@@ -20,7 +20,7 @@ impl ChatWidget {
     }
 
     pub(super) fn on_image_generation_begin(&mut self) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
     }
 
     pub(super) fn on_image_generation_end(
@@ -29,7 +29,7 @@ impl ChatWidget {
         revised_prompt: Option<String>,
         saved_path: Option<AbsolutePathBuf>,
     ) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.add_to_history(history_cell::new_image_generation_call(
             call_id,
             revised_prompt,
@@ -63,7 +63,7 @@ impl ChatWidget {
     }
 
     pub(super) fn on_web_search_begin(&mut self, call_id: String) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.flush_active_cell();
         self.transcript.active_cell = Some(Box::new(history_cell::new_active_web_search_call(
             call_id,
@@ -80,7 +80,7 @@ impl ChatWidget {
         query: String,
         action: firefam_app_server_protocol::WebSearchAction,
     ) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         let mut handled = false;
         if let Some(cell) = self
             .transcript
@@ -103,7 +103,7 @@ impl ChatWidget {
     }
 
     pub(super) fn on_collab_event(&mut self, cell: PlainHistoryCell) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.add_to_history(cell);
         self.request_redraw();
     }
@@ -166,7 +166,7 @@ impl ChatWidget {
         else {
             return;
         };
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         self.flush_active_cell();
         self.transcript.active_cell = Some(Box::new(history_cell::new_active_mcp_tool_call(
             id,
@@ -182,7 +182,7 @@ impl ChatWidget {
     }
 
     pub(crate) fn handle_mcp_tool_call_completed_now(&mut self, item: ThreadItem) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
 
         let ThreadItem::McpToolCall {
             id,

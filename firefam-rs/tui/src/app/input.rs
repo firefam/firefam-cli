@@ -91,6 +91,25 @@ impl App {
         tui.frame_requester().schedule_frame();
     }
 
+    pub(super) fn apply_work_log_visibility(
+        &mut self,
+        tui: &mut tui::Tui,
+        visible: bool,
+        notify: bool,
+    ) {
+        if notify {
+            self.chat_widget.set_work_log_visible_and_notify(visible);
+        } else {
+            self.chat_widget.set_work_log_visible(visible);
+        }
+        if let Err(err) = self.reflow_transcript_now(tui) {
+            tracing::warn!(error = %err, "failed to reflow transcript after work log toggle");
+            self.chat_widget
+                .add_error_message(format!("Failed to redraw transcript: {err}"));
+        }
+        tui.frame_requester().schedule_frame();
+    }
+
     pub(super) async fn handle_key_event(
         &mut self,
         tui: &mut tui::Tui,

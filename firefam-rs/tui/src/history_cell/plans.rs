@@ -212,4 +212,8 @@ impl HistoryCell for PlanUpdateCell {
         }
         lines
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }

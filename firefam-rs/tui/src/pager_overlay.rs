@@ -28,7 +28,6 @@ use crate::keymap::PagerKeymap;
 use crate::render::Insets;
 use crate::render::renderable::InsetRenderable;
 use crate::render::renderable::Renderable;
-use crate::style::user_message_style;
 use crate::tui;
 use crate::tui::TuiEvent;
 use crossterm::event::KeyCode;
@@ -468,9 +467,9 @@ impl TranscriptOverlay {
                     Box::new(CachedRenderable::new(CellRenderable {
                         cell: c.clone(),
                         style: if highlight_cell == Some(i) {
-                            user_message_style().reversed()
+                            Style::default().reversed()
                         } else {
-                            user_message_style()
+                            Style::default()
                         },
                     })) as Box<dyn Renderable>
                 } else {

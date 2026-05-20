@@ -102,3 +102,58 @@ impl HistoryCell for CompositeHistoryCell {
         out
     }
 }
+
+#[derive(Debug)]
+pub(crate) struct WorkLogHistoryCell {
+    inner: Box<dyn HistoryCell>,
+}
+
+impl WorkLogHistoryCell {
+    pub(crate) fn new(inner: impl HistoryCell + 'static) -> Self {
+        Self {
+            inner: Box::new(inner),
+        }
+    }
+}
+
+impl HistoryCell for WorkLogHistoryCell {
+    fn display_lines(&self, width: u16) -> Vec<Line<'static>> {
+        self.inner.display_lines(width)
+    }
+
+    fn raw_lines(&self) -> Vec<Line<'static>> {
+        self.inner.raw_lines()
+    }
+
+    fn display_lines_for_mode(&self, width: u16, mode: HistoryRenderMode) -> Vec<Line<'static>> {
+        self.inner.display_lines_for_mode(width, mode)
+    }
+
+    fn desired_height(&self, width: u16) -> u16 {
+        self.inner.desired_height(width)
+    }
+
+    fn desired_height_for_mode(&self, width: u16, mode: HistoryRenderMode) -> u16 {
+        self.inner.desired_height_for_mode(width, mode)
+    }
+
+    fn transcript_lines(&self, width: u16) -> Vec<Line<'static>> {
+        self.inner.transcript_lines(width)
+    }
+
+    fn desired_transcript_height(&self, width: u16) -> u16 {
+        self.inner.desired_transcript_height(width)
+    }
+
+    fn is_stream_continuation(&self) -> bool {
+        self.inner.is_stream_continuation()
+    }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
+
+    fn transcript_animation_tick(&self) -> Option<u64> {
+        self.inner.transcript_animation_tick()
+    }
+}

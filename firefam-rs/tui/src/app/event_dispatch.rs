@@ -38,6 +38,9 @@ impl App {
             AppEvent::RawOutputModeChanged { enabled } => {
                 self.apply_raw_output_mode(tui, enabled, /*notify*/ false);
             }
+            AppEvent::WorkLogVisibilityChanged { visible } => {
+                self.apply_work_log_visibility(tui, visible, /*notify*/ false);
+            }
             AppEvent::ClearUiAndSubmitUserMessage { text } => {
                 self.clear_terminal_ui(tui, /*redraw_header*/ false)?;
                 self.reset_app_ui_state_after_clear();
@@ -218,6 +221,7 @@ impl App {
                 cwd,
                 scrollback_reflow,
                 deferred_history_cell,
+                work_log,
             } => {
                 self.handle_consolidate_agent_message(
                     tui,
@@ -225,6 +229,7 @@ impl App {
                     cwd,
                     scrollback_reflow,
                     deferred_history_cell,
+                    work_log,
                 )?;
             }
             AppEvent::ConsolidateProposedPlan(source) => {

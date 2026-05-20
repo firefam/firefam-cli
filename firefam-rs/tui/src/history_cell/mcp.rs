@@ -14,6 +14,10 @@ impl HistoryCell for CompletedMcpToolCallWithImageOutput {
     fn raw_lines(&self) -> Vec<Line<'static>> {
         vec![Line::from("tool result (image output)")]
     }
+
+    fn is_work_log(&self) -> bool {
+        true
+    }
 }
 fn mcp_auth_status_label(status: McpAuthStatus) -> &'static str {
     match status {
@@ -243,6 +247,10 @@ impl HistoryCell for McpToolCallCell {
             return None;
         }
         Some((self.start_time.elapsed().as_millis() / 50) as u64)
+    }
+
+    fn is_work_log(&self) -> bool {
+        true
     }
 }
 

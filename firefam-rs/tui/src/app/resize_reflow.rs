@@ -76,14 +76,13 @@ impl App {
         cell: &dyn HistoryCell,
         width: u16,
     ) -> Vec<Line<'static>> {
-        let mut display =
-            cell.display_lines_for_mode(width, self.chat_widget.history_render_mode());
+        if !self.chat_widget.work_log_visible() && cell.is_work_log() {
+            return Vec::new();
+        }
+
+        let display = cell.display_lines_for_mode(width, self.chat_widget.history_render_mode());
         if !display.is_empty() && !cell.is_stream_continuation() {
-            if self.has_emitted_history_lines {
-                display.insert(0, Line::from(""));
-            } else {
-                self.has_emitted_history_lines = true;
-            }
+            self.has_emitted_history_lines = true;
         }
         display
     }
@@ -462,6 +461,9 @@ impl App {
         while start > 0 {
             start -= 1;
             let cell = self.transcript_cells[start].clone();
+            if !self.chat_widget.work_log_visible() && cell.is_work_log() {
+                continue;
+            }
             let lines = cell.display_lines_for_mode(width, self.chat_widget.history_render_mode());
             rendered_rows += lines.len();
             cell_displays.push_front(ReflowCellDisplay {
@@ -481,21 +483,19 @@ impl App {
         {
             start -= 1;
             let cell = self.transcript_cells[start].clone();
+            if !self.chat_widget.work_log_visible() && cell.is_work_log() {
+                continue;
+            }
             cell_displays.push_front(ReflowCellDisplay {
                 lines: cell.display_lines_for_mode(width, self.chat_widget.history_render_mode()),
                 is_stream_continuation: cell.is_stream_continuation(),
             });
         }
 
-        let mut has_emitted_history_lines = false;
         let mut reflowed_lines = Vec::new();
         for display in cell_displays {
             if !display.lines.is_empty() && !display.is_stream_continuation {
-                if has_emitted_history_lines {
-                    reflowed_lines.push(Line::from(""));
-                } else {
-                    has_emitted_history_lines = true;
-                }
+                self.has_emitted_history_lines = true;
             }
             reflowed_lines.extend(display.lines);
         }

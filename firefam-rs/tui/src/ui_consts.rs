@@ -4,7 +4,7 @@
 /// live cells and aligned widgets.
 ///
 /// Semantics:
-/// - Chat composer reserves this many columns for the left border + padding.
+/// - Chat composer reserves this many columns for the prompt + padding inside the border.
 /// - Status indicator lines begin with this many spaces for alignment.
 /// - User history lines account for this many columns (e.g., "▌ ") when wrapping.
 pub(crate) const LIVE_PREFIX_COLS: u16 = 2;

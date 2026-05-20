@@ -263,6 +263,9 @@ impl App {
                 .chat_widget
                 .history_wrap_width(tui.terminal.last_known_screen_size.width);
             for cell in &self.transcript_cells {
+                if !self.chat_widget.work_log_visible() && cell.is_work_log() {
+                    continue;
+                }
                 tui.insert_history_lines_with_wrap_policy(
                     cell.display_lines_for_mode(width, self.chat_widget.history_render_mode()),
                     self.history_line_wrap_policy(),

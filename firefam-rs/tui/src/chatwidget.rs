@@ -516,6 +516,7 @@ pub(crate) struct ChatWidget {
     transcript: TranscriptState,
     config: Config,
     raw_output_mode: bool,
+    work_log_visible: bool,
     /// Runtime value resolved by core. `config.service_tier` remains the explicit user choice.
     effective_service_tier: Option<String>,
     /// The unmasked collaboration mode settings (always Default mode).
@@ -1511,6 +1512,10 @@ impl ChatWidget {
         self.raw_output_mode
     }
 
+    pub(crate) fn work_log_visible(&self) -> bool {
+        self.work_log_visible
+    }
+
     pub(crate) fn history_render_mode(&self) -> HistoryRenderMode {
         if self.raw_output_mode {
             HistoryRenderMode::Raw
@@ -1552,6 +1557,33 @@ impl ChatWidget {
         let enabled = !self.raw_output_mode;
         self.set_raw_output_mode_and_notify(enabled);
         enabled
+    }
+
+    pub(crate) fn set_work_log_visible(&mut self, visible: bool) {
+        self.work_log_visible = visible;
+        self.bump_active_cell_revision();
+    }
+
+    pub(crate) fn work_log_visibility_notice(visible: bool) -> &'static str {
+        if visible {
+            "Work log visible: agent reasoning and tool activity will be shown."
+        } else {
+            "Work log hidden: agent reasoning and tool activity will stay collapsed."
+        }
+    }
+
+    pub(crate) fn set_work_log_visible_and_notify(&mut self, visible: bool) {
+        self.set_work_log_visible(visible);
+        self.add_info_message(
+            Self::work_log_visibility_notice(visible).to_string(),
+            /*hint*/ None,
+        );
+    }
+
+    pub(crate) fn toggle_work_log_visibility_and_notify(&mut self) -> bool {
+        let visible = !self.work_log_visible;
+        self.set_work_log_visible_and_notify(visible);
+        visible
     }
 
     /// Update resize-sensitive chat widget state after the terminal width changes.

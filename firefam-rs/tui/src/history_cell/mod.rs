@@ -251,6 +251,11 @@ pub(crate) trait HistoryCell: std::fmt::Debug + Send + Sync + Any {
         false
     }
 
+    /// Returns whether this cell is agent work-log output such as reasoning or tool activity.
+    fn is_work_log(&self) -> bool {
+        false
+    }
+
     /// Returns a coarse "animation tick" when transcript output is time-dependent.
     ///
     /// The transcript overlay caches the rendered output of the in-flight active cell, so cells

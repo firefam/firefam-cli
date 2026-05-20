@@ -281,7 +281,7 @@ impl ChatWidget {
     }
 
     pub(crate) fn handle_exec_approval_now(&mut self, ev: ExecApprovalRequestEvent) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         let command = shlex::try_join(ev.command.iter().map(String::as_str))
             .unwrap_or_else(|_| ev.command.join(" "));
         self.notify(Notification::ExecApprovalRequested { command });
@@ -307,7 +307,7 @@ impl ChatWidget {
     }
 
     pub(crate) fn handle_apply_patch_approval_now(&mut self, ev: ApplyPatchApprovalRequestEvent) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
 
         let request = ApprovalRequest::ApplyPatch {
             thread_id: self.thread_id.unwrap_or_default(),
@@ -335,7 +335,7 @@ impl ChatWidget {
         request_id: AppServerRequestId,
         params: McpServerElicitationRequestParams,
     ) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
 
         self.notify(Notification::ElicitationRequested {
             server_name: params.server_name.clone(),
@@ -413,7 +413,7 @@ impl ChatWidget {
     }
 
     pub(crate) fn handle_request_user_input_now(&mut self, ev: ToolRequestUserInputParams) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         let question_count = ev.questions.len();
         let summary = Notification::user_input_request_summary(&ev.questions);
         let title = match (question_count, summary.as_deref()) {
@@ -431,7 +431,7 @@ impl ChatWidget {
     }
 
     pub(crate) fn handle_request_permissions_now(&mut self, ev: RequestPermissionsEvent) {
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         let request = ApprovalRequest::Permissions {
             thread_id: self.thread_id.unwrap_or_default(),
             thread_label: None,

@@ -30,7 +30,7 @@ impl ChatWidget {
             return;
         };
         let (_command, parsed_cmd) = command_execution_command_and_parsed(command, command_actions);
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         if is_unified_exec_source(*source) {
             if *source == ExecCommandSource::UnifiedExecStartup {
                 self.track_unified_exec_process_begin(id, process_id.as_deref(), command);
@@ -85,7 +85,7 @@ impl ChatWidget {
             return;
         }
 
-        self.flush_answer_stream_with_separator();
+        self.flush_work_log_answer_stream_with_separator();
         if stdin.is_empty() {
             // Empty stdin means we are polling for background output.
             // Surface this in the status indicator (single "waiting" surface) instead of

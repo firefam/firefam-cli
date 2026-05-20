@@ -17,6 +17,14 @@ impl ChatWidget {
     }
 
     pub(super) fn flush_answer_stream_with_separator(&mut self) {
+        self.flush_answer_stream_with_work_log(/*work_log*/ false);
+    }
+
+    pub(super) fn flush_work_log_answer_stream_with_separator(&mut self) {
+        self.flush_answer_stream_with_work_log(/*work_log*/ true);
+    }
+
+    fn flush_answer_stream_with_work_log(&mut self, work_log: bool) {
         let had_stream_controller = self.stream_controller.is_some();
         if let Some(mut controller) = self.stream_controller.take() {
             let scrollback_reflow = if controller.has_live_tail() {
@@ -44,6 +52,7 @@ impl ChatWidget {
                     cwd: self.config.cwd.to_path_buf(),
                     scrollback_reflow,
                     deferred_history_cell,
+                    work_log,
                 });
             }
         }
@@ -89,7 +98,11 @@ impl ChatWidget {
         self.status_state.pending_status_indicator_restore = false;
     }
 
-    pub(super) fn finalize_completed_assistant_message(&mut self, message: Option<&str>) {
+    pub(super) fn finalize_completed_assistant_message(
+        &mut self,
+        message: Option<&str>,
+        work_log: bool,
+    ) {
         // If we have a stream_controller, the finalized message payload is redundant because the
         // visible content has already been accumulated through deltas.
         if self.stream_controller.is_none()
@@ -98,7 +111,7 @@ impl ChatWidget {
         {
             self.handle_streaming_delta(message.to_string());
         }
-        self.flush_answer_stream_with_separator();
+        self.flush_answer_stream_with_work_log(work_log);
         self.handle_stream_finished();
         self.request_redraw();
     }
@@ -259,8 +272,10 @@ impl ChatWidget {
             }
         }
         let parsed = parse_assistant_markdown(&message);
+        let work_log = matches!(item.phase, Some(MessagePhase::Commentary));
         self.finalize_completed_assistant_message(
             (!parsed.visible_markdown.is_empty()).then_some(parsed.visible_markdown.as_str()),
+            work_log,
         );
         if matches!(item.phase, Some(MessagePhase::FinalAnswer) | None)
             && !parsed.visible_markdown.is_empty()
