@@ -1,0 +1,4 @@
+interface:
+  display_name: "Firefam Issue Digest"
+  short_description: "Summarize Firefam issues by labels or all areas"
+  default_prompt: "Use $firefam-issue-digest to run the Firefam issue digest for labels tui and exec over the previous 24 hours."

@@ -1,0 +1,47 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-memories-write"
+version.workspace = true
+
+[lib]
+name = "firefam_memories_write"
+path = "src/lib.rs"
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+chrono = { workspace = true }
+firefam-backend-client = { workspace = true }
+firefam-core = { workspace = true }
+firefam-config = { workspace = true }
+firefam-features = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-login = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-rollout = { workspace = true }
+firefam-rollout-trace = { workspace = true }
+firefam-secrets = { workspace = true }
+firefam-state = { workspace = true }
+firefam-terminal-detection = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-output-truncation = { workspace = true }
+firefam-utils-template = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["fs", "rt", "sync", "time"] }
+tracing = { workspace = true, features = ["log"] }
+uuid = { workspace = true, features = ["v4", "v5"] }
+
+[dev-dependencies]
+firefam-models-manager = { workspace = true }
+core_test_support = { workspace = true }
+pretty_assertions = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["fs", "macros"] }
+wiremock = { workspace = true }

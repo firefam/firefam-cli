@@ -11,10 +11,10 @@ ensure_local_sdk_src()
 
 import asyncio
 
-from openai_codex import (
-    AsyncCodex,
+from firefamai_firefam import (
+    AsyncFirefam,
 )
-from openai_codex.types import (
+from firefamai_firefam.types import (
     ThreadTokenUsageUpdatedNotification,
     TurnCompletedNotification,
 )
@@ -31,10 +31,10 @@ def _format_usage(usage: object) -> str:
 
 
 async def main() -> None:
-    print("Codex async mini CLI. Type /exit to quit.")
+    print("Firefam async mini CLI. Type /exit to quit.")
 
-    async with AsyncCodex(config=runtime_config()) as codex:
-        thread = await codex.thread_start(
+    async with AsyncFirefam(config=runtime_config()) as firefam:
+        thread = await firefam.thread_start(
             model="gpt-5.4", config={"model_reasoning_effort": "high"}
         )
         print("Thread:", thread.id)

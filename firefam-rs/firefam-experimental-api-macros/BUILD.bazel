@@ -1,0 +1,7 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "firefam-experimental-api-macros",
+    crate_name = "firefam_experimental_api_macros",
+    proc_macro = True,
+)

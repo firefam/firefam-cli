@@ -1,0 +1,7 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "test-binary-support",
+    crate_name = "firefam_test_binary_support",
+    crate_srcs = ["lib.rs"],
+)

@@ -9,7 +9,7 @@ import {
   sse,
   startResponsesTestProxy,
 } from "./responsesProxy";
-import { createMockClient } from "./testCodex";
+import { createMockClient } from "./testFirefam";
 
 describe("Firefam", () => {
   it("returns thread events", async () => {
@@ -188,7 +188,7 @@ describe("Firefam", () => {
       const text = payload!.json.text;
       expect(text).toBeDefined();
       expect(text?.format).toEqual({
-        name: "codex_output_schema",
+        name: "firefam_output_schema",
         type: "json_schema",
         strict: true,
         schema,

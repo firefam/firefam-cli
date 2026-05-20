@@ -5,7 +5,7 @@ Bazel consumer builds use:
 
 - upstream `denoland/rusty_v8` release archives on Windows MSVC
 - source-built V8 archives on Darwin, GNU Linux, musl Linux, and Windows GNU
-- `openai/codex` release assets for published musl release pairs
+- `firefamai/firefam` release assets for published musl release pairs
 
 Cargo builds still use prebuilt `rusty_v8` archives by default. Only Bazel
 overrides `RUSTY_V8_ARCHIVE`/`RUSTY_V8_SRC_BINDING_PATH` in `MODULE.bazel` to
@@ -27,7 +27,7 @@ Current pinned versions:
 
 Use this as the maintainer flow for a version bump:
 
-1. Bump the `v8` crate version and refresh `codex-rs/Cargo.lock`.
+1. Bump the `v8` crate version and refresh `firefam-rs/Cargo.lock`.
 2. Update the Bazel versioned inputs in `MODULE.bazel`, then refresh the
    matching checksum manifest and generated checksums as described below.
 3. Publish a release-candidate PR and validate that `v8-canary` passes.
@@ -101,10 +101,10 @@ it cannot truthfully reproduce upstream's `*-pc-windows-msvc` archives until we
 add a real MSVC-targeting C++ toolchain to the Bazel graph.
 
 Cargo musl builds use `RUSTY_V8_ARCHIVE` plus a downloaded
-`RUSTY_V8_SRC_BINDING_PATH` to point at those `openai/codex` release assets
+`RUSTY_V8_SRC_BINDING_PATH` to point at those `firefamai/firefam` release assets
 directly. We do not use `RUSTY_V8_MIRROR` for musl because the upstream `v8`
 crate hardcodes a `v<crate_version>` tag layout, while our musl artifacts are
 published under `rusty-v8-v<crate_version>`.
 
 Do not mix artifacts across crate versions. The archive and binding must match
-the exact resolved `v8` crate version in `codex-rs/Cargo.lock`.
+the exact resolved `v8` crate version in `firefam-rs/Cargo.lock`.

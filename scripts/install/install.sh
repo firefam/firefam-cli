@@ -4,10 +4,10 @@ set -eu
 
 RELEASE="latest"
 
-BIN_DIR="${CODEX_INSTALL_DIR:-$HOME/.local/bin}"
+BIN_DIR="${FIREFAM_INSTALL_DIR:-$HOME/.local/bin}"
 BIN_PATH="$BIN_DIR/firefam"
-CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
-STANDALONE_ROOT="$CODEX_HOME_DIR/packages/standalone"
+FIREFAM_HOME_DIR="${FIREFAM_HOME:-$HOME/.firefam}"
+STANDALONE_ROOT="$FIREFAM_HOME_DIR/packages/standalone"
 RELEASES_DIR="$STANDALONE_ROOT/releases"
 CURRENT_LINK="$STANDALONE_ROOT/current"
 LOCK_FILE="$STANDALONE_ROOT/install.lock"
@@ -406,7 +406,7 @@ cleanup_stale_install_artifacts() {
   find "$STANDALONE_ROOT" -mindepth 1 -maxdepth 1 -name '.current.*' -exec rm -f {} +
 
   if [ -d "$BIN_DIR" ]; then
-    find "$BIN_DIR" -mindepth 1 -maxdepth 1 -name '.codex.*' -exec rm -f {} +
+    find "$BIN_DIR" -mindepth 1 -maxdepth 1 -name '.firefam.*' -exec rm -f {} +
   fi
 }
 
@@ -431,13 +431,13 @@ replace_path_with_symlink() {
 }
 
 version_from_binary() {
-  codex_path="$1"
+  firefam_path="$1"
 
-  if [ ! -x "$codex_path" ]; then
+  if [ ! -x "$firefam_path" ]; then
     return 1
   fi
 
-  "$codex_path" --version 2>/dev/null | sed -n 's/.* \([0-9][0-9A-Za-z.+-]*\)$/\1/p' | head -n 1
+  "$firefam_path" --version 2>/dev/null | sed -n 's/.* \([0-9][0-9A-Za-z.+-]*\)$/\1/p' | head -n 1
 }
 
 current_installed_version() {
@@ -450,11 +450,11 @@ current_installed_version() {
   return 0
 }
 
-resolve_existing_codex() {
+resolve_existing_firefam() {
   command -v firefam 2>/dev/null || true
 }
 
-classify_existing_codex() {
+classify_existing_firefam() {
   existing_path="$1"
 
   if [ -z "$existing_path" ] || [ "$existing_path" = "$BIN_PATH" ]; then
@@ -536,7 +536,7 @@ print_launch_instructions() {
   esac
 }
 
-maybe_launch_codex_now() {
+maybe_launch_firefam_now() {
   if prompt_yes_no "Start Firefam now?"; then
     step "Launching Firefam"
     "$BIN_PATH"
@@ -544,8 +544,8 @@ maybe_launch_codex_now() {
 }
 
 detect_conflicting_install() {
-  existing_path="$(resolve_existing_codex)"
-  manager="$(classify_existing_codex "$existing_path" || true)"
+  existing_path="$(resolve_existing_firefam)"
+  manager="$(classify_existing_firefam "$existing_path" || true)"
 
   if [ -z "$manager" ]; then
     return
@@ -591,14 +591,14 @@ install_release() {
 
   mkdir -p "$RELEASES_DIR"
   rm -rf "$stage_release"
-  mkdir -p "$stage_release/codex-resources"
+  mkdir -p "$stage_release/firefam-resources"
   cp "$vendor_root/firefam/firefam" "$stage_release/firefam"
-  cp "$vendor_root/path/rg" "$stage_release/codex-resources/rg"
+  cp "$vendor_root/path/rg" "$stage_release/firefam-resources/rg"
   chmod 0755 "$stage_release/firefam"
-  chmod 0755 "$stage_release/codex-resources/rg"
-  if [ -f "$vendor_root/codex-resources/bwrap" ]; then
-    cp "$vendor_root/codex-resources/bwrap" "$stage_release/codex-resources/bwrap"
-    chmod 0755 "$stage_release/codex-resources/bwrap"
+  chmod 0755 "$stage_release/firefam-resources/rg"
+  if [ -f "$vendor_root/firefam-resources/bwrap" ]; then
+    cp "$vendor_root/firefam-resources/bwrap" "$stage_release/firefam-resources/bwrap"
+    chmod 0755 "$stage_release/firefam-resources/bwrap"
   fi
 
   if [ -e "$release_dir" ] || [ -L "$release_dir" ]; then
@@ -614,10 +614,10 @@ release_dir_is_complete() {
 
   [ -d "$release_dir" ] &&
     [ -x "$release_dir/firefam" ] &&
-    [ -x "$release_dir/codex-resources/rg" ] &&
+    [ -x "$release_dir/firefam-resources/rg" ] &&
     [ "$(basename "$release_dir")" = "$expected_version-$expected_target" ] &&
     case "$expected_target" in
-      *linux*) [ -x "$release_dir/codex-resources/bwrap" ] ;;
+      *linux*) [ -x "$release_dir/firefam-resources/bwrap" ] ;;
       *) true ;;
     esac
 }
@@ -773,4 +773,4 @@ case "$path_action" in
 esac
 
 printf 'Firefam CLI %s installed successfully.\n' "$resolved_version"
-maybe_launch_codex_now
+maybe_launch_firefam_now

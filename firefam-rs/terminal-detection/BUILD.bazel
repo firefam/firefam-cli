@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "terminal-detection",
+    crate_name = "firefam_terminal_detection",
+)

@@ -40,13 +40,13 @@ function createEarlyExitChild(exitCode = 2): FakeChildProcess {
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe("CodexExec", () => {
+describe("FirefamExec", () => {
   it("rejects when exit happens before stdout closes", async () => {
-    const { CodexExec } = await import("../src/exec");
+    const { FirefamExec } = await import("../src/exec");
     const child = createEarlyExitChild();
     spawnMock.mockReturnValue(child as unknown as child_process.ChildProcess);
 
-    const exec = new CodexExec("firefam");
+    const exec = new FirefamExec("firefam");
     const runPromise = (async () => {
       for await (const _ of exec.run({ input: "hi" })) {
         // no-op
@@ -69,7 +69,7 @@ describe("CodexExec", () => {
   });
 
   it("places resume args before image args", async () => {
-    const { CodexExec } = await import("../src/exec");
+    const { FirefamExec } = await import("../src/exec");
     spawnMock.mockClear();
     const child = new FakeChildProcess();
     spawnMock.mockReturnValue(child as unknown as child_process.ChildProcess);
@@ -80,7 +80,7 @@ describe("CodexExec", () => {
       child.emit("exit", 0, null);
     });
 
-    const exec = new CodexExec("firefam");
+    const exec = new FirefamExec("firefam");
     for await (const _ of exec.run({ input: "hi", images: ["img.png"], threadId: "thread-id" })) {
       // no-op
     }
@@ -95,7 +95,7 @@ describe("CodexExec", () => {
   });
 
   it("allows overriding the env passed to the Firefam CLI", async () => {
-    const { CodexExec } = await import("../src/exec");
+    const { FirefamExec } = await import("../src/exec");
     spawnMock.mockClear();
     const child = new FakeChildProcess();
     spawnMock.mockReturnValue(child as unknown as child_process.ChildProcess);
@@ -106,11 +106,11 @@ describe("CodexExec", () => {
       child.emit("exit", 0, null);
     });
 
-    process.env.CODEX_ENV_SHOULD_NOT_LEAK = "leak";
+    process.env.FIREFAM_ENV_SHOULD_NOT_LEAK = "leak";
 
     try {
-      const exec = new CodexExec("firefam", {
-        CODEX_HOME: "/tmp/firefam-home",
+      const exec = new FirefamExec("firefam", {
+        FIREFAM_HOME: "/tmp/firefam-home",
         CUSTOM_ENV: "custom",
       });
 
@@ -131,15 +131,15 @@ describe("CodexExec", () => {
         throw new Error("Spawn args missing");
       }
 
-      expect(spawnEnv.CODEX_HOME).toBe("/tmp/firefam-home");
+      expect(spawnEnv.FIREFAM_HOME).toBe("/tmp/firefam-home");
       expect(spawnEnv.CUSTOM_ENV).toBe("custom");
-      expect(spawnEnv.CODEX_ENV_SHOULD_NOT_LEAK).toBeUndefined();
+      expect(spawnEnv.FIREFAM_ENV_SHOULD_NOT_LEAK).toBeUndefined();
       expect(spawnEnv.CODEX_API_KEY).toBe("test");
-      expect(spawnEnv.CODEX_INTERNAL_ORIGINATOR_OVERRIDE).toBeDefined();
+      expect(spawnEnv.FIREFAM_INTERNAL_ORIGINATOR_OVERRIDE).toBeDefined();
       expect(commandArgs).toContain("--config");
-      expect(commandArgs).toContain(`openai_base_url=${JSON.stringify("https://example.test")}`);
+      expect(commandArgs).toContain(`firefamai_base_url=${JSON.stringify("https://example.test")}`);
     } finally {
-      delete process.env.CODEX_ENV_SHOULD_NOT_LEAK;
+      delete process.env.FIREFAM_ENV_SHOULD_NOT_LEAK;
     }
   });
 });

@@ -1,0 +1,26 @@
+[package]
+name = "firefam-arg0"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "firefam_arg0"
+path = "src/lib.rs"
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+firefam-apply-patch = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-linux-sandbox = { workspace = true }
+firefam-sandboxing = { workspace = true }
+firefam-shell-escalation = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-home-dir = { workspace = true }
+dotenvy = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = ["rt-multi-thread"] }

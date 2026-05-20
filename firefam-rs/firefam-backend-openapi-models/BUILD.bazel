@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "firefam-backend-openapi-models",
+    crate_name = "firefam_backend_openapi_models",
+)

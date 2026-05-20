@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "json-to-toml",
+    crate_name = "firefam_utils_json_to_toml",
+)

@@ -165,15 +165,15 @@ function Resolve-Version {
 
 function Get-VersionFromBinary {
     param(
-        [string]$CodexPath
+        [string]$FirefamPath
     )
 
-    if (-not (Test-Path -LiteralPath $CodexPath -PathType Leaf)) {
+    if (-not (Test-Path -LiteralPath $FirefamPath -PathType Leaf)) {
         return $null
     }
 
     try {
-        $versionOutput = & $CodexPath --version 2>$null
+        $versionOutput = & $FirefamPath --version 2>$null
     } catch {
         return $null
     }
@@ -190,7 +190,7 @@ function Get-CurrentInstalledVersion {
         [string]$StandaloneCurrentDir
     )
 
-    $standaloneVersion = Get-VersionFromBinary -CodexPath (Join-Path $StandaloneCurrentDir "firefam.exe")
+    $standaloneVersion = Get-VersionFromBinary -FirefamPath (Join-Path $StandaloneCurrentDir "firefam.exe")
     if (-not [string]::IsNullOrWhiteSpace($standaloneVersion)) {
         return $standaloneVersion
     }
@@ -216,7 +216,7 @@ function Test-OldStandaloneBinLayout {
         return $false
     }
 
-    $requiredFiles = @("codex.exe", "rg.exe")
+    $requiredFiles = @("firefam.exe", "rg.exe")
     foreach ($fileName in $requiredFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $VisibleBinDir $fileName) -PathType Leaf)) {
             return $false
@@ -224,11 +224,11 @@ function Test-OldStandaloneBinLayout {
     }
 
     $knownFiles = @(
-        "codex.exe",
+        "firefam.exe",
         "rg.exe",
-        "codex-command-runner.exe",
-        "codex-windows-sandbox.exe",
-        "codex-windows-sandbox-setup.exe"
+        "firefam-command-runner.exe",
+        "firefam-windows-sandbox.exe",
+        "firefam-windows-sandbox-setup.exe"
     )
     foreach ($child in Get-ChildItem -LiteralPath $VisibleBinDir -Force) {
         if ($child.PSIsContainer) {
@@ -265,7 +265,7 @@ function Move-OldStandaloneBinIfApproved {
 }
 
 function Add-JunctionSupportType {
-    if (([System.Management.Automation.PSTypeName]'CodexInstaller.Junction').Type) {
+    if (([System.Management.Automation.PSTypeName]'FirefamInstaller.Junction').Type) {
         return
     }
 
@@ -277,7 +277,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Win32.SafeHandles;
 
-namespace CodexInstaller
+namespace FirefamInstaller
 {
     public static class Junction
     {
@@ -384,7 +384,7 @@ function Set-JunctionTarget {
     )
 
     Add-JunctionSupportType
-    [CodexInstaller.Junction]::SetTarget($LinkPath, $TargetPath)
+    [FirefamInstaller.Junction]::SetTarget($LinkPath, $TargetPath)
 }
 
 function Test-IsJunction {
@@ -462,9 +462,9 @@ function Test-ReleaseIsComplete {
 
     $expectedFiles = @(
         "firefam.exe",
-        "codex-resources\codex-command-runner.exe",
-        "codex-resources\codex-windows-sandbox-setup.exe",
-        "codex-resources\rg.exe"
+        "firefam-resources\firefam-command-runner.exe",
+        "firefam-resources\firefam-windows-sandbox-setup.exe",
+        "firefam-resources\rg.exe"
     )
     foreach ($name in $expectedFiles) {
         if (-not (Test-Path -LiteralPath (Join-Path $ReleaseDir $name) -PathType Leaf)) {
@@ -475,7 +475,7 @@ function Test-ReleaseIsComplete {
     return (Split-Path -Leaf $ReleaseDir) -eq "$ExpectedVersion-$ExpectedTarget"
 }
 
-function Get-ExistingCodexCommand {
+function Get-ExistingFirefamCommand {
     $existing = Get-Command firefam -ErrorAction SilentlyContinue
     if ($null -eq $existing) {
         return $null
@@ -484,7 +484,7 @@ function Get-ExistingCodexCommand {
     return $existing.Source
 }
 
-function Get-ExistingCodexManager {
+function Get-ExistingFirefamManager {
     param(
         [string]$ExistingPath,
         [string]$VisibleBinDir
@@ -514,8 +514,8 @@ function Get-ConflictingInstall {
         [string]$VisibleBinDir
     )
 
-    $existingPath = Get-ExistingCodexCommand
-    $manager = Get-ExistingCodexManager -ExistingPath $existingPath -VisibleBinDir $VisibleBinDir
+    $existingPath = Get-ExistingFirefamCommand
+    $manager = Get-ExistingFirefamManager -ExistingPath $existingPath -VisibleBinDir $VisibleBinDir
     if ($null -eq $manager) {
         return $null
     }
@@ -559,15 +559,15 @@ function Maybe-HandleConflictingInstall {
     }
 }
 
-function Test-VisibleCodexCommand {
+function Test-VisibleFirefamCommand {
     param(
         [string]$VisibleBinDir
     )
 
-    $codexCommand = Join-Path $VisibleBinDir "firefam.exe"
-    & $codexCommand --version *> $null
+    $firefamCommand = Join-Path $VisibleBinDir "firefam.exe"
+    & $firefamCommand --version *> $null
     if ($LASTEXITCODE -ne 0) {
-        throw "Installed Firefam command failed verification: $codexCommand --version"
+        throw "Installed Firefam command failed verification: $firefamCommand --version"
     }
 }
 
@@ -602,21 +602,21 @@ switch ($architecture) {
     }
 }
 
-$codexHome = if ([string]::IsNullOrWhiteSpace($env:CODEX_HOME)) {
-    Join-Path $env:USERPROFILE ".codex"
+$firefamHome = if ([string]::IsNullOrWhiteSpace($env:FIREFAM_HOME)) {
+    Join-Path $env:USERPROFILE ".firefam"
 } else {
-    $env:CODEX_HOME
+    $env:FIREFAM_HOME
 }
-$standaloneRoot = Join-Path $codexHome "packages\standalone"
+$standaloneRoot = Join-Path $firefamHome "packages\standalone"
 $releasesDir = Join-Path $standaloneRoot "releases"
 $currentDir = Join-Path $standaloneRoot "current"
 $lockPath = Join-Path $standaloneRoot "install.lock"
 
 $defaultVisibleBinDir = Join-Path $env:LOCALAPPDATA "Programs\Emranio\Firefam\bin"
-if ([string]::IsNullOrWhiteSpace($env:CODEX_INSTALL_DIR)) {
+if ([string]::IsNullOrWhiteSpace($env:FIREFAM_INSTALL_DIR)) {
     $visibleBinDir = $defaultVisibleBinDir
 } else {
-    $visibleBinDir = $env:CODEX_INSTALL_DIR
+    $visibleBinDir = $env:FIREFAM_INSTALL_DIR
 }
 
 $currentVersion = Get-CurrentInstalledVersion -StandaloneCurrentDir $currentDir
@@ -668,13 +668,13 @@ try {
             tar -xzf $archivePath -C $extractDir
 
             $vendorRoot = Join-Path $extractDir "package/vendor/$target"
-            $resourcesDir = Join-Path $stagingDir "codex-resources"
+            $resourcesDir = Join-Path $stagingDir "firefam-resources"
             New-Item -ItemType Directory -Force -Path $resourcesDir | Out-Null
             $copyMap = @{
                 "firefam/firefam.exe" = "firefam.exe"
-                "firefam/codex-command-runner.exe" = "codex-resources\codex-command-runner.exe"
-                "firefam/codex-windows-sandbox-setup.exe" = "codex-resources\codex-windows-sandbox-setup.exe"
-                "path/rg.exe" = "codex-resources\rg.exe"
+                "firefam/firefam-command-runner.exe" = "firefam-resources\firefam-command-runner.exe"
+                "firefam/firefam-windows-sandbox-setup.exe" = "firefam-resources\firefam-windows-sandbox-setup.exe"
+                "path/rg.exe" = "firefam-resources\rg.exe"
             }
 
             foreach ($relativeSource in $copyMap.Keys) {
@@ -695,7 +695,7 @@ try {
         $oldStandaloneBackup = Move-OldStandaloneBinIfApproved -VisibleBinDir $visibleBinDir -DefaultVisibleBinDir $defaultVisibleBinDir
         try {
             Ensure-Junction -LinkPath $visibleBinDir -TargetPath $currentDir -InstallerOwnedTargetPrefix $standaloneRoot
-            Test-VisibleCodexCommand -VisibleBinDir $visibleBinDir
+            Test-VisibleFirefamCommand -VisibleBinDir $visibleBinDir
         } catch {
             if ($null -ne $oldStandaloneBackup -and (Test-Path -LiteralPath $oldStandaloneBackup)) {
                 if (Test-Path -LiteralPath $visibleBinDir) {
@@ -743,8 +743,8 @@ Write-Step "Current PowerShell session: firefam"
 Write-Step "Future PowerShell windows: open a new PowerShell window and run: firefam"
 Write-Host "Firefam CLI $resolvedVersion installed successfully."
 
-$codexCommand = Join-Path $visibleBinDir "firefam.exe"
+$firefamCommand = Join-Path $visibleBinDir "firefam.exe"
 if (Prompt-YesNo "Start Firefam now?") {
     Write-Step "Launching Firefam"
-    & $codexCommand
+    & $firefamCommand
 }

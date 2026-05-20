@@ -26,9 +26,9 @@ export type {
 export { Thread } from "./thread";
 export type { RunResult, RunStreamedResult, Input, UserInput } from "./thread";
 
-export { Firefam } from "./codex";
+export { Firefam } from "./firefam";
 
-export type { CodexOptions } from "./codexOptions";
+export type { FirefamOptions } from "./firefamOptions";
 
 export type {
   ThreadOptions,

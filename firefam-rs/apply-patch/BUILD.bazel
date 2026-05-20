@@ -1,0 +1,11 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+exports_files(["apply_patch_tool_instructions.md"])
+
+firefam_rust_crate(
+    name = "apply-patch",
+    crate_name = "firefam_apply_patch",
+    compile_data = [
+        "apply_patch_tool_instructions.md",
+    ],
+)

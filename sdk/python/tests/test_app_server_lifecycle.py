@@ -5,7 +5,7 @@ import asyncio
 from app_server_harness import AppServerHarness
 from app_server_helpers import request_kind
 
-from openai_codex import AsyncCodex, Firefam
+from firefamai_firefam import AsyncFirefam, Firefam
 
 
 def _thread_message_summary(read_response) -> list[tuple[str, str]]:
@@ -29,8 +29,8 @@ def _thread_message_summary(read_response) -> list[tuple[str, str]]:
 def test_thread_set_name_and_read(tmp_path) -> None:
     """Thread naming should round-trip through app-server JSON-RPC."""
     with AppServerHarness(tmp_path) as harness:
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
             thread.set_name("sdk integration thread")
             named = thread.read(include_turns=True)
 
@@ -43,23 +43,23 @@ def test_sync_and_async_initialization_round_trip_metadata(tmp_path) -> None:
     """Public clients should initialize and start threads through app-server."""
 
     async def async_scenario(harness: AppServerHarness) -> dict[str, object]:
-        async with AsyncCodex(config=harness.app_server_config()) as codex:
-            thread = await codex.thread_start()
-            server = codex.metadata.serverInfo
+        async with AsyncFirefam(config=harness.app_server_config()) as firefam:
+            thread = await firefam.thread_start()
+            server = firefam.metadata.serverInfo
             return {
                 "thread_id": thread.id,
-                "user_agent": codex.metadata.userAgent,
+                "user_agent": firefam.metadata.userAgent,
                 "server_name": None if server is None else server.name,
                 "server_version": None if server is None else server.version,
             }
 
     with AppServerHarness(tmp_path) as harness:
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
-            server = codex.metadata.serverInfo
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
+            server = firefam.metadata.serverInfo
             sync_summary = {
                 "thread_id": thread.id,
-                "user_agent": codex.metadata.userAgent,
+                "user_agent": firefam.metadata.userAgent,
                 "server_name": None if server is None else server.name,
                 "server_version": None if server is None else server.version,
             }
@@ -103,14 +103,14 @@ def test_thread_list_filters_archived_threads(tmp_path) -> None:
             response_id="list-archived",
         )
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            active_thread = codex.thread_start()
-            archived_thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            active_thread = firefam.thread_start()
+            archived_thread = firefam.thread_start()
             active_thread.run("keep this listed")
             archived_thread.run("archive this")
-            codex.thread_archive(archived_thread.id)
-            active_list = codex.thread_list(archived=False)
-            archived_list = codex.thread_list(archived=True)
+            firefam.thread_archive(archived_thread.id)
+            active_list = firefam.thread_list(archived=False)
+            archived_list = firefam.thread_list(archived=True)
 
     expected_ids = {active_thread.id, archived_thread.id}
     assert {
@@ -130,8 +130,8 @@ def test_read_include_turns_returns_persisted_history(tmp_path) -> None:
         harness.responses.enqueue_assistant_message("first answer", response_id="read-1")
         harness.responses.enqueue_assistant_message("second answer", response_id="read-2")
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
             thread.run("first question")
             thread.run("second question")
             read = thread.read(include_turns=True)
@@ -155,15 +155,15 @@ def test_async_lifecycle_methods_round_trip(tmp_path) -> None:
                 response_id="async-lifecycle",
             )
 
-            async with AsyncCodex(config=harness.app_server_config()) as codex:
-                thread = await codex.thread_start()
+            async with AsyncFirefam(config=harness.app_server_config()) as firefam:
+                thread = await firefam.thread_start()
                 turn_result = await thread.run("materialize async thread")
                 await thread.set_name("async lifecycle")
                 named = await thread.read()
-                resumed = await codex.thread_resume(thread.id)
-                forked = await codex.thread_fork(thread.id)
-                archive_response = await codex.thread_archive(thread.id)
-                unarchived = await codex.thread_unarchive(thread.id)
+                resumed = await firefam.thread_resume(thread.id)
+                forked = await firefam.thread_fork(thread.id)
+                archive_response = await firefam.thread_archive(thread.id)
+                unarchived = await firefam.thread_unarchive(thread.id)
 
         assert {
             "turn_final_response": turn_result.final_response,
@@ -189,10 +189,10 @@ def test_thread_fork_returns_distinct_thread(tmp_path) -> None:
     with AppServerHarness(tmp_path) as harness:
         harness.responses.enqueue_assistant_message("materialized", response_id="fork-seed")
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
             seeded = thread.run("materialize this thread before fork")
-            forked = codex.thread_fork(thread.id)
+            forked = firefam.thread_fork(thread.id)
 
     assert {
         "seeded_response": seeded.final_response,
@@ -208,11 +208,11 @@ def test_archive_unarchive_round_trip_uses_materialized_rollout(tmp_path) -> Non
     with AppServerHarness(tmp_path) as harness:
         harness.responses.enqueue_assistant_message("materialized", response_id="archive-seed")
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
             seeded = thread.run("materialize this thread before archive")
-            archived = codex.thread_archive(thread.id)
-            unarchived = codex.thread_unarchive(thread.id)
+            archived = firefam.thread_archive(thread.id)
+            unarchived = firefam.thread_unarchive(thread.id)
             read = unarchived.read()
 
     assert {
@@ -231,8 +231,8 @@ def test_archive_unarchive_round_trip_uses_materialized_rollout(tmp_path) -> Non
 def test_models_rpc(tmp_path) -> None:
     """Model listing should go through the pinned app-server method."""
     with AppServerHarness(tmp_path) as harness:
-        with Firefam(config=harness.app_server_config()) as codex:
-            models = codex.models(include_hidden=True)
+        with Firefam(config=harness.app_server_config()) as firefam:
+            models = firefam.models(include_hidden=True)
 
     assert {
         "models_payload_has_data": isinstance(
@@ -251,8 +251,8 @@ def test_compact_rpc_hits_mock_responses(tmp_path) -> None:
             response_id="compact-summary",
         )
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            thread = codex.thread_start()
+        with Firefam(config=harness.app_server_config()) as firefam:
+            thread = firefam.thread_start()
             turn_result = thread.run("create history")
             compact_response = thread.compact()
             requests = harness.responses.wait_for_requests(2)

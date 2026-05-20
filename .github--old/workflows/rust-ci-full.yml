@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: codex-rs
+        working-directory: firefam-rs
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-24.04
     defaults:
       run:
-        working-directory: codex-rs
+        working-directory: firefam-rs
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -104,8 +104,8 @@ jobs:
           - name: Windows
             runner: windows-x64
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -120,7 +120,7 @@ jobs:
         run: |
           sudo DEBIAN_FRONTEND=noninteractive apt-get update
           sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends pkg-config libcap-dev
-      - name: Run argument comment lint on codex-rs via Bazel
+      - name: Run argument comment lint on firefam-rs via Bazel
         if: ${{ runner.os != 'Windows' }}
         env:
           BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
@@ -135,7 +135,7 @@ jobs:
             --build_metadata=COMMIT_SHA=${GITHUB_SHA} \
             -- \
             ${bazel_targets}
-      - name: Run argument comment lint on codex-rs via Bazel
+      - name: Run argument comment lint on firefam-rs via Bazel
         if: ${{ runner.os == 'Windows' }}
         env:
           BUILDBUDDY_API_KEY: ${{ secrets.BUILDBUDDY_API_KEY }}
@@ -154,7 +154,7 @@ jobs:
     timeout-minutes: 30
     defaults:
       run:
-        working-directory: codex-rs
+        working-directory: firefam-rs
     env:
       # Speed up repeated builds across CI runs by caching compiled objects, except on
       # arm64 macOS runners cross-targeting x86_64 where ring/cc-rs can produce
@@ -179,38 +179,38 @@ jobs:
             target: x86_64-unknown-linux-musl
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-linux-x64
+              group: firefam-runners
+              labels: firefam-linux-x64
           - runner: ubuntu-24.04
             target: x86_64-unknown-linux-gnu
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-linux-x64
+              group: firefam-runners
+              labels: firefam-linux-x64
           - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-linux-arm64
+              group: firefam-runners
+              labels: firefam-linux-arm64
           - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-gnu
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-linux-arm64
+              group: firefam-runners
+              labels: firefam-linux-arm64
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             profile: dev
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
 
           # Also run representative release builds on Mac and Linux because
           # there could be release-only build errors we want to catch.
@@ -223,26 +223,26 @@ jobs:
             target: x86_64-unknown-linux-musl
             profile: release
             runs_on:
-              group: codex-runners
-              labels: codex-linux-x64
+              group: firefam-runners
+              labels: firefam-linux-x64
           - runner: ubuntu-24.04-arm
             target: aarch64-unknown-linux-musl
             profile: release
             runs_on:
-              group: codex-runners
-              labels: codex-linux-arm64
+              group: firefam-runners
+              labels: firefam-linux-arm64
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             profile: release
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             profile: release
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -279,7 +279,7 @@ jobs:
 
       - name: Compute lockfile hash
         id: lockhash
-        working-directory: codex-rs
+        working-directory: firefam-rs
         shell: bash
         run: |
           set -euo pipefail
@@ -466,7 +466,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: cargo-timings-rust-ci-clippy-${{ matrix.target }}-${{ matrix.profile }}
-          path: codex-rs/target/**/cargo-timings/cargo-timing.html
+          path: firefam-rs/target/**/cargo-timings/cargo-timing.html
           if-no-files-found: warn
 
       # Save caches explicitly; make non-fatal so cache packaging
@@ -537,8 +537,8 @@ jobs:
     uses: ./.github/workflows/rust-ci-full-nextest-platform.yml
     with:
       runner: ubuntu-24.04
-      runner_group: codex-runners
-      runner_labels: codex-linux-x64
+      runner_group: firefam-runners
+      runner_labels: firefam-linux-x64
       target: x86_64-unknown-linux-gnu
       profile: ci-test
       artifact_id: linux-x64-remote
@@ -551,8 +551,8 @@ jobs:
     uses: ./.github/workflows/rust-ci-full-nextest-platform.yml
     with:
       runner: ubuntu-24.04-arm
-      runner_group: codex-runners
-      runner_labels: codex-linux-arm64
+      runner_group: firefam-runners
+      runner_labels: firefam-linux-arm64
       target: aarch64-unknown-linux-gnu
       profile: ci-test
       artifact_id: linux-arm64
@@ -564,8 +564,8 @@ jobs:
     uses: ./.github/workflows/rust-ci-full-nextest-platform.yml
     with:
       runner: windows-x64
-      runner_group: codex-runners
-      runner_labels: codex-windows-x64
+      runner_group: firefam-runners
+      runner_labels: firefam-windows-x64
       target: x86_64-pc-windows-msvc
       profile: ci-test
       artifact_id: windows-x64
@@ -577,11 +577,11 @@ jobs:
     uses: ./.github/workflows/rust-ci-full-nextest-platform.yml
     with:
       runner: windows-arm64
-      runner_group: codex-runners
-      runner_labels: codex-windows-arm64
+      runner_group: firefam-runners
+      runner_labels: firefam-windows-arm64
       archive_runner: windows-x64
-      archive_runner_group: codex-runners
-      archive_runner_labels: codex-windows-x64
+      archive_runner_group: firefam-runners
+      archive_runner_labels: firefam-windows-x64
       target: aarch64-pc-windows-msvc
       profile: ci-test
       artifact_id: windows-arm64

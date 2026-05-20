@@ -9,12 +9,12 @@ from _bootstrap import ensure_local_sdk_src, runtime_config, server_label
 
 ensure_local_sdk_src()
 
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
-with Firefam(config=runtime_config()) as codex:
-    print("Server:", server_label(codex.metadata))
+with Firefam(config=runtime_config()) as firefam:
+    print("Server:", server_label(firefam.metadata))
 
-    thread = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
+    thread = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
     turn = thread.turn("Say hello in one sentence.")
     result = turn.run()
 

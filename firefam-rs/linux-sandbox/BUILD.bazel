@@ -1,0 +1,9 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "linux-sandbox",
+    crate_name = "firefam_linux_sandbox",
+    extra_binaries = [
+        "//firefam-rs/bwrap:bwrap",
+    ],
+)

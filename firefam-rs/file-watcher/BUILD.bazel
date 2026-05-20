@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "file-watcher",
+    crate_name = "firefam_file_watcher",
+)

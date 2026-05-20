@@ -2,11 +2,11 @@
 
 Each example folder contains runnable versions:
 
-- `sync.py` (public sync surface: `Codex`)
-- `async.py` (public async surface: `AsyncCodex`)
+- `sync.py` (public sync surface: `Firefam`)
+- `async.py` (public async surface: `AsyncFirefam`)
 
-All examples intentionally use only public SDK exports from `openai_codex`
-and `openai_codex.types`.
+All examples intentionally use only public SDK exports from `firefamai_firefam`
+and `firefamai_firefam.types`.
 
 Examples use plain strings for text-only turns and typed input objects for
 multimodal or structured input lists.
@@ -25,11 +25,11 @@ source .venv/bin/activate
 
 When running examples from this repo checkout, the SDK source uses the local
 tree and does not bundle a runtime binary. The helper in `examples/_bootstrap.py`
-uses the installed `openai-codex-cli-bin` runtime package.
+uses the installed `firefamai-firefam-cli-bin` runtime package.
 
-If the pinned `openai-codex-cli-bin` runtime is not already installed, the bootstrap
+If the pinned `firefamai-firefam-cli-bin` runtime is not already installed, the bootstrap
 will download the matching GitHub release artifact, stage a temporary local
-`openai-codex-cli-bin` package, install it into your active interpreter, and clean up
+`firefamai-firefam-cli-bin` package, install it into your active interpreter, and clean up
 the temporary files afterward.
 
 The pinned runtime version comes from the SDK package dependency.
@@ -45,7 +45,7 @@ python examples/<example-folder>/async.py
 
 The examples bootstrap local imports from `sdk/python/src` automatically, so no
 SDK wheel install is required. You only need the Python dependencies for your
-active interpreter and an installed `openai-codex-cli-bin` runtime package (either
+active interpreter and an installed `firefamai-firefam-cli-bin` runtime package (either
 already present or automatically provisioned by the bootstrap).
 
 ## Recommended first run

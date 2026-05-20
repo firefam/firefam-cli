@@ -18,9 +18,9 @@ Then run `firefam` to get started.
 
 ### Authentication
 
-Run `firefam` and choose the sign-in flow. OpenAI API key and ChatGPT authentication support remain intact.
+Run `firefam` and choose the sign-in flow. FirefamAI API key and ChatGPT authentication support remain intact.
 
-You can also use an API key with the existing OpenAI authentication setup.
+You can also use an API key with the existing FirefamAI authentication setup.
 
 ## Docs
 

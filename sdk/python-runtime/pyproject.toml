@@ -3,13 +3,13 @@ requires = ["hatchling>=1.24.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "openai-codex-cli-bin"
-version = "0.0.0-dev"
+name = "firefamai-firefam-cli-bin"
+version = "0.131.0a4"
 description = "Pinned Firefam CLI runtime for the Python SDK"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-authors = [{ name = "OpenAI" }]
+authors = [{ name = "FirefamAI" }]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
@@ -35,8 +35,8 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/codex_cli_bin"]
-include = ["src/codex_cli_bin/bin/**"]
+packages = ["src/firefam_cli_bin"]
+include = ["src/firefam_cli_bin/bin/**"]
 
 [tool.hatch.build.targets.wheel.hooks.custom]
 

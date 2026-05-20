@@ -28,13 +28,13 @@ if [[ $windows_cross_compile -eq 1 ]]; then
     ./.github/scripts/run-bazel-query-ci.sh \
       --windows-cross-compile \
       --output=label \
-      -- 'kind("rust_test rule", attr(tags, "manual", //codex-rs/... except //codex-rs/v8-poc/...))'
+      -- 'kind("rust_test rule", attr(tags, "manual", //firefam-rs/... except //firefam-rs/v8-poc/...))'
   )"
 else
   manual_rust_test_targets="$(
     ./.github/scripts/run-bazel-query-ci.sh \
       --output=label \
-      -- 'kind("rust_test rule", attr(tags, "manual", //codex-rs/... except //codex-rs/v8-poc/...))'
+      -- 'kind("rust_test rule", attr(tags, "manual", //firefam-rs/... except //firefam-rs/v8-poc/...))'
   )"
 fi
 if [[ "${RUNNER_OS:-}" != "Windows" ]]; then
@@ -52,8 +52,8 @@ elif [[ $windows_cross_compile -eq 1 ]]; then
 fi
 
 printf '%s\n' \
-  "//codex-rs/..." \
-  "-//codex-rs/v8-poc:all"
+  "//firefam-rs/..." \
+  "-//firefam-rs/v8-poc:all"
 
 # `--config=clippy` on the `workspace_root_test` wrappers does not lint the
 # underlying `rust_test` binaries. Add the internal manual `*-unit-tests-bin`

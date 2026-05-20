@@ -25,7 +25,7 @@ self-descriptive at the callsite.
 Given:
 
 ```rust
-fn create_openai_url(base_url: Option<String>, retry_count: usize) -> String {
+fn create_firefamai_url(base_url: Option<String>, retry_count: usize) -> String {
     let _ = (base_url, retry_count);
     String::new()
 }
@@ -34,19 +34,19 @@ fn create_openai_url(base_url: Option<String>, retry_count: usize) -> String {
 This is accepted:
 
 ```rust
-create_openai_url(/*base_url*/ None, /*retry_count*/ 3);
+create_firefamai_url(/*base_url*/ None, /*retry_count*/ 3);
 ```
 
 This is warned on by `argument_comment_mismatch`:
 
 ```rust
-create_openai_url(/*api_base*/ None, 3);
+create_firefamai_url(/*api_base*/ None, 3);
 ```
 
 This is only warned on when `uncommented_anonymous_literal_argument` is enabled:
 
 ```rust
-create_openai_url(None, 3);
+create_firefamai_url(None, 3);
 ```
 
 ## Development
@@ -85,7 +85,7 @@ rustup toolchain install nightly-2025-09-18 \
 
 The checked-in DotSlash file lives at `tools/argument-comment-lint/argument-comment-lint`.
 `run-prebuilt-linter.py` resolves that file via `dotslash` and is the path used by
-targeted package runs such as `just argument-comment-lint -p codex-core`.
+targeted package runs such as `just argument-comment-lint -p firefam-core`.
 Repo-wide runs now go through a native Bazel aspect that invokes a custom
 `rustc_driver` and reuses Bazel-managed Rust dependency metadata instead of
 spawning `cargo dylint` once per crate. The source-build path remains available
@@ -122,21 +122,21 @@ required for the current Windows Dylint driver path.
 If you are changing the lint crate itself, use the source-build wrapper:
 
 ```bash
-./tools/argument-comment-lint/run.py -p codex-core
+./tools/argument-comment-lint/run.py -p firefam-core
 ```
 
-Run the lint against `codex-rs` from the repo root:
+Run the lint against `firefam-rs` from the repo root:
 
 ```bash
 just argument-comment-lint
 bazel build --config=argument-comment-lint -- \
   $(./tools/argument-comment-lint/list-bazel-targets.sh)
-./tools/argument-comment-lint/run-prebuilt-linter.py -p codex-core
-just argument-comment-lint -p codex-core
+./tools/argument-comment-lint/run-prebuilt-linter.py -p firefam-core
+just argument-comment-lint -p firefam-core
 ```
 
 If no package selection is provided, `just argument-comment-lint` now defaults
-to the Bazel aspect path over `//codex-rs/...`. The Python wrappers remain the
+to the Bazel aspect path over `//firefam-rs/...`. The Python wrappers remain the
 package-scoped escape hatch and still default the underlying Cargo invocation
 to `--all-targets` unless you explicitly narrow the target set, so targeted
 wrapper runs cover test-only call sites by default. The Bazel entrypoints use
@@ -148,7 +148,7 @@ Repo runs also promote `argument_comment_mismatch` and
 `uncommented_anonymous_literal_argument` to errors by default:
 
 ```bash
-./tools/argument-comment-lint/run-prebuilt-linter.py -p codex-core
+./tools/argument-comment-lint/run-prebuilt-linter.py -p firefam-core
 ```
 
 The wrapper does that by setting `DYLINT_RUSTFLAGS`, and it leaves an explicit
@@ -160,11 +160,11 @@ hoc run:
 ```bash
 DYLINT_RUSTFLAGS="-A argument-comment-mismatch -A uncommented-anonymous-literal-argument" \
 CARGO_INCREMENTAL=1 \
-  ./tools/argument-comment-lint/run.py -p codex-core
+  ./tools/argument-comment-lint/run.py -p firefam-core
 ```
 
 To override an explicitly narrow target selection, or to be explicit in scripts:
 
 ```bash
-./tools/argument-comment-lint/run-prebuilt-linter.py -p codex-core -- --all-targets
+./tools/argument-comment-lint/run-prebuilt-linter.py -p firefam-core -- --all-targets
 ```

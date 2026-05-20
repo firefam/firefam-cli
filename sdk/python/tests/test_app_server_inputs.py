@@ -3,14 +3,14 @@ from __future__ import annotations
 from app_server_harness import AppServerHarness
 from app_server_helpers import TINY_PNG_BYTES
 
-from openai_codex import Firefam, ImageInput, LocalImageInput, SkillInput, TextInput
+from firefamai_firefam import Firefam, ImageInput, LocalImageInput, SkillInput, TextInput
 
 
 def test_remote_image_input_reaches_responses_api(
     tmp_path,
 ) -> None:
     """Remote image inputs should survive the SDK and app-server boundary."""
-    remote_image_url = "https://example.com/codex.png"
+    remote_image_url = "https://example.com/firefam.png"
 
     with AppServerHarness(tmp_path) as harness:
         harness.responses.enqueue_assistant_message(
@@ -18,8 +18,8 @@ def test_remote_image_input_reaches_responses_api(
             response_id="remote-image",
         )
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            result = codex.thread_start().run(
+        with Firefam(config=harness.app_server_config()) as firefam:
+            result = firefam.thread_start().run(
                 [
                     TextInput("Describe the remote image."),
                     ImageInput(remote_image_url),
@@ -51,8 +51,8 @@ def test_local_image_input_reaches_responses_api(
             response_id="local-image",
         )
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            result = codex.thread_start().run(
+        with Firefam(config=harness.app_server_config()) as firefam:
+            result = firefam.thread_start().run(
                 [
                     TextInput("Describe the local image."),
                     LocalImageInput(str(local_image)),
@@ -87,8 +87,8 @@ def test_skill_input_injects_loaded_skill_body(tmp_path) -> None:
             response_id="skill-input",
         )
 
-        with Firefam(config=harness.app_server_config()) as codex:
-            result = codex.thread_start().run(
+        with Firefam(config=harness.app_server_config()) as firefam:
+            result = firefam.thread_start().run(
                 [
                     TextInput("Use the selected skill."),
                     SkillInput("demo", str(skill_path)),

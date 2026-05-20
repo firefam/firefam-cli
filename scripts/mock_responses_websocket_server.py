@@ -109,7 +109,7 @@ async def _handle_connection(
         sys.stdout.write(f"[conn] {_utc_iso()} send {_dump_json(ev)}\n")
         await websocket.send(_dump_json(ev))
 
-    # Request 1: provoke a function call (mirrors `codex-rs/core/tests/suite/agent_websocket.rs`).
+    # Request 1: provoke a function call (mirrors `firefam-rs/core/tests/suite/agent_websocket.rs`).
     await recv_json("req1")
     await send_event(_event_response_created("resp-1"))
     await send_event(_event_function_call(CALL_ID, FUNCTION_NAME, FUNCTION_ARGS_JSON))
@@ -172,7 +172,7 @@ start firefam with `firefam --profile localapi_ws`
 def main() -> int:
     parser = argparse.ArgumentParser(
         description=(
-            "Mock a minimal Responses API WebSocket endpoint for the `test_codex` flow.\n"
+            "Mock a minimal Responses API WebSocket endpoint for the `test_firefam` flow.\n"
             f"Binds to {HOST}:{DEFAULT_PORT} by default and logs incoming JSON requests to stdout."
         ),
         formatter_class=argparse.RawTextHelpFormatter,

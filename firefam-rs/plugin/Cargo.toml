@@ -1,0 +1,19 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-plugin"
+version.workspace = true
+
+[lib]
+doctest = false
+name = "firefam_plugin"
+path = "src/lib.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+firefam-config = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-plugins = { workspace = true }
+thiserror = { workspace = true }

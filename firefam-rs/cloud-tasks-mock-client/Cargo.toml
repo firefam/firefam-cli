@@ -1,0 +1,21 @@
+
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-cloud-tasks-mock-client"
+version.workspace = true
+
+[lib]
+name = "firefam_cloud_tasks_mock_client"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+chrono = { workspace = true }
+firefam-cloud-tasks-client = { workspace = true }
+diffy = { workspace = true }

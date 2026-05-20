@@ -5,10 +5,10 @@ import { stdin as input, stdout as output } from "node:process";
 
 import { Firefam } from "firefam-sdk";
 import type { ThreadEvent, ThreadItem } from "firefam-sdk";
-import { codexPathOverride } from "./helpers.ts";
+import { firefamPathOverride } from "./helpers.ts";
 
-const codex = new Firefam({ codexPathOverride: codexPathOverride() });
-const thread = codex.startThread();
+const firefam = new Firefam({ firefamPathOverride: firefamPathOverride() });
+const thread = firefam.startThread();
 const rl = createInterface({ input, output });
 
 const handleItemCompleted = (item: ThreadItem): void => {

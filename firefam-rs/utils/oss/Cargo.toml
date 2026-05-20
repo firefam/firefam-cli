@@ -1,0 +1,17 @@
+[package]
+name = "firefam-utils-oss"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+firefam-core = { workspace = true }
+firefam-lmstudio = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-ollama = { workspace = true }
+
+[lib]
+doctest = false

@@ -1,0 +1,18 @@
+[package]
+name = "firefam-file-system"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+
+[lib]
+test = false
+doctest = false

@@ -1,0 +1,36 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-model-provider"
+version.workspace = true
+
+[lib]
+doctest = false
+name = "firefam_model_provider"
+path = "src/lib.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+firefam-api = { workspace = true }
+firefam-agent-identity = { workspace = true }
+firefam-aws-auth = { workspace = true }
+firefam-client = { workspace = true }
+firefam-feedback = { workspace = true }
+firefam-login = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-response-debug-context = { workspace = true }
+http = { workspace = true }
+tokio = { workspace = true, features = ["sync", "time"] }
+tracing = { workspace = true, features = ["log"] }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt"] }
+wiremock = { workspace = true }

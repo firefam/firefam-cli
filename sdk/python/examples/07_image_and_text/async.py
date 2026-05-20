@@ -11,14 +11,14 @@ ensure_local_sdk_src()
 
 import asyncio
 
-from openai_codex import AsyncCodex, ImageInput, TextInput
+from firefamai_firefam import AsyncFirefam, ImageInput, TextInput
 
 REMOTE_IMAGE_URL = "https://raw.githubusercontent.com/github/explore/main/topics/python/python.png"
 
 
 async def main() -> None:
-    async with AsyncCodex(config=runtime_config()) as codex:
-        thread = await codex.thread_start(
+    async with AsyncFirefam(config=runtime_config()) as firefam:
+        thread = await firefam.thread_start(
             model="gpt-5.4", config={"model_reasoning_effort": "high"}
         )
         turn = await thread.turn(

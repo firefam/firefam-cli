@@ -1,0 +1,32 @@
+[package]
+name = "firefam-chatgpt"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+firefam-app-server-protocol = { workspace = true }
+firefam-connectors = { workspace = true }
+firefam-core = { workspace = true }
+firefam-core-plugins = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-login = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-utils-cli = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tokio = { workspace = true, features = ["full"] }
+
+[dev-dependencies]
+firefam-utils-cargo-bin = { workspace = true }
+pretty_assertions = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+
+[lib]
+doctest = false

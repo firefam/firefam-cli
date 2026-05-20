@@ -1,8 +1,8 @@
 import path from "node:path";
 
-export function codexPathOverride() {
+export function firefamPathOverride() {
   return (
-    process.env.CODEX_EXECUTABLE ??
-    path.join(process.cwd(), "..", "..", "codex-rs", "target", "debug", "firefam")
+    process.env.FIREFAM_EXECUTABLE ??
+    path.join(process.cwd(), "..", "..", "firefam-rs", "target", "debug", "firefam")
   );
 }

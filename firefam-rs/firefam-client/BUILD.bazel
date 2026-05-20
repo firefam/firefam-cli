@@ -1,0 +1,7 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "firefam-client",
+    crate_name = "firefam_client",
+    compile_data = glob(["tests/fixtures/**"]),
+)

@@ -1,0 +1,160 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-core"
+version.workspace = true
+
+[lib]
+name = "firefam_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "firefam-write-config-schema"
+path = "src/bin/config_schema.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+arc-swap = { workspace = true }
+async-channel = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+bm25 = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+clap = { workspace = true, features = ["derive"] }
+firefam-analytics = { workspace = true }
+firefam-api = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-apply-patch = { workspace = true }
+firefam-async-utils = { workspace = true }
+firefam-code-mode = { workspace = true }
+firefam-connectors = { workspace = true }
+firefam-config = { workspace = true }
+firefam-core-plugins = { workspace = true }
+firefam-core-skills = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-extension-api = { workspace = true }
+firefam-features = { workspace = true }
+firefam-feedback = { workspace = true }
+firefam-login = { workspace = true }
+firefam-memories-read = { workspace = true }
+firefam-mcp = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-shell-command = { workspace = true }
+firefam-execpolicy = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-hooks = { workspace = true }
+firefam-network-proxy = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-response-debug-context = { workspace = true }
+firefam-rollout = { workspace = true }
+firefam-rollout-trace = { workspace = true }
+firefam-rmcp-client = { workspace = true }
+firefam-sandboxing = { workspace = true }
+firefam-state = { workspace = true }
+firefam-terminal-detection = { workspace = true }
+firefam-thread-store = { workspace = true }
+firefam-tools = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-cache = { workspace = true }
+firefam-utils-image = { workspace = true }
+firefam-utils-home-dir = { workspace = true }
+firefam-utils-output-truncation = { workspace = true }
+firefam-utils-path = { workspace = true }
+firefam-utils-plugins = { workspace = true }
+firefam-utils-pty = { workspace = true }
+firefam-utils-string = { workspace = true }
+firefam-utils-stream-parser = { workspace = true }
+firefam-utils-template = { workspace = true }
+firefam-windows-sandbox = { package = "firefam-windows-sandbox", path = "../windows-sandbox-rs" }
+csv = { workspace = true }
+dirs = { workspace = true }
+dunce = { workspace = true }
+eventsource-stream = { workspace = true }
+futures = { workspace = true }
+http = { workspace = true }
+iana-time-zone = { workspace = true }
+image = { workspace = true, features = ["jpeg", "png", "webp"] }
+indexmap = { workspace = true }
+libc = { workspace = true }
+once_cell = { workspace = true }
+rand = { workspace = true }
+regex-lite = { workspace = true }
+reqwest = { workspace = true, features = ["json", "stream"] }
+rmcp = { workspace = true, default-features = false, features = [
+    "base64",
+    "macros",
+    "schemars",
+    "server",
+] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+sha1 = { workspace = true }
+shlex = { workspace = true }
+similar = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = [
+    "io-std",
+    "macros",
+    "process",
+    "rt-multi-thread",
+    "signal",
+] }
+tokio-util = { workspace = true, features = ["rt"] }
+tokio-tungstenite = { workspace = true }
+toml = { workspace = true }
+toml_edit = { workspace = true }
+tracing = { workspace = true, features = ["log"] }
+url = { workspace = true }
+uuid = { workspace = true, features = ["serde", "v4", "v5"] }
+which = { workspace = true }
+whoami = { workspace = true }
+
+# Build OpenSSL from source for musl builds.
+[target.x86_64-unknown-linux-musl.dependencies]
+openssl-sys = { workspace = true, features = ["vendored"] }
+
+# Build OpenSSL from source for musl builds.
+[target.aarch64-unknown-linux-musl.dependencies]
+openssl-sys = { workspace = true, features = ["vendored"] }
+
+[target.'cfg(unix)'.dependencies]
+firefam-shell-escalation = { workspace = true }
+
+[dev-dependencies]
+assert_cmd = { workspace = true }
+assert_matches = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-test-binary-support = { workspace = true }
+firefam-utils-cargo-bin = { workspace = true }
+core_test_support = { workspace = true }
+ctor = { workspace = true }
+insta = { workspace = true }
+maplit = { workspace = true }
+opentelemetry = { workspace = true }
+predicates = { workspace = true }
+pretty_assertions = { workspace = true }
+test-case = "3.3.1"
+opentelemetry_sdk = { workspace = true, features = [
+    "experimental_metrics_custom_reader",
+    "metrics",
+] }
+serial_test = { workspace = true }
+tempfile = { workspace = true }
+test-log = { workspace = true }
+tracing-opentelemetry = { workspace = true }
+tracing-subscriber = { workspace = true }
+tracing-test = { workspace = true, features = ["no-env-filter"] }
+walkdir = { workspace = true }
+wiremock = { workspace = true }
+zstd = { workspace = true }
+
+[package.metadata.cargo-shear]
+ignored = ["openssl-sys"]

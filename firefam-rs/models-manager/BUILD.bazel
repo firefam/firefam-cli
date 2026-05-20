@@ -1,0 +1,10 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "models-manager",
+    crate_name = "firefam_models_manager",
+    compile_data = [
+        "models.json",
+        "prompt.md",
+    ],
+)

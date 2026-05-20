@@ -9,15 +9,15 @@ from _bootstrap import ensure_local_sdk_src, runtime_config
 
 ensure_local_sdk_src()
 
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
-with Firefam(config=runtime_config()) as codex:
+with Firefam(config=runtime_config()) as firefam:
     # Create an initial thread and turn so we have a real thread to resume.
-    original = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
+    original = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
     first = original.turn("Tell me one fact about Saturn.").run()
     print("Created thread:", original.id)
 
     # Resume the existing thread by ID.
-    resumed = codex.thread_resume(original.id)
+    resumed = firefam.thread_resume(original.id)
     second = resumed.turn("Continue with one more fact.").run()
     print(second.final_response)

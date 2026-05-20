@@ -17,9 +17,9 @@ Choose `run()` for most apps. Choose `stream()` for progress UIs, custom timeout
 ## Sync vs async clients
 
 - `Firefam` is the sync public API.
-- `AsyncCodex` is an async replica of the same public API shape.
-- Prefer `async with AsyncCodex()` for async code. It is the standard path for
-  explicit startup/shutdown, and `AsyncCodex` initializes lazily on context
+- `AsyncFirefam` is an async replica of the same public API shape.
+- Prefer `async with AsyncFirefam()` for async code. It is the standard path for
+  explicit startup/shutdown, and `AsyncFirefam` initializes lazily on context
   entry or first awaited API use.
 
 If your app is not already async, stay with `Firefam`.
@@ -66,7 +66,7 @@ This avoids duplicate ways to do the same operation and keeps behavior explicit.
 Common causes:
 
 - published runtime package (`firefam-cli-bin`) is not installed
-- local `codex_bin` override points to a missing file
+- local `firefam_bin` override points to a missing file
 - app-server version older than the SDK schema
 
 ## Why does a turn "hang"?

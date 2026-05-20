@@ -1,0 +1,167 @@
+[package]
+name = "firefam-tui"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+autobins = false
+
+[[bin]]
+name = "firefam-tui"
+path = "src/main.rs"
+
+[[bin]]
+name = "md-events"
+path = "src/bin/md-events.rs"
+
+[lib]
+name = "firefam_tui"
+path = "src/lib.rs"
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+clap = { workspace = true, features = ["derive"] }
+firefam-ansi-escape = { workspace = true }
+firefam-app-server-client = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-arg0 = { workspace = true }
+firefam-install-context = { workspace = true }
+firefam-chatgpt = { workspace = true }
+firefam-cloud-requirements = { workspace = true }
+firefam-config = { workspace = true }
+firefam-connectors = { workspace = true }
+firefam-core-plugins = { workspace = true }
+firefam-core-skills = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-features = { workspace = true }
+firefam-feedback = { workspace = true }
+firefam-file-search = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-login = { workspace = true }
+firefam-message-history = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-realtime-webrtc = { workspace = true }
+firefam-rollout = { workspace = true }
+firefam-sandboxing = { workspace = true }
+firefam-shell-command = { workspace = true }
+firefam-state = { workspace = true }
+firefam-terminal-detection = { workspace = true }
+firefam-utils-approval-presets = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-cli = { workspace = true }
+firefam-utils-elapsed = { workspace = true }
+firefam-utils-fuzzy-match = { workspace = true }
+firefam-utils-home-dir = { workspace = true }
+firefam-utils-oss = { workspace = true }
+firefam-utils-path = { workspace = true }
+firefam-utils-plugins = { workspace = true }
+firefam-utils-sandbox-summary = { workspace = true }
+firefam-utils-sleep-inhibitor = { workspace = true }
+firefam-utils-string = { workspace = true }
+color-eyre = { workspace = true }
+crossterm = { workspace = true, features = ["bracketed-paste", "event-stream"] }
+derive_more = { workspace = true, features = ["is_variant"] }
+diffy = { workspace = true }
+dirs = { workspace = true }
+dunce = { workspace = true }
+image = { workspace = true, features = ["jpeg", "png", "gif", "webp"] }
+itertools = { workspace = true }
+lazy_static = { workspace = true }
+pathdiff = { workspace = true }
+pulldown-cmark = { workspace = true }
+rand = { workspace = true }
+ratatui = { workspace = true, features = [
+    "scrolling-regions",
+    "unstable-backend-writer",
+    "unstable-rendered-line-info",
+    "unstable-widget-ref",
+] }
+ratatui-macros = { workspace = true }
+regex-lite = { workspace = true }
+reqwest = { workspace = true, features = ["blocking", "json"] }
+rmcp = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true, features = ["preserve_order"] }
+sha2 = { workspace = true }
+shlex = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }
+supports-color = { workspace = true }
+tempfile = { workspace = true }
+textwrap = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = [
+    "io-std",
+    "macros",
+    "process",
+    "rt-multi-thread",
+    "signal",
+    "test-util",
+    "time",
+] }
+tokio-stream = { workspace = true, features = ["sync"] }
+toml = { workspace = true }
+tracing = { workspace = true, features = ["log"] }
+tracing-appender = { workspace = true }
+tracing-subscriber = { workspace = true, features = ["env-filter"] }
+syntect = "5"
+two-face = { version = "0.5", default-features = false, features = ["syntect-default-onig"] }
+unicode-segmentation = { workspace = true }
+unicode-width = { workspace = true }
+url = { workspace = true }
+urlencoding = { workspace = true }
+webbrowser = { workspace = true }
+uuid = { workspace = true }
+
+firefam-windows-sandbox = { workspace = true }
+tokio-util = { workspace = true, features = ["time"] }
+
+[target.'cfg(not(target_os = "linux"))'.dependencies]
+cpal = "0.15"
+
+[target.'cfg(unix)'.dependencies]
+libc = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+which = { workspace = true }
+windows-sys = { version = "0.52", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Console",
+    "Win32_System_IO",
+    "Win32_System_Pipes",
+    "Win32_System_Threading",
+] }
+winsplit = "0.1"
+
+# Clipboard support via `arboard` is not available on Android/Termux.
+# Only include it for non-Android targets so the crate builds on Android.
+[target.'cfg(not(target_os = "android"))'.dependencies]
+arboard = { workspace = true }
+
+
+[dev-dependencies]
+firefam-cli = { workspace = true }
+firefam-mcp = { workspace = true }
+core_test_support = { workspace = true }
+firefam-utils-cargo-bin = { workspace = true }
+assert_matches = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
+insta = { workspace = true }
+pretty_assertions = { workspace = true }
+rand = { workspace = true }
+serial_test = { workspace = true }
+vt100 = { workspace = true }
+uuid = { workspace = true }
+wiremock = { workspace = true }

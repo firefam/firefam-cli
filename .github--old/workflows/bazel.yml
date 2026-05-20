@@ -82,14 +82,14 @@ jobs:
           bazel_targets=(
             //...
             # Keep standalone V8 library targets out of the ordinary Bazel CI
-            # path. V8 consumers under `//codex-rs/...` still participate
+            # path. V8 consumers under `//firefam-rs/...` still participate
             # transitively through `//...`.
             -//third_party/v8:all
             # V8-backed code-mode tests are covered by Cargo CI. Bazel CI
             # cross-compiles in several legs, and those tests are not stable in
             # that setup yet.
-            -//codex-rs/code-mode:code-mode-unit-tests
-            -//codex-rs/v8-poc:v8-poc-unit-tests
+            -//firefam-rs/code-mode:code-mode-unit-tests
+            -//firefam-rs/v8-poc:v8-poc-unit-tests
           )
 
           bazel_wrapper_args=(
@@ -170,7 +170,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          bazel_test_query='tests(//...) except tests(//third_party/v8:all) except //codex-rs/code-mode:code-mode-unit-tests except //codex-rs/v8-poc:v8-poc-unit-tests except attr(tags, "manual", tests(//...))'
+          bazel_test_query='tests(//...) except tests(//third_party/v8:all) except //firefam-rs/code-mode:code-mode-unit-tests except //firefam-rs/v8-poc:v8-poc-unit-tests except attr(tags, "manual", tests(//...))'
           mapfile -t bazel_targets < <(
             MSYS2_ARG_CONV_EXCL='*' bazel query --output=label "${bazel_test_query}" \
               | LC_ALL=C sort
@@ -271,14 +271,14 @@ jobs:
           bazel_targets=(
             //...
             # Keep standalone V8 library targets out of the ordinary Bazel CI
-            # path. V8 consumers under `//codex-rs/...` still participate
+            # path. V8 consumers under `//firefam-rs/...` still participate
             # transitively through `//...`.
             -//third_party/v8:all
             # Keep this aligned with the main Bazel job. The native Windows
             # job preserves broad post-merge coverage, but code-mode/V8 tests
             # are covered by Cargo CI rather than Bazel for now.
-            -//codex-rs/code-mode:code-mode-unit-tests
-            -//codex-rs/v8-poc:v8-poc-unit-tests
+            -//firefam-rs/code-mode:code-mode-unit-tests
+            -//firefam-rs/v8-poc:v8-poc-unit-tests
           )
 
           bazel_test_args=(
@@ -496,7 +496,7 @@ jobs:
             --build_metadata=COMMIT_SHA=${GITHUB_SHA} \
             --build_metadata=TAG_job=verify-bwrap \
             -- \
-            //codex-rs/bwrap:bwrap
+            //firefam-rs/bwrap:bwrap
 
       - name: Upload Bazel execution logs
         if: always() && !cancelled()

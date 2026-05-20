@@ -1,0 +1,7 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "state",
+    crate_name = "firefam_state",
+    compile_data = glob(["goals_migrations/**", "logs_migrations/**", "migrations/**"]),
+)

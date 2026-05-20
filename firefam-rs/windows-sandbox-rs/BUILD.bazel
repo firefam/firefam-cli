@@ -1,0 +1,10 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "windows-sandbox-rs",
+    crate_name = "firefam_windows_sandbox",
+    build_script_data = [
+        "Cargo.toml",
+        "firefam-windows-sandbox-setup.manifest",
+    ],
+)

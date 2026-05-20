@@ -6,7 +6,7 @@ The generated wire-model layer is sourced from the pinned `firefam-cli-bin`
 runtime package and exposed as Pydantic models with snake_case Python fields
 that serialize back to the app-server’s camelCase wire format.
 The package root exports the ergonomic client API; public app-server value and
-event types live in `openai_codex.types`.
+event types live in `firefamai_firefam.types`.
 
 ## Install
 
@@ -17,13 +17,13 @@ source .venv/bin/activate
 ```
 
 Published SDK builds pin an exact `firefam-cli-bin` runtime dependency
-with the same version as the SDK. Pass `AppServerConfig(codex_bin=...)` only
+with the same version as the SDK. Pass `AppServerConfig(firefam_bin=...)` only
 when you intentionally want to run against a specific local app-server binary.
 
 ## Quickstart
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 with Firefam() as firefam:
     # Call login_api_key(...) first when this app-server session is not
@@ -43,7 +43,7 @@ phase-less assistant message item.
 Use the auth helper that matches your app:
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 with Firefam() as firefam:
     firefam.login_api_key("sk-...")
@@ -92,7 +92,7 @@ target wheel. The SDK package version and runtime package version must match.
 
 ## Compatibility and versioning
 
-- Package: `openai-firefam`
+- Package: `firefamai-firefam`
 - Runtime package: `firefam-cli-bin`
 - Python: `>=3.10`
 - Target protocol: Firefam `app-server` JSON-RPC v2

@@ -1,0 +1,9 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "rmcp-client",
+    crate_name = "firefam_rmcp_client",
+    extra_binaries = [
+        "//firefam-rs/cli:firefam",
+    ],
+)

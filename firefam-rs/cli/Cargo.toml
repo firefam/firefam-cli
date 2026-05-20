@@ -1,0 +1,91 @@
+[package]
+name = "firefam-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+build = "build.rs"
+
+[[bin]]
+name = "firefam"
+path = "src/main.rs"
+
+[lib]
+name = "firefam_cli"
+path = "src/lib.rs"
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+clap_complete = { workspace = true }
+firefam-app-server = { workspace = true }
+firefam-app-server-daemon = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-app-server-test-client = { workspace = true }
+firefam-arg0 = { workspace = true }
+firefam-api = { workspace = true }
+firefam-chatgpt = { workspace = true }
+firefam-cloud-tasks = { path = "../cloud-tasks" }
+firefam-utils-cli = { workspace = true }
+firefam-config = { workspace = true }
+firefam-core = { workspace = true }
+firefam-core-plugins = { workspace = true }
+firefam-exec = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-execpolicy = { workspace = true }
+firefam-features = { workspace = true }
+firefam-install-context = { workspace = true }
+firefam-login = { workspace = true }
+firefam-memories-write = { workspace = true }
+firefam-mcp = { workspace = true }
+firefam-mcp-server = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-responses-api-proxy = { workspace = true }
+firefam-rmcp-client = { workspace = true }
+firefam-rollout-trace = { workspace = true }
+firefam-sandboxing = { workspace = true }
+firefam-state = { workspace = true }
+firefam-stdio-to-uds = { workspace = true }
+firefam-terminal-detection = { workspace = true }
+firefam-tui = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-path = { workspace = true }
+crossterm = { workspace = true }
+http = { workspace = true }
+libc = { workspace = true }
+owo-colors = { workspace = true }
+regex-lite = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+supports-color = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true, features = [
+    "io-std",
+    "macros",
+    "net",
+    "process",
+    "rt-multi-thread",
+    "signal",
+    "time",
+] }
+toml = { workspace = true }
+tracing = { workspace = true }
+tracing-appender = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+[target.'cfg(target_os = "windows")'.dependencies]
+firefam_windows_sandbox = { package = "firefam-windows-sandbox", path = "../windows-sandbox-rs" }
+
+[dev-dependencies]
+assert_cmd = { workspace = true }
+assert_matches = { workspace = true }
+firefam-utils-cargo-bin = { workspace = true }
+predicates = { workspace = true }
+pretty_assertions = { workspace = true }
+sqlx = { workspace = true }

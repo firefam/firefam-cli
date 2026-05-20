@@ -17,8 +17,8 @@ Requires Node.js 18+.
 ```typescript
 import { Firefam } from "firefam-sdk";
 
-const codex = new Firefam();
-const thread = codex.startThread();
+const firefam = new Firefam();
+const thread = firefam.startThread();
 const turn = await thread.run("Diagnose the test failure and propose a fix");
 
 console.log(turn.finalResponse);
@@ -97,11 +97,11 @@ const turn = await thread.run([
 
 ### Resuming an existing thread
 
-Threads are persisted in `~/.codex/sessions`. If you lose the in-memory `Thread` object, reconstruct it with `resumeThread()` and keep going.
+Threads are persisted in `~/.firefam/sessions`. If you lose the in-memory `Thread` object, reconstruct it with `resumeThread()` and keep going.
 
 ```typescript
-const savedThreadId = process.env.CODEX_THREAD_ID!;
-const thread = codex.resumeThread(savedThreadId);
+const savedThreadId = process.env.FIREFAM_THREAD_ID!;
+const thread = firefam.resumeThread(savedThreadId);
 await thread.run("Implement the fix");
 ```
 
@@ -110,7 +110,7 @@ await thread.run("Implement the fix");
 Firefam runs in the current working directory by default. To avoid unrecoverable errors, Firefam requires the working directory to be a Git repository. You can skip the Git repository check by passing the `skipGitRepoCheck` option when creating a thread.
 
 ```typescript
-const thread = codex.startThread({
+const thread = firefam.startThread({
   workingDirectory: "/path/to/project",
   skipGitRepoCheck: true,
 });
@@ -119,10 +119,10 @@ const thread = codex.startThread({
 ### Controlling the Firefam CLI environment
 
 By default, the Firefam CLI inherits the Node.js process environment. Provide the optional `env` parameter when instantiating the
-`Codex` client to fully control which variables the CLI receives—useful for sandboxed hosts like Electron apps.
+`Firefam` client to fully control which variables the CLI receives—useful for sandboxed hosts like Electron apps.
 
 ```typescript
-const codex = new Firefam({
+const firefam = new Firefam({
   env: {
     PATH: "/usr/local/bin",
   },
@@ -130,7 +130,7 @@ const codex = new Firefam({
 ```
 
 The SDK still injects its required variables (such as `CODEX_API_KEY`) on top of the environment you provide. If you set
-`baseUrl`, the SDK passes it as a `--config openai_base_url=...` override.
+`baseUrl`, the SDK passes it as a `--config firefamai_base_url=...` override.
 
 ### Passing `--config` overrides
 
@@ -138,7 +138,7 @@ Use the `config` option to provide additional Firefam CLI configuration override
 into dotted paths, and serializes values as TOML literals before passing them as repeated `--config key=value` flags.
 
 ```typescript
-const codex = new Firefam({
+const firefam = new Firefam({
   config: {
     show_raw_agent_reasoning: true,
     sandbox_workspace_write: { network_access: true },

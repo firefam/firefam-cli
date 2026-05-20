@@ -11,23 +11,23 @@ ensure_local_sdk_src()
 
 import asyncio
 
-from openai_codex import AsyncCodex
+from firefamai_firefam import AsyncFirefam
 
 
 async def main() -> None:
-    async with AsyncCodex(config=runtime_config()) as codex:
+    async with AsyncFirefam(config=runtime_config()) as firefam:
         # Browser login returns a live handle. Open `auth_url` and await `wait()`
         # in a real app; this example cancels immediately so it stays non-blocking.
-        login = await codex.login_chatgpt()
+        login = await firefam.login_chatgpt()
         canceled = await login.cancel()
         completed = await login.wait()
-        account = await codex.account()
+        account = await firefam.account()
 
         print("login.id:", login.login_id)
         print("login.auth_url:", login.auth_url)
         print("login.cancel.status:", canceled.status)
         print("login.completed.success:", completed.success)
-        print("account.requires_openai_auth:", account.requires_openai_auth)
+        print("account.requires_firefamai_auth:", account.requires_firefamai_auth)
 
 
 if __name__ == "__main__":

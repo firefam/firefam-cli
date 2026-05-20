@@ -1,6 +1,6 @@
 # Firefam CLI Runtime for Python SDK
 
-Platform-specific runtime package consumed by the published `openai-firefam`.
+Platform-specific runtime package consumed by the published `firefamai-firefam`.
 
 This package is staged during release so the SDK can pin an exact Firefam CLI
 version without checking platform binaries into the repo.

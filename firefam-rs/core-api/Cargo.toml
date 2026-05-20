@@ -1,0 +1,29 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-core-api"
+version.workspace = true
+
+[lib]
+doctest = false
+name = "firefam_core_api"
+path = "src/lib.rs"
+test = false
+
+[lints]
+workspace = true
+
+[dependencies]
+firefam-app-server-protocol = { workspace = true }
+firefam-arg0 = { workspace = true }
+firefam-analytics = { workspace = true }
+firefam-config = { workspace = true }
+firefam-core = { workspace = true }
+firefam-extension-api = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-features = { workspace = true }
+firefam-login = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }

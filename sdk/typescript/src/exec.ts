@@ -3,10 +3,10 @@ import path from "node:path";
 import readline from "node:readline";
 import { createRequire } from "node:module";
 
-import type { CodexConfigObject, CodexConfigValue } from "./codexOptions";
+import type { FirefamConfigObject, FirefamConfigValue } from "./firefamOptions";
 import { SandboxMode, ModelReasoningEffort, ApprovalMode, WebSearchMode } from "./threadOptions";
 
-export type CodexExecArgs = {
+export type FirefamExecArgs = {
   input: string;
 
   baseUrl?: string;
@@ -39,9 +39,9 @@ export type CodexExecArgs = {
   approvalPolicy?: ApprovalMode;
 };
 
-const INTERNAL_ORIGINATOR_ENV = "CODEX_INTERNAL_ORIGINATOR_OVERRIDE";
+const INTERNAL_ORIGINATOR_ENV = "FIREFAM_INTERNAL_ORIGINATOR_OVERRIDE";
 const TYPESCRIPT_SDK_ORIGINATOR = "firefam_sdk_ts";
-const CODEX_NPM_NAME = "firefam";
+const FIREFAM_NPM_NAME = "firefam";
 
 const PLATFORM_PACKAGE_BY_TARGET: Record<string, string> = {
   "x86_64-unknown-linux-musl": "firefam-linux-x64",
@@ -54,22 +54,22 @@ const PLATFORM_PACKAGE_BY_TARGET: Record<string, string> = {
 
 const moduleRequire = createRequire(import.meta.url);
 
-export class CodexExec {
+export class FirefamExec {
   private executablePath: string;
   private envOverride?: Record<string, string>;
-  private configOverrides?: CodexConfigObject;
+  private configOverrides?: FirefamConfigObject;
 
   constructor(
     executablePath: string | null = null,
     env?: Record<string, string>,
-    configOverrides?: CodexConfigObject,
+    configOverrides?: FirefamConfigObject,
   ) {
-    this.executablePath = executablePath || findCodexPath();
+    this.executablePath = executablePath || findFirefamPath();
     this.envOverride = env;
     this.configOverrides = configOverrides;
   }
 
-  async *run(args: CodexExecArgs): AsyncGenerator<string> {
+  async *run(args: FirefamExecArgs): AsyncGenerator<string> {
     const commandArgs: string[] = ["exec", "--experimental-json"];
 
     if (this.configOverrides) {
@@ -81,7 +81,7 @@ export class CodexExec {
     if (args.baseUrl) {
       commandArgs.push(
         "--config",
-        `openai_base_url=${toTomlValue(args.baseUrl, "openai_base_url")}`,
+        `firefamai_base_url=${toTomlValue(args.baseUrl, "firefamai_base_url")}`,
       );
     }
 
@@ -226,14 +226,14 @@ export class CodexExec {
   }
 }
 
-function serializeConfigOverrides(configOverrides: CodexConfigObject): string[] {
+function serializeConfigOverrides(configOverrides: FirefamConfigObject): string[] {
   const overrides: string[] = [];
   flattenConfigOverrides(configOverrides, "", overrides);
   return overrides;
 }
 
 function flattenConfigOverrides(
-  value: CodexConfigValue,
+  value: FirefamConfigValue,
   prefix: string,
   overrides: string[],
 ): void {
@@ -272,7 +272,7 @@ function flattenConfigOverrides(
   }
 }
 
-function toTomlValue(value: CodexConfigValue, path: string): string {
+function toTomlValue(value: FirefamConfigValue, path: string): string {
   if (typeof value === "string") {
     return JSON.stringify(value);
   } else if (typeof value === "number") {
@@ -310,11 +310,11 @@ function formatTomlKey(key: string): string {
   return TOML_BARE_KEY.test(key) ? key : JSON.stringify(key);
 }
 
-function isPlainObject(value: unknown): value is CodexConfigObject {
+function isPlainObject(value: unknown): value is FirefamConfigObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function findCodexPath() {
+function findFirefamPath() {
   const { platform, arch } = process;
 
   let targetTriple = null;
@@ -371,13 +371,13 @@ function findCodexPath() {
 
   let vendorRoot: string;
   try {
-    const codexPackageJsonPath = moduleRequire.resolve(`${CODEX_NPM_NAME}/package.json`);
-    const codexRequire = createRequire(codexPackageJsonPath);
-    const platformPackageJsonPath = codexRequire.resolve(`${platformPackage}/package.json`);
+    const firefamPackageJsonPath = moduleRequire.resolve(`${FIREFAM_NPM_NAME}/package.json`);
+    const firefamRequire = createRequire(firefamPackageJsonPath);
+    const platformPackageJsonPath = firefamRequire.resolve(`${platformPackage}/package.json`);
     vendorRoot = path.join(path.dirname(platformPackageJsonPath), "vendor");
   } catch {
     throw new Error(
-      `Unable to locate Firefam CLI binaries. Ensure ${CODEX_NPM_NAME} is installed with optional dependencies.`,
+      `Unable to locate Firefam CLI binaries. Ensure ${FIREFAM_NPM_NAME} is installed with optional dependencies.`,
     );
   }
 

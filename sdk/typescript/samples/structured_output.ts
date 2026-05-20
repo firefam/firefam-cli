@@ -2,11 +2,11 @@
 
 import { Firefam } from "firefam-sdk";
 
-import { codexPathOverride } from "./helpers.ts";
+import { firefamPathOverride } from "./helpers.ts";
 
-const codex = new Firefam({ codexPathOverride: codexPathOverride() });
+const firefam = new Firefam({ firefamPathOverride: firefamPathOverride() });
 
-const thread = codex.startThread();
+const thread = firefam.startThread();
 
 const schema = {
   type: "object",

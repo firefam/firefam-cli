@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "external-agent-sessions",
+    crate_name = "firefam_external_agent_sessions",
+)

@@ -9,10 +9,10 @@ from _bootstrap import ensure_local_sdk_src, runtime_config, server_label
 
 ensure_local_sdk_src()
 
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
-with Firefam(config=runtime_config()) as codex:
-    print("server:", server_label(codex.metadata))
-    models = codex.models()
+with Firefam(config=runtime_config()) as firefam:
+    print("server:", server_label(firefam.metadata))
+    models = firefam.models()
     print("models.count:", len(models.data))
     print("models:", ", ".join(model.id for model in models.data[:5]))

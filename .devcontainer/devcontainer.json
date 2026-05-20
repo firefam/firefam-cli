@@ -1,5 +1,5 @@
 {
-  "name": "Codex",
+  "name": "Firefam",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "..",
@@ -12,7 +12,7 @@
 
   "containerEnv": {
     "RUST_BACKTRACE": "1",
-    "CARGO_TARGET_DIR": "${containerWorkspaceFolder}/codex-rs/target-arm64"
+    "CARGO_TARGET_DIR": "${containerWorkspaceFolder}/firefam-rs/target-arm64"
   },
 
   "remoteUser": "ubuntu",

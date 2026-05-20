@@ -13,11 +13,11 @@ from _bootstrap import (
 
 ensure_local_sdk_src()
 
-from openai_codex import Firefam, LocalImageInput, TextInput
+from firefamai_firefam import Firefam, LocalImageInput, TextInput
 
 with temporary_sample_image_path() as image_path:
-    with Firefam(config=runtime_config()) as codex:
-        thread = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
+    with Firefam(config=runtime_config()) as firefam:
+        thread = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
 
         result = thread.turn(
             [

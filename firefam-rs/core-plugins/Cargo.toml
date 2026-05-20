@@ -1,0 +1,51 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-core-plugins"
+version.workspace = true
+
+[lib]
+doctest = false
+name = "firefam_core_plugins"
+path = "src/lib.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+firefam-analytics = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-config = { workspace = true }
+firefam-core-skills = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-hooks = { workspace = true }
+firefam-login = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-plugins = { workspace = true }
+chrono = { workspace = true }
+dirs = { workspace = true }
+flate2 = { workspace = true }
+reqwest = { workspace = true }
+semver = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tar = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["fs", "macros", "rt", "time"] }
+toml = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+zip = { workspace = true }
+
+[dev-dependencies]
+libc = { workspace = true }
+pretty_assertions = { workspace = true }
+tempfile = { workspace = true }
+wiremock = { workspace = true }

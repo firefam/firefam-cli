@@ -15,14 +15,14 @@ ensure_local_sdk_src()
 
 import asyncio
 
-from openai_codex import AsyncCodex
+from firefamai_firefam import AsyncFirefam
 
 
 async def main() -> None:
-    async with AsyncCodex(config=runtime_config()) as codex:
-        print("Server:", server_label(codex.metadata))
+    async with AsyncFirefam(config=runtime_config()) as firefam:
+        print("Server:", server_label(firefam.metadata))
 
-        thread = await codex.thread_start(
+        thread = await firefam.thread_start(
             model="gpt-5.4", config={"model_reasoning_effort": "high"}
         )
         result = await thread.run("Say hello in one sentence.")

@@ -6,14 +6,14 @@ from typing import Any
 
 import pytest
 
-import openai_codex.api as public_api_module
-from openai_codex.api import (
+import firefamai_firefam.api as public_api_module
+from firefamai_firefam.api import (
     ApprovalMode,
-    AsyncCodex,
+    AsyncFirefam,
     Firefam,
 )
-from openai_codex.generated.v2_all import TurnStartParams
-from openai_codex.models import InitializeResponse
+from firefamai_firefam.generated.v2_all import TurnStartParams
+from firefamai_firefam.models import InitializeResponse
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,7 +34,7 @@ def _approval_settings(params: list[Any]) -> list[dict[str, object]]:
     ]
 
 
-def test_codex_init_failure_closes_client(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_firefam_init_failure_closes_client(monkeypatch: pytest.MonkeyPatch) -> None:
     closed: list[bool] = []
 
     class FakeClient:
@@ -59,9 +59,9 @@ def test_codex_init_failure_closes_client(monkeypatch: pytest.MonkeyPatch) -> No
     assert closed == [True]
 
 
-def test_async_codex_init_failure_closes_client() -> None:
+def test_async_firefam_init_failure_closes_client() -> None:
     async def scenario() -> None:
-        codex = AsyncCodex()
+        firefam = AsyncFirefam()
         close_calls = 0
 
         async def fake_start() -> None:
@@ -74,23 +74,23 @@ def test_async_codex_init_failure_closes_client() -> None:
             nonlocal close_calls
             close_calls += 1
 
-        codex._client.start = fake_start  # type: ignore[method-assign]
-        codex._client.initialize = fake_initialize  # type: ignore[method-assign]
-        codex._client.close = fake_close  # type: ignore[method-assign]
+        firefam._client.start = fake_start  # type: ignore[method-assign]
+        firefam._client.initialize = fake_initialize  # type: ignore[method-assign]
+        firefam._client.close = fake_close  # type: ignore[method-assign]
 
         with pytest.raises(RuntimeError, match="missing required metadata"):
-            await codex.models()
+            await firefam.models()
 
         assert close_calls == 1
-        assert codex._initialized is False
-        assert codex._init is None
+        assert firefam._initialized is False
+        assert firefam._init is None
 
     asyncio.run(scenario())
 
 
-def test_async_codex_initializes_only_once_under_concurrency() -> None:
+def test_async_firefam_initializes_only_once_under_concurrency() -> None:
     async def scenario() -> None:
-        codex = AsyncCodex()
+        firefam = AsyncFirefam()
         start_calls = 0
         initialize_calls = 0
         ready = asyncio.Event()
@@ -106,8 +106,8 @@ def test_async_codex_initializes_only_once_under_concurrency() -> None:
             await asyncio.sleep(0.02)
             return InitializeResponse.model_validate(
                 {
-                    "userAgent": "codex-cli/1.2.3",
-                    "serverInfo": {"name": "codex-cli", "version": "1.2.3"},
+                    "userAgent": "firefam-cli/1.2.3",
+                    "serverInfo": {"name": "firefam-cli", "version": "1.2.3"},
                 }
             )
 
@@ -115,11 +115,11 @@ def test_async_codex_initializes_only_once_under_concurrency() -> None:
             await ready.wait()
             return object()
 
-        codex._client.start = fake_start  # type: ignore[method-assign]
-        codex._client.initialize = fake_initialize  # type: ignore[method-assign]
-        codex._client.model_list = fake_model_list  # type: ignore[method-assign]
+        firefam._client.start = fake_start  # type: ignore[method-assign]
+        firefam._client.initialize = fake_initialize  # type: ignore[method-assign]
+        firefam._client.model_list = fake_model_list  # type: ignore[method-assign]
 
-        await asyncio.gather(codex.models(), codex.models())
+        await asyncio.gather(firefam.models(), firefam.models())
 
         assert start_calls == 1
         assert initialize_calls == 1

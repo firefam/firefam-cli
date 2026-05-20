@@ -62,7 +62,7 @@ def test_root_fmt_recipe_formats_rust_and_python_sdk() -> None:
         "commands": [line.strip() for line in fmt_recipe[1:] if line.strip()],
     }
     expected = {
-        "working_directory": 'set working-directory := "codex-rs"',
+        "working_directory": 'set working-directory := "firefam-rs"',
         "previous_attribute": "# Format Rust and Python SDK code.",
         "commands": [
             "cargo fmt -- --config imports_granularity=Item 2>/dev/null",
@@ -185,7 +185,7 @@ def test_generate_v2_all_uses_titles_for_generated_names() -> None:
 
 
 def test_runtime_package_template_has_no_checked_in_binaries() -> None:
-    runtime_root = ROOT.parent / "python-runtime" / "src" / "codex_cli_bin"
+    runtime_root = ROOT.parent / "python-runtime" / "src" / "firefam_cli_bin"
     assert sorted(
         path.name
         for path in runtime_root.rglob("*")
@@ -202,16 +202,16 @@ def test_examples_readme_points_to_runtime_version_source_of_truth() -> None:
 def test_runtime_distribution_name_is_consistent() -> None:
     script = _load_update_script_module()
     runtime_setup = _load_runtime_setup_module()
-    from openai_codex import _version, client as client_module
+    from firefamai_firefam import _version, client as client_module
 
-    assert script.SDK_DISTRIBUTION_NAME == "openai-codex"
-    assert runtime_setup.SDK_PACKAGE_NAME == "openai-codex"
-    assert _version.DISTRIBUTION_NAME == "openai-codex"
-    assert script.RUNTIME_DISTRIBUTION_NAME == "openai-codex-cli-bin"
-    assert runtime_setup.PACKAGE_NAME == "openai-codex-cli-bin"
-    assert client_module.RUNTIME_PKG_NAME == "openai-codex-cli-bin"
+    assert script.SDK_DISTRIBUTION_NAME == "firefamai-firefam"
+    assert runtime_setup.SDK_PACKAGE_NAME == "firefamai-firefam"
+    assert _version.DISTRIBUTION_NAME == "firefamai-firefam"
+    assert script.RUNTIME_DISTRIBUTION_NAME == "firefamai-firefam-cli-bin"
+    assert runtime_setup.PACKAGE_NAME == "firefamai-firefam-cli-bin"
+    assert client_module.RUNTIME_PKG_NAME == "firefamai-firefam-cli-bin"
     assert (
-        "importlib.metadata.version('codex-cli-bin')"
+        "importlib.metadata.version('firefam-cli-bin')"
         not in (ROOT / "_runtime_setup.py").read_text()
     )
 
@@ -230,7 +230,7 @@ def test_source_sdk_package_pins_published_runtime() -> None:
         "runtime_pin": "0.131.0a4",
         "dependencies": [
             "pydantic>=2.12",
-            "openai-codex-cli-bin==0.131.0a4",
+            "firefamai-firefam-cli-bin==0.131.0a4",
         ],
     }
 
@@ -261,12 +261,12 @@ def test_release_metadata_retries_without_invalid_auth(
     assert authorizations == ["Bearer invalid-token", None]
 
 
-def test_runtime_setup_uses_pep440_package_version_and_codex_release_tags() -> None:
+def test_runtime_setup_uses_pep440_package_version_and_firefam_release_tags() -> None:
     """The SDK uses PEP 440 package pins and converts only when fetching releases."""
     runtime_setup = _load_runtime_setup_module()
     pyproject = tomllib.loads((ROOT / "pyproject.toml").read_text())
 
-    assert runtime_setup.PACKAGE_NAME == "openai-codex-cli-bin"
+    assert runtime_setup.PACKAGE_NAME == "firefamai-firefam-cli-bin"
     assert runtime_setup.pinned_runtime_version() == pyproject["project"]["version"]
     assert (
         f"{runtime_setup.PACKAGE_NAME}=={pyproject['project']['version']}"
@@ -321,10 +321,10 @@ def test_runtime_package_is_wheel_only_and_builds_platform_specific_wheels() -> 
         elif isinstance(node.value, ast.JoinedStr):
             build_data_assignments[node.targets[0].slice.value] = "joined-string"
 
-    assert pyproject["project"]["name"] == "openai-codex-cli-bin"
+    assert pyproject["project"]["name"] == "firefamai-firefam-cli-bin"
     assert pyproject["tool"]["hatch"]["build"]["targets"]["wheel"] == {
-        "packages": ["src/codex_cli_bin"],
-        "include": ["src/codex_cli_bin/bin/**"],
+        "packages": ["src/firefam_cli_bin"],
+        "include": ["src/firefam_cli_bin/bin/**"],
         "hooks": {"custom": {}},
     }
     assert pyproject["tool"]["hatch"]["build"]["targets"]["sdist"] == {
@@ -341,7 +341,7 @@ def test_runtime_package_is_wheel_only_and_builds_platform_specific_wheels() -> 
 def test_stage_runtime_release_copies_binary_and_sets_version(tmp_path: Path) -> None:
     script = _load_update_script_module()
     fake_binary = tmp_path / script.runtime_binary_name()
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
 
     staged = script.stage_python_runtime_package(
         tmp_path / "runtime-stage",
@@ -350,18 +350,18 @@ def test_stage_runtime_release_copies_binary_and_sets_version(tmp_path: Path) ->
     )
 
     assert staged == tmp_path / "runtime-stage"
-    assert script.staged_runtime_bin_path(staged).read_text() == "fake codex\n"
-    assert 'name = "openai-codex-cli-bin"' in (staged / "pyproject.toml").read_text()
+    assert script.staged_runtime_bin_path(staged).read_text() == "fake firefam\n"
+    assert 'name = "firefamai-firefam-cli-bin"' in (staged / "pyproject.toml").read_text()
     assert 'version = "1.2.3"' in (staged / "pyproject.toml").read_text()
 
 
-def test_normalize_codex_version_accepts_release_tags_and_pep440_versions() -> None:
+def test_normalize_firefam_version_accepts_release_tags_and_pep440_versions() -> None:
     script = _load_update_script_module()
 
-    assert script.normalize_codex_version("rust-v0.116.0-alpha.1") == "0.116.0a1"
-    assert script.normalize_codex_version("v0.116.0-beta.2") == "0.116.0b2"
-    assert script.normalize_codex_version("0.116.0rc3") == "0.116.0rc3"
-    assert script.normalize_codex_version("0.116.0") == "0.116.0"
+    assert script.normalize_firefam_version("rust-v0.116.0-alpha.1") == "0.116.0a1"
+    assert script.normalize_firefam_version("v0.116.0-beta.2") == "0.116.0b2"
+    assert script.normalize_firefam_version("0.116.0rc3") == "0.116.0rc3"
+    assert script.normalize_firefam_version("0.116.0") == "0.116.0"
 
 
 def test_stage_runtime_release_replaces_existing_staging_dir(tmp_path: Path) -> None:
@@ -372,7 +372,7 @@ def test_stage_runtime_release_replaces_existing_staging_dir(tmp_path: Path) -> 
     old_file.write_text("stale")
 
     fake_binary = tmp_path / script.runtime_binary_name()
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
 
     staged = script.stage_python_runtime_package(
         staging_dir,
@@ -382,13 +382,13 @@ def test_stage_runtime_release_replaces_existing_staging_dir(tmp_path: Path) -> 
 
     assert staged == staging_dir
     assert not old_file.exists()
-    assert script.staged_runtime_bin_path(staged).read_text() == "fake codex\n"
+    assert script.staged_runtime_bin_path(staged).read_text() == "fake firefam\n"
 
 
 def test_stage_runtime_release_can_pin_wheel_platform_tag(tmp_path: Path) -> None:
     script = _load_update_script_module()
     fake_binary = tmp_path / script.runtime_binary_name()
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
 
     staged = script.stage_python_runtime_package(
         tmp_path / "runtime-stage",
@@ -407,7 +407,7 @@ def test_stage_runtime_release_copies_resource_binaries(tmp_path: Path) -> None:
     fake_binary = tmp_path / script.runtime_binary_name()
     helper = tmp_path / "helper"
     fallback = tmp_path / "fallback-helper"
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
     helper.write_text("fake helper\n")
     fallback.write_text("fake fallback\n")
 
@@ -419,10 +419,10 @@ def test_stage_runtime_release_copies_resource_binaries(tmp_path: Path) -> None:
     )
 
     assert {
-        path.relative_to(staged / "src" / "codex_cli_bin" / "bin").as_posix(): path.read_text()
-        for path in (staged / "src" / "codex_cli_bin" / "bin").iterdir()
+        path.relative_to(staged / "src" / "firefam_cli_bin" / "bin").as_posix(): path.read_text()
+        for path in (staged / "src" / "firefam_cli_bin" / "bin").iterdir()
     } == {
-        script.runtime_binary_name(): "fake codex\n",
+        script.runtime_binary_name(): "fake firefam\n",
         "fallback-helper": "fake fallback\n",
         "helper": "fake helper\n",
     }
@@ -435,7 +435,7 @@ def test_runtime_resource_binaries_are_included_by_wheel_config(
     script = _load_update_script_module()
     fake_binary = tmp_path / script.runtime_binary_name()
     helper = tmp_path / "helper"
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
     helper.write_text("fake helper\n")
 
     staged = script.stage_python_runtime_package(
@@ -448,9 +448,9 @@ def test_runtime_resource_binaries_are_included_by_wheel_config(
     pyproject = tomllib.loads((staged / "pyproject.toml").read_text())
     assert {
         "include": pyproject["tool"]["hatch"]["build"]["targets"]["wheel"]["include"],
-        "helper": (staged / "src" / "codex_cli_bin" / "bin" / "helper").read_text(),
+        "helper": (staged / "src" / "firefam_cli_bin" / "bin" / "helper").read_text(),
     } == {
-        "include": ["src/codex_cli_bin/bin/**"],
+        "include": ["src/firefam_cli_bin/bin/**"],
         "helper": "fake helper\n",
     }
 
@@ -463,18 +463,18 @@ def test_stage_sdk_release_injects_exact_runtime_pin(tmp_path: Path) -> None:
     )
 
     pyproject = (staged / "pyproject.toml").read_text()
-    assert 'name = "openai-codex"' in pyproject
+    assert 'name = "firefamai-firefam"' in pyproject
     assert 'version = "0.116.0a1"' in pyproject
-    assert '"openai-codex-cli-bin==0.116.0a1"' in pyproject
+    assert '"firefamai-firefam-cli-bin==0.116.0a1"' in pyproject
     assert (
         '__version__ = "0.116.0a1"'
-        not in (staged / "src" / "openai_codex" / "__init__.py").read_text()
+        not in (staged / "src" / "firefamai_firefam" / "__init__.py").read_text()
     )
     assert (
         'client_version: str = "0.116.0a1"'
-        not in (staged / "src" / "openai_codex" / "client.py").read_text()
+        not in (staged / "src" / "firefamai_firefam" / "client.py").read_text()
     )
-    assert not any((staged / "src" / "openai_codex").glob("bin/**"))
+    assert not any((staged / "src" / "firefamai_firefam").glob("bin/**"))
 
 
 def test_stage_sdk_release_replaces_existing_staging_dir(tmp_path: Path) -> None:
@@ -493,7 +493,7 @@ def test_stage_sdk_release_replaces_existing_staging_dir(tmp_path: Path) -> None
 def test_staged_sdk_and_runtime_versions_match(tmp_path: Path) -> None:
     script = _load_update_script_module()
     fake_binary = tmp_path / script.runtime_binary_name()
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
 
     sdk_stage = script.stage_python_sdk_package(
         tmp_path / "sdk-stage",
@@ -511,7 +511,7 @@ def test_staged_sdk_and_runtime_versions_match(tmp_path: Path) -> None:
     assert sdk_pyproject["project"]["version"] == runtime_pyproject["project"]["version"]
     assert sdk_pyproject["project"]["dependencies"] == [
         "pydantic>=2.12",
-        "openai-codex-cli-bin==0.116.0a1",
+        "firefamai-firefam-cli-bin==0.116.0a1",
     ]
 
 
@@ -522,7 +522,7 @@ def test_stage_sdk_runs_type_generation_before_staging(tmp_path: Path) -> None:
         [
             "stage-sdk",
             str(tmp_path / "sdk-stage"),
-            "--codex-version",
+            "--firefam-version",
             "rust-v0.116.0-alpha.1",
         ]
     )
@@ -530,8 +530,8 @@ def test_stage_sdk_runs_type_generation_before_staging(tmp_path: Path) -> None:
     def fake_generate_types() -> None:
         calls.append("generate_types")
 
-    def fake_stage_sdk_package(_staging_dir: Path, codex_version: str) -> Path:
-        calls.append(f"stage_sdk:{codex_version}")
+    def fake_stage_sdk_package(_staging_dir: Path, firefam_version: str) -> Path:
+        calls.append(f"stage_sdk:{firefam_version}")
         return tmp_path / "sdk-stage"
 
     def fake_stage_runtime_package(
@@ -564,7 +564,7 @@ def test_stage_sdk_rejects_mismatched_legacy_versions(tmp_path: Path) -> None:
         [
             "stage-sdk",
             str(tmp_path / "sdk-stage"),
-            "--codex-version",
+            "--firefam-version",
             "0.116.0a1",
             "--runtime-version",
             "0.116.0a1",
@@ -582,7 +582,7 @@ def test_stage_runtime_stages_binary_without_type_generation(tmp_path: Path) -> 
     fake_binary = tmp_path / script.runtime_binary_name()
     helper = tmp_path / "helper"
     fallback = tmp_path / "fallback-helper"
-    fake_binary.write_text("fake codex\n")
+    fake_binary.write_text("fake firefam\n")
     helper.write_text("fake helper\n")
     fallback.write_text("fake fallback\n")
     calls: list[str] = []
@@ -591,7 +591,7 @@ def test_stage_runtime_stages_binary_without_type_generation(tmp_path: Path) -> 
             "stage-runtime",
             str(tmp_path / "runtime-stage"),
             str(fake_binary),
-            "--codex-version",
+            "--firefam-version",
             "rust-v0.116.0-alpha.1",
             "--platform-tag",
             "musllinux_1_1_x86_64",
@@ -605,18 +605,18 @@ def test_stage_runtime_stages_binary_without_type_generation(tmp_path: Path) -> 
     def fake_generate_types() -> None:
         calls.append("generate_types")
 
-    def fake_stage_sdk_package(_staging_dir: Path, _codex_version: str) -> Path:
+    def fake_stage_sdk_package(_staging_dir: Path, _firefam_version: str) -> Path:
         raise AssertionError("sdk staging should not run for stage-runtime")
 
     def fake_stage_runtime_package(
         _staging_dir: Path,
-        codex_version: str,
+        firefam_version: str,
         _runtime_binary: Path,
         platform_tag: str | None,
         resource_binaries: Sequence[Path],
     ) -> Path:
         calls.append(
-            f"stage_runtime:{codex_version}:{platform_tag}:"
+            f"stage_runtime:{firefam_version}:{platform_tag}:"
             f"{','.join(path.name for path in resource_binaries)}"
         )
         return tmp_path / "runtime-stage"
@@ -639,63 +639,63 @@ def test_stage_runtime_stages_binary_without_type_generation(tmp_path: Path) -> 
 def test_default_runtime_is_resolved_from_installed_runtime_package(
     tmp_path: Path,
 ) -> None:
-    from openai_codex import client as client_module
+    from firefamai_firefam import client as client_module
 
-    fake_binary = tmp_path / ("codex.exe" if client_module.os.name == "nt" else "codex")
+    fake_binary = tmp_path / ("firefam.exe" if client_module.os.name == "nt" else "firefam")
     fake_binary.write_text("")
-    ops = client_module.CodexBinResolverOps(
-        installed_codex_path=lambda: fake_binary,
+    ops = client_module.FirefamBinResolverOps(
+        installed_firefam_path=lambda: fake_binary,
         path_exists=lambda path: path == fake_binary,
     )
 
     config = client_module.AppServerConfig()
-    assert config.codex_bin is None
-    assert client_module.resolve_codex_bin(config, ops) == fake_binary
+    assert config.firefam_bin is None
+    assert client_module.resolve_firefam_bin(config, ops) == fake_binary
 
 
-def test_explicit_codex_bin_override_takes_priority(tmp_path: Path) -> None:
-    from openai_codex import client as client_module
+def test_explicit_firefam_bin_override_takes_priority(tmp_path: Path) -> None:
+    from firefamai_firefam import client as client_module
 
     explicit_binary = tmp_path / (
-        "custom-codex.exe" if client_module.os.name == "nt" else "custom-codex"
+        "custom-firefam.exe" if client_module.os.name == "nt" else "custom-firefam"
     )
     explicit_binary.write_text("")
-    ops = client_module.CodexBinResolverOps(
-        installed_codex_path=lambda: (_ for _ in ()).throw(
+    ops = client_module.FirefamBinResolverOps(
+        installed_firefam_path=lambda: (_ for _ in ()).throw(
             AssertionError("packaged runtime should not be used")
         ),
         path_exists=lambda path: path == explicit_binary,
     )
 
-    config = client_module.AppServerConfig(codex_bin=str(explicit_binary))
-    assert client_module.resolve_codex_bin(config, ops) == explicit_binary
+    config = client_module.AppServerConfig(firefam_bin=str(explicit_binary))
+    assert client_module.resolve_firefam_bin(config, ops) == explicit_binary
 
 
-def test_missing_runtime_package_requires_explicit_codex_bin() -> None:
-    from openai_codex import client as client_module
+def test_missing_runtime_package_requires_explicit_firefam_bin() -> None:
+    from firefamai_firefam import client as client_module
 
-    ops = client_module.CodexBinResolverOps(
-        installed_codex_path=lambda: (_ for _ in ()).throw(
+    ops = client_module.FirefamBinResolverOps(
+        installed_firefam_path=lambda: (_ for _ in ()).throw(
             FileNotFoundError("missing packaged runtime")
         ),
         path_exists=lambda _path: False,
     )
 
     with pytest.raises(FileNotFoundError, match="missing packaged runtime"):
-        client_module.resolve_codex_bin(client_module.AppServerConfig(), ops)
+        client_module.resolve_firefam_bin(client_module.AppServerConfig(), ops)
 
 
 def test_broken_runtime_package_does_not_fall_back() -> None:
-    from openai_codex import client as client_module
+    from firefamai_firefam import client as client_module
 
-    ops = client_module.CodexBinResolverOps(
-        installed_codex_path=lambda: (_ for _ in ()).throw(
+    ops = client_module.FirefamBinResolverOps(
+        installed_firefam_path=lambda: (_ for _ in ()).throw(
             FileNotFoundError("missing packaged binary")
         ),
         path_exists=lambda _path: False,
     )
 
     with pytest.raises(FileNotFoundError) as exc_info:
-        client_module.resolve_codex_bin(client_module.AppServerConfig(), ops)
+        client_module.resolve_firefam_bin(client_module.AppServerConfig(), ops)
 
     assert str(exc_info.value) == ("missing packaged binary")

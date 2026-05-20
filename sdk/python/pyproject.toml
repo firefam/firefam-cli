@@ -3,13 +3,13 @@ requires = ["hatchling>=1.24.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "openai-codex"
+name = "firefamai-firefam"
 version = "0.131.0a4"
 description = "Python SDK for Firefam app-server v2"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
-authors = [{ name = "OpenAI" }]
+authors = [{ name = "FirefamAI" }]
 keywords = ["firefam", "json-rpc", "sdk", "llm", "app-server"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -22,7 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-dependencies = ["pydantic>=2.12", "openai-codex-cli-bin==0.131.0a4"]
+dependencies = ["pydantic>=2.12", "firefamai-firefam-cli-bin==0.131.0a4"]
 
 [project.urls]
 Homepage = "https://github.com/firefam/firefam-cli"
@@ -42,14 +42,14 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/openai_codex"]
+packages = ["src/firefamai_firefam"]
 include = [
-  "src/openai_codex/py.typed",
+  "src/firefamai_firefam/py.typed",
 ]
 
 [tool.hatch.build.targets.sdist]
 include = [
-  "src/openai_codex/**",
+  "src/firefamai_firefam/**",
   "README.md",
   "CHANGELOG.md",
   "CONTRIBUTING.md",
@@ -67,7 +67,7 @@ required-version = ">=0.15.8"
 line-length = 100
 extend-exclude = [
   "notebooks/**",
-  "src/openai_codex/generated/**",
+  "src/firefamai_firefam/generated/**",
 ]
 
 [tool.ruff.lint]
@@ -86,10 +86,13 @@ combine-as-imports = true
 
 [tool.uv]
 exclude-newer = "7 days"
-exclude-newer-package = { openai-codex-cli-bin = "2026-05-10T00:00:00Z" }
+exclude-newer-package = { firefamai-firefam-cli-bin = "2026-05-10T00:00:00Z" }
 index-strategy = "first-index"
+
+[tool.uv.sources]
+firefamai-firefam-cli-bin = { path = "../python-runtime" }
 
 [tool.uv.pip]
 exclude-newer = "7 days"
-exclude-newer-package = { openai-codex-cli-bin = "2026-05-10T00:00:00Z" }
+exclude-newer-package = { firefamai-firefam-cli-bin = "2026-05-10T00:00:00Z" }
 index-strategy = "first-index"

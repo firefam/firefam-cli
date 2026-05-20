@@ -1,0 +1,6 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "absolute-path",
+    crate_name = "firefam_utils_absolute_path",
+)

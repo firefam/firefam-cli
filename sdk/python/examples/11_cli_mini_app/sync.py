@@ -9,15 +9,15 @@ from _bootstrap import ensure_local_sdk_src, runtime_config
 
 ensure_local_sdk_src()
 
-from openai_codex import (
+from firefamai_firefam import (
     Firefam,
 )
-from openai_codex.types import (
+from firefamai_firefam.types import (
     ThreadTokenUsageUpdatedNotification,
     TurnCompletedNotification,
 )
 
-print("Codex mini CLI. Type /exit to quit.")
+print("Firefam mini CLI. Type /exit to quit.")
 
 
 def _format_usage(usage: object) -> str:
@@ -30,8 +30,8 @@ def _format_usage(usage: object) -> str:
     )
 
 
-with Firefam(config=runtime_config()) as codex:
-    thread = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
+with Firefam(config=runtime_config()) as firefam:
+    thread = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
     print("Thread:", thread.id)
 
     while True:

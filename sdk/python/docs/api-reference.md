@@ -1,6 +1,6 @@
 # Firefam SDK API Reference
 
-Public surface of `openai_codex` for app-server v2.
+Public surface of `firefamai_firefam` for app-server v2.
 
 This SDK surface is experimental. Turn streams are routed by turn ID so one client can consume multiple active turns concurrently.
 Thread starts default to `ApprovalMode.auto_review`; turn starts accept an optional `approval_mode` override.
@@ -8,9 +8,9 @@ Thread starts default to `ApprovalMode.auto_review`; turn starts accept an optio
 ## Package Entry
 
 ```python
-from openai_codex import (
+from firefamai_firefam import (
     Firefam,
-    AsyncCodex,
+    AsyncFirefam,
     ApprovalMode,
     ChatgptLoginHandle,
     DeviceCodeLoginHandle,
@@ -30,7 +30,7 @@ from openai_codex import (
     SkillInput,
     MentionInput,
 )
-from openai_codex.types import (
+from firefamai_firefam.types import (
     Account,
     AccountLoginCompletedNotification,
     CancelLoginAccountResponse,
@@ -44,14 +44,14 @@ from openai_codex.types import (
 )
 ```
 
-- Version: `openai_codex.__version__`
+- Version: `firefamai_firefam.__version__`
 - Requires Python >= 3.10
-- Public app-server value and event types live in `openai_codex.types`
+- Public app-server value and event types live in `firefamai_firefam.types`
 
 ## Firefam (sync)
 
 ```python
-Codex(config: AppServerConfig | None = None)
+Firefam(config: AppServerConfig | None = None)
 ```
 
 Properties/methods:
@@ -74,24 +74,24 @@ Properties/methods:
 Context manager:
 
 ```python
-with Firefam() as codex:
+with Firefam() as firefam:
     ...
 ```
 
-## AsyncCodex (async parity)
+## AsyncFirefam (async parity)
 
 ```python
-AsyncCodex(config: AppServerConfig | None = None)
+AsyncFirefam(config: AppServerConfig | None = None)
 ```
 
 Preferred usage:
 
 ```python
-async with AsyncCodex() as codex:
+async with AsyncFirefam() as firefam:
     ...
 ```
 
-`AsyncCodex` initializes lazily. Context entry is the standard path because it
+`AsyncFirefam` initializes lazily. Context entry is the standard path because it
 ensures startup and shutdown are paired explicitly.
 
 Properties/methods:
@@ -114,7 +114,7 @@ Properties/methods:
 Async context manager:
 
 ```python
-async with AsyncCodex() as codex:
+async with AsyncFirefam() as firefam:
     ...
 ```
 
@@ -194,7 +194,7 @@ Use `turn(...)` when you need low-level turn control (`stream()`, `steer()`,
 Behavior notes:
 
 - `stream()` and `run()` consume only notifications for their own turn ID
-- one `Codex` instance can stream multiple active turns concurrently
+- one `Firefam` instance can stream multiple active turns concurrently
 
 ### AsyncTurnHandle
 
@@ -206,7 +206,7 @@ Behavior notes:
 Behavior notes:
 
 - `stream()` and `run()` consume only notifications for their own turn ID
-- one `AsyncCodex` instance can stream multiple active turns concurrently
+- one `AsyncFirefam` instance can stream multiple active turns concurrently
 
 ## Inputs
 
@@ -230,7 +230,7 @@ Use a plain `str` as shorthand for `TextInput(...)` anywhere a turn input is acc
 The SDK wrappers return and accept public app-server models wherever possible:
 
 ```python
-from openai_codex.types import (
+from firefamai_firefam.types import (
     Account,
     AccountLoginCompletedNotification,
     CancelLoginAccountResponse,
@@ -245,7 +245,7 @@ from openai_codex.types import (
 ## Retry + errors
 
 ```python
-from openai_codex import (
+from firefamai_firefam import (
     retry_on_overload,
     JsonRpcError,
     MethodNotFoundError,
@@ -261,10 +261,10 @@ from openai_codex import (
 ## Example
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
-with Firefam() as codex:
-    thread = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
+with Firefam() as firefam:
+    thread = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
     result = thread.run("Say hello in one sentence.")
     print(result.final_response)
 ```

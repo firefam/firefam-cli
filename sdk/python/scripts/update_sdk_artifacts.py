@@ -18,8 +18,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Sequence, get_args, get_origin
 
-SDK_DISTRIBUTION_NAME = "openai-codex"
-RUNTIME_DISTRIBUTION_NAME = "openai-codex-cli-bin"
+SDK_DISTRIBUTION_NAME = "firefamai-firefam"
+RUNTIME_DISTRIBUTION_NAME = "firefamai-firefam-cli-bin"
 
 
 def repo_root() -> Path:
@@ -41,7 +41,7 @@ def sdk_pyproject_path() -> Path:
 
 def schema_bundle_path(schema_dir: Path) -> Path:
     """Return the aggregate v2 schema bundle emitted by the runtime binary."""
-    return schema_dir / "codex_app_server_protocol.v2.schemas.json"
+    return schema_dir / "firefam_app_server_protocol.v2.schemas.json"
 
 
 def _is_windows() -> bool:
@@ -49,11 +49,11 @@ def _is_windows() -> bool:
 
 
 def runtime_binary_name() -> str:
-    return "codex.exe" if _is_windows() else "codex"
+    return "firefam.exe" if _is_windows() else "firefam"
 
 
 def staged_runtime_bin_path(root: Path) -> Path:
-    return root / "src" / "codex_cli_bin" / "bin" / runtime_binary_name()
+    return root / "src" / "firefam_cli_bin" / "bin" / runtime_binary_name()
 
 
 def staged_runtime_resource_path(root: Path, resource: Path) -> Path:
@@ -61,7 +61,7 @@ def staged_runtime_resource_path(root: Path, resource: Path) -> Path:
     # Runtime wheels include the whole bin/ directory, so helper executables
     # should be staged beside the main Firefam binary instead of changing the
     # package template for each platform.
-    return root / "src" / "codex_cli_bin" / "bin" / resource.name
+    return root / "src" / "firefam_cli_bin" / "bin" / resource.name
 
 
 def run(cmd: list[str], cwd: Path) -> None:
@@ -99,10 +99,10 @@ def pinned_runtime_version() -> str:
             f"Expected exactly one {RUNTIME_DISTRIBUTION_NAME} dependency pin "
             "in sdk/python/pyproject.toml"
         )
-    return normalize_codex_version(pins[0])
+    return normalize_firefam_version(pins[0])
 
 
-def pinned_runtime_codex_path() -> Path:
+def pinned_runtime_firefam_path() -> Path:
     """Return the bundled Firefam binary from the installed pinned runtime wheel."""
     expected_version = pinned_runtime_version()
     try:
@@ -113,7 +113,7 @@ def pinned_runtime_codex_path() -> Path:
             "generating Python SDK types."
         ) from exc
 
-    normalized_installed_version = normalize_codex_version(installed_version)
+    normalized_installed_version = normalize_firefam_version(installed_version)
     if normalized_installed_version != expected_version:
         raise RuntimeError(
             f"Expected {RUNTIME_DISTRIBUTION_NAME}=={expected_version}, "
@@ -121,19 +121,19 @@ def pinned_runtime_codex_path() -> Path:
         )
 
     try:
-        from codex_cli_bin import bundled_codex_path
+        from firefam_cli_bin import bundled_firefam_path
     except ImportError as exc:
         raise RuntimeError(
-            f"Installed {RUNTIME_DISTRIBUTION_NAME} package does not expose bundled_codex_path."
+            f"Installed {RUNTIME_DISTRIBUTION_NAME} package does not expose bundled_firefam_path."
         ) from exc
 
-    codex_path = bundled_codex_path()
-    if not codex_path.exists():
-        raise RuntimeError(f"Pinned Firefam runtime binary not found at {codex_path}.")
-    return codex_path
+    firefam_path = bundled_firefam_path()
+    if not firefam_path.exists():
+        raise RuntimeError(f"Pinned Firefam runtime binary not found at {firefam_path}.")
+    return firefam_path
 
 
-def normalize_codex_version(version: str) -> str:
+def normalize_firefam_version(version: str) -> str:
     normalized = version.strip()
     if normalized.startswith("rust-v"):
         normalized = normalized.removeprefix("rust-v")
@@ -232,7 +232,7 @@ def _rewrite_sdk_runtime_dependency(pyproject_text: str, runtime_version: str) -
     raw_items = [
         item
         for item in raw_items
-        if RUNTIME_DISTRIBUTION_NAME.removeprefix("openai-") not in item
+        if RUNTIME_DISTRIBUTION_NAME.removeprefix("firefamai-") not in item
         and RUNTIME_DISTRIBUTION_NAME not in item
     ]
     raw_items.append(f'"{RUNTIME_DISTRIBUTION_NAME}=={runtime_version}"')
@@ -240,10 +240,10 @@ def _rewrite_sdk_runtime_dependency(pyproject_text: str, runtime_version: str) -
     return pyproject_text[: match.start()] + replacement + pyproject_text[match.end() :]
 
 
-def stage_python_sdk_package(staging_dir: Path, codex_version: str) -> Path:
-    package_version = normalize_codex_version(codex_version)
+def stage_python_sdk_package(staging_dir: Path, firefam_version: str) -> Path:
+    package_version = normalize_firefam_version(firefam_version)
     _copy_package_tree(sdk_root(), staging_dir)
-    sdk_bin_dir = staging_dir / "src" / "openai_codex" / "bin"
+    sdk_bin_dir = staging_dir / "src" / "firefamai_firefam" / "bin"
     if sdk_bin_dir.exists():
         shutil.rmtree(sdk_bin_dir)
 
@@ -258,12 +258,12 @@ def stage_python_sdk_package(staging_dir: Path, codex_version: str) -> Path:
 
 def stage_python_runtime_package(
     staging_dir: Path,
-    codex_version: str,
+    firefam_version: str,
     binary_path: Path,
     platform_tag: str | None = None,
     resource_binaries: Sequence[Path] = (),
 ) -> Path:
-    package_version = normalize_codex_version(codex_version)
+    package_version = normalize_firefam_version(firefam_version)
     _copy_package_tree(python_runtime_root(), staging_dir)
 
     pyproject_path = staging_dir / "pyproject.toml"
@@ -516,13 +516,13 @@ def _annotate_schema(value: Any, base: str | None = None) -> None:
 
 def generate_schema_from_pinned_runtime(schema_dir: Path) -> Path:
     """Generate app-server schemas by invoking the installed pinned runtime binary."""
-    codex_path = pinned_runtime_codex_path()
+    firefam_path = pinned_runtime_firefam_path()
     if schema_dir.exists():
         shutil.rmtree(schema_dir)
     schema_dir.mkdir(parents=True)
     run(
         [
-            str(codex_path),
+            str(firefam_path),
             "app-server",
             "generate-json-schema",
             "--out",
@@ -549,7 +549,7 @@ def _normalized_schema_bundle_text(schema_dir: Path) -> str:
 
 def generate_v2_all(schema_dir: Path) -> None:
     """Regenerate the Pydantic v2 protocol model module from runtime schemas."""
-    out_path = sdk_root() / "src" / "openai_codex" / "generated" / "v2_all.py"
+    out_path = sdk_root() / "src" / "firefamai_firefam" / "generated" / "v2_all.py"
     out_dir = out_path.parent
     old_package_dir = out_dir / "v2_all"
     if old_package_dir.exists():
@@ -598,7 +598,9 @@ def _notification_specs(schema_dir: Path) -> list[tuple[str, str]]:
     """Map each server notification method to its generated payload model class."""
     server_notifications = json.loads((schema_dir / "ServerNotification.json").read_text())
     one_of = server_notifications.get("oneOf", [])
-    generated_source = (sdk_root() / "src" / "openai_codex" / "generated" / "v2_all.py").read_text()
+    generated_source = (
+        sdk_root() / "src" / "firefamai_firefam" / "generated" / "v2_all.py"
+    ).read_text()
 
     specs: list[tuple[str, str]] = []
 
@@ -670,7 +672,7 @@ def _type_tuple_source(class_names: list[str]) -> str:
 
 def generate_notification_registry(schema_dir: Path) -> None:
     """Regenerate notification dispatch metadata from the runtime notification schema."""
-    out = sdk_root() / "src" / "openai_codex" / "generated" / "notification_registry.py"
+    out = sdk_root() / "src" / "firefamai_firefam" / "generated" / "notification_registry.py"
     specs = _notification_specs(schema_dir)
     class_names = sorted({class_name for _, class_name in specs})
     direct_turn_id_types, nested_turn_types = _notification_turn_id_specs(
@@ -797,7 +799,7 @@ def _load_public_fields(
 ) -> list[PublicFieldSpec]:
     """Load generated model fields used to render the ergonomic public methods."""
     exclude = exclude or set()
-    if module_name == "openai_codex.generated.v2_all":
+    if module_name == "firefamai_firefam.generated.v2_all":
         module = _load_generated_v2_all_module()
     else:
         module = importlib.import_module(module_name)
@@ -824,9 +826,9 @@ def _load_public_fields(
 
 def _load_generated_v2_all_module() -> types.ModuleType:
     """Import the freshly generated v2_all module without importing package init."""
-    module_name = "_openai_codex_generated_v2_all_for_artifacts"
+    module_name = "_firefamai_firefam_generated_v2_all_for_artifacts"
     sys.modules.pop(module_name, None)
-    module_path = sdk_root() / "src" / "openai_codex" / "generated" / "v2_all.py"
+    module_path = sdk_root() / "src" / "firefamai_firefam" / "generated" / "v2_all.py"
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Failed to load generated module from {module_path}")
@@ -882,7 +884,7 @@ def _replace_generated_block(source: str, block_name: str, body: str) -> str:
     return updated
 
 
-def _render_codex_block(
+def _render_firefam_block(
     thread_start_fields: list[PublicFieldSpec],
     thread_list_fields: list[PublicFieldSpec],
     resume_fields: list[PublicFieldSpec],
@@ -955,7 +957,7 @@ def _render_codex_block(
     return "\n".join(lines)
 
 
-def _render_async_codex_block(
+def _render_async_firefam_block(
     thread_start_fields: list[PublicFieldSpec],
     thread_list_fields: list[PublicFieldSpec],
     resume_fields: list[PublicFieldSpec],
@@ -1070,7 +1072,7 @@ def _render_async_thread_block(
         *_approval_mode_override_signature_lines(),
         *_kw_signature_lines(turn_fields),
         "    ) -> AsyncTurnHandle:",
-        "        await self._codex._ensure_initialized()",
+        "        await self._firefam._ensure_initialized()",
         "        wire_input = _to_wire_input(_normalize_run_input(input))",
         _approval_mode_assignment_line("_approval_mode_override_settings"),
         "        params = TurnStartParams(",
@@ -1079,12 +1081,12 @@ def _render_async_thread_block(
         *_approval_mode_model_arg_lines(),
         *_model_arg_lines(turn_fields),
         "        )",
-        "        turn = await self._codex._client.turn_start(",
+        "        turn = await self._firefam._client.turn_start(",
         "            self.id,",
         "            wire_input,",
         "            params=params,",
         "        )",
-        "        return AsyncTurnHandle(self._codex, self.id, turn.turn.id)",
+        "        return AsyncTurnHandle(self._firefam, self.id, turn.turn.id)",
     ]
     return "\n".join(lines)
 
@@ -1092,7 +1094,7 @@ def _render_async_thread_block(
 def generate_public_api_flat_methods() -> None:
     """Regenerate the public convenience methods from generated protocol models."""
     src_dir = sdk_root() / "src"
-    public_api_path = src_dir / "openai_codex" / "api.py"
+    public_api_path = src_dir / "firefamai_firefam" / "api.py"
     if not public_api_path.exists():
         # PR2 can run codegen before the ergonomic public API layer is added.
         return
@@ -1102,26 +1104,26 @@ def generate_public_api_flat_methods() -> None:
 
     approval_fields = {"approval_policy", "approvals_reviewer"}
     thread_start_fields = _load_public_fields(
-        "openai_codex.generated.v2_all",
+        "firefamai_firefam.generated.v2_all",
         "ThreadStartParams",
         exclude=approval_fields,
     )
     thread_list_fields = _load_public_fields(
-        "openai_codex.generated.v2_all",
+        "firefamai_firefam.generated.v2_all",
         "ThreadListParams",
     )
     thread_resume_fields = _load_public_fields(
-        "openai_codex.generated.v2_all",
+        "firefamai_firefam.generated.v2_all",
         "ThreadResumeParams",
         exclude={"thread_id", *approval_fields},
     )
     thread_fork_fields = _load_public_fields(
-        "openai_codex.generated.v2_all",
+        "firefamai_firefam.generated.v2_all",
         "ThreadForkParams",
         exclude={"thread_id", *approval_fields},
     )
     turn_start_fields = _load_public_fields(
-        "openai_codex.generated.v2_all",
+        "firefamai_firefam.generated.v2_all",
         "TurnStartParams",
         exclude={"thread_id", "input", *approval_fields},
     )
@@ -1129,8 +1131,8 @@ def generate_public_api_flat_methods() -> None:
     source = public_api_path.read_text()
     source = _replace_generated_block(
         source,
-        "Codex.flat_methods",
-        _render_codex_block(
+        "Firefam.flat_methods",
+        _render_firefam_block(
             thread_start_fields,
             thread_list_fields,
             thread_resume_fields,
@@ -1139,8 +1141,8 @@ def generate_public_api_flat_methods() -> None:
     )
     source = _replace_generated_block(
         source,
-        "AsyncCodex.flat_methods",
-        _render_async_codex_block(
+        "AsyncFirefam.flat_methods",
+        _render_async_firefam_block(
             thread_start_fields,
             thread_list_fields,
             thread_resume_fields,
@@ -1171,7 +1173,7 @@ def generate_types_from_schema_dir(schema_dir: Path) -> None:
 
 def generate_types() -> None:
     """Generate schemas from the pinned runtime and then refresh SDK artifacts."""
-    with tempfile.TemporaryDirectory(prefix="codex-python-schema-") as td:
+    with tempfile.TemporaryDirectory(prefix="firefam-python-schema-") as td:
         schema_dir = generate_schema_from_pinned_runtime(Path(td) / "schema")
         generate_types_from_schema_dir(schema_dir)
 
@@ -1192,9 +1194,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output directory for the staged SDK package",
     )
     stage_sdk_parser.add_argument(
-        "--codex-version",
+        "--firefam-version",
         help=(
-            "Codex release version to write into the staged SDK package and exact "
+            "Firefam release version to write into the staged SDK package and exact "
             f"{RUNTIME_DISTRIBUTION_NAME} dependency. Accepts PEP 440 versions "
             "or release tags such as rust-v0.116.0-alpha.1."
         ),
@@ -1220,12 +1222,12 @@ def build_parser() -> argparse.ArgumentParser:
     stage_runtime_parser.add_argument(
         "runtime_binary",
         type=Path,
-        help="Path to the codex binary to package for this platform",
+        help="Path to the firefam binary to package for this platform",
     )
     stage_runtime_parser.add_argument(
-        "--codex-version",
+        "--firefam-version",
         help=(
-            "Codex release version to write into the staged runtime package. "
+            "Firefam release version to write into the staged runtime package. "
             "Accepts PEP 440 versions or release tags such as rust-v0.116.0-alpha.1."
         ),
     )
@@ -1245,7 +1247,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         type=Path,
-        help="Additional executable to package beside the codex runtime binary.",
+        help="Additional executable to package beside the firefam runtime binary.",
     )
     return parser
 
@@ -1263,22 +1265,24 @@ def default_cli_ops() -> CliOps:
     )
 
 
-def _resolve_codex_version(args: argparse.Namespace) -> str:
+def _resolve_firefam_version(args: argparse.Namespace) -> str:
     versions = [
         value
         for value in (
-            getattr(args, "codex_version", None),
+            getattr(args, "firefam_version", None),
             getattr(args, "runtime_version", None),
             getattr(args, "sdk_version", None),
         )
         if value is not None
     ]
     if not versions:
-        raise RuntimeError("Pass --codex-version to stage Python release artifacts")
+        raise RuntimeError("Pass --firefam-version to stage Python release artifacts")
 
-    normalized_versions = [normalize_codex_version(version) for version in versions]
+    normalized_versions = [normalize_firefam_version(version) for version in versions]
     if len(set(normalized_versions)) != 1:
-        raise RuntimeError("SDK and runtime package versions must match; pass one --codex-version")
+        raise RuntimeError(
+            "SDK and runtime package versions must match; pass one --firefam-version"
+        )
     return normalized_versions[0]
 
 
@@ -1286,17 +1290,17 @@ def run_command(args: argparse.Namespace, ops: CliOps) -> None:
     if args.command == "generate-types":
         ops.generate_types()
     elif args.command == "stage-sdk":
-        codex_version = _resolve_codex_version(args)
+        firefam_version = _resolve_firefam_version(args)
         ops.generate_types()
         ops.stage_python_sdk_package(
             args.staging_dir,
-            codex_version,
+            firefam_version,
         )
     elif args.command == "stage-runtime":
-        codex_version = _resolve_codex_version(args)
+        firefam_version = _resolve_firefam_version(args)
         ops.stage_python_runtime_package(
             args.staging_dir,
-            codex_version,
+            firefam_version,
             args.runtime_binary.resolve(),
             args.platform_tag,
             tuple(path.resolve() for path in args.resource_binary),

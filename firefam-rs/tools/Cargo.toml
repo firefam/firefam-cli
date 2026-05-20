@@ -1,0 +1,34 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-tools"
+version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-code-mode = { workspace = true }
+firefam-features = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-pty = { workspace = true }
+firefam-utils-string = { workspace = true }
+rmcp = { workspace = true, default-features = false, features = [
+    "base64",
+    "macros",
+    "schemars",
+    "server",
+] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+
+[lib]
+doctest = false

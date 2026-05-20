@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { codexExecSpy } from "./codexExecSpy";
+import { firefamExecSpy } from "./firefamExecSpy";
 import { describe, expect, it } from "@jest/globals";
 
 import {
@@ -14,7 +14,7 @@ import {
   startResponsesTestProxy,
   SseResponseBody,
 } from "./responsesProxy";
-import { createMockClient, createTestClient } from "./testCodex";
+import { createMockClient, createTestClient } from "./testFirefam";
 
 describe("Firefam", () => {
   it("returns thread events", async () => {
@@ -195,7 +195,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -234,7 +234,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -265,7 +265,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -296,7 +296,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -327,7 +327,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -358,7 +358,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -389,7 +389,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -408,7 +408,7 @@ describe("Firefam", () => {
     }
   });
 
-  it("passes CodexOptions config overrides as TOML --config flags", async () => {
+  it("passes FirefamOptions config overrides as TOML --config flags", async () => {
     const { url, close } = await startResponsesTestProxy({
       statusCode: 200,
       responseBodies: [
@@ -420,7 +420,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createTestClient({
       baseUrl: url,
       apiKey: "test",
@@ -449,7 +449,7 @@ describe("Firefam", () => {
     }
   });
 
-  it("lets thread options override CodexOptions config overrides", async () => {
+  it("lets thread options override FirefamOptions config overrides", async () => {
     const { url, close } = await startResponsesTestProxy({
       statusCode: 200,
       responseBodies: [
@@ -461,7 +461,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createTestClient({
       baseUrl: url,
       apiKey: "test",
@@ -498,7 +498,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const { client, cleanup } = createMockClient(url);
 
     try {
@@ -540,7 +540,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
 
     const schema = {
       type: "object",
@@ -563,7 +563,7 @@ describe("Firefam", () => {
       const text = payload!.json.text;
       expect(text).toBeDefined();
       expect(text?.format).toEqual({
-        name: "codex_output_schema",
+        name: "firefam_output_schema",
         type: "json_schema",
         strict: true,
         schema,
@@ -626,7 +626,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "firefam-images-"));
     const imagesDirectoryEntries: [string, string] = [
       path.join(tempDir, "first.png"),
@@ -673,7 +673,7 @@ describe("Firefam", () => {
       ],
     });
 
-    const { args: spawnArgs, restore } = codexExecSpy();
+    const { args: spawnArgs, restore } = firefamExecSpy();
     const workingDirectory = fs.mkdtempSync(path.join(os.tmpdir(), "firefam-working-dir-"));
     const { client, cleanup } = createTestClient({
       baseUrl: url,
@@ -742,9 +742,9 @@ describe("Firefam", () => {
       expect(requests.length).toBeGreaterThan(0);
       const originatorHeader = requests[0]!.headers["originator"];
       if (Array.isArray(originatorHeader)) {
-        expect(originatorHeader).toContain("codex_sdk_ts");
+        expect(originatorHeader).toContain("firefam_sdk_ts");
       } else {
-        expect(originatorHeader).toBe("codex_sdk_ts");
+        expect(originatorHeader).toBe("firefam_sdk_ts");
       }
     } finally {
       cleanup();

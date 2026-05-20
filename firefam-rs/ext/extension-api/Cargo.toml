@@ -1,0 +1,19 @@
+[package]
+edition.workspace = true
+license.workspace = true
+name = "firefam-extension-api"
+version.workspace = true
+
+[lib]
+name = "firefam_extension_api"
+path = "src/lib.rs"
+test = false
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+async-trait = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-tools = { workspace = true }

@@ -1,0 +1,125 @@
+[package]
+name = "firefam-app-server"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "firefam-app-server"
+path = "src/main.rs"
+
+[[bin]]
+name = "firefam-app-server-test-notify-capture"
+path = "src/bin/notify_capture.rs"
+
+[lib]
+name = "firefam_app_server"
+path = "src/lib.rs"
+doctest = false
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+axum = { workspace = true, default-features = false, features = [
+    "http1",
+    "json",
+    "tokio",
+    "ws",
+] }
+firefam-analytics = { workspace = true }
+firefam-arg0 = { workspace = true }
+firefam-cloud-requirements = { workspace = true }
+firefam-config = { workspace = true }
+firefam-core = { workspace = true }
+firefam-core-plugins = { workspace = true }
+firefam-exec-server = { workspace = true }
+firefam-extension-api = { workspace = true }
+firefam-external-agent-migration = { workspace = true }
+firefam-external-agent-sessions = { workspace = true }
+firefam-features = { workspace = true }
+firefam-guardian = { workspace = true }
+firefam-git-utils = { workspace = true }
+firefam-file-watcher = { workspace = true }
+firefam-hooks = { workspace = true }
+firefam-otel = { workspace = true }
+firefam-plugin = { workspace = true }
+firefam-shell-command = { workspace = true }
+firefam-utils-cli = { workspace = true }
+firefam-utils-pty = { workspace = true }
+firefam-backend-client = { workspace = true }
+firefam-file-search = { workspace = true }
+firefam-chatgpt = { workspace = true }
+firefam-login = { workspace = true }
+firefam-memories-extension = { workspace = true }
+firefam-memories-write = { workspace = true }
+firefam-mcp = { workspace = true }
+firefam-model-provider = { workspace = true }
+firefam-models-manager = { workspace = true }
+firefam-protocol = { workspace = true }
+firefam-app-server-protocol = { workspace = true }
+firefam-app-server-transport = { workspace = true }
+firefam-feedback = { workspace = true }
+firefam-rmcp-client = { workspace = true }
+firefam-rollout = { workspace = true }
+firefam-sandboxing = { workspace = true }
+firefam-state = { workspace = true }
+firefam-thread-store = { workspace = true }
+firefam-tools = { workspace = true }
+firefam-utils-absolute-path = { workspace = true }
+firefam-utils-json-to-toml = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+futures = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+time = { workspace = true }
+toml = { workspace = true }
+toml_edit = { workspace = true }
+tokio = { workspace = true, features = [
+    "io-std",
+    "macros",
+    "process",
+    "rt-multi-thread",
+    "signal",
+] }
+tokio-util = { workspace = true }
+tracing = { workspace = true, features = ["log"] }
+tracing-subscriber = { workspace = true, features = ["env-filter", "fmt", "json"] }
+uuid = { workspace = true, features = ["serde", "v7"] }
+
+[dev-dependencies]
+app_test_support = { workspace = true }
+axum = { workspace = true, default-features = false, features = [
+    "http1",
+    "json",
+    "tokio",
+] }
+base64 = { workspace = true }
+firefam-model-provider-info = { workspace = true }
+firefam-utils-cargo-bin = { workspace = true }
+core_test_support = { workspace = true }
+flate2 = { workspace = true }
+hmac = { workspace = true }
+opentelemetry = { workspace = true }
+opentelemetry_sdk = { workspace = true }
+pretty_assertions = { workspace = true }
+reqwest = { workspace = true, features = ["rustls-tls"] }
+rmcp = { workspace = true, default-features = false, features = [
+    "elicitation",
+    "server",
+    "transport-streamable-http-server",
+] }
+serial_test = { workspace = true }
+sha2 = { workspace = true }
+shlex = { workspace = true }
+tar = { workspace = true }
+tokio-tungstenite = { workspace = true }
+tracing-opentelemetry = { workspace = true }
+url = { workspace = true }
+wiremock = { workspace = true }

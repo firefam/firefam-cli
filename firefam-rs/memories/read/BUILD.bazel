@@ -1,0 +1,9 @@
+load("//:defs.bzl", "firefam_rust_crate")
+
+firefam_rust_crate(
+    name = "read",
+    crate_name = "firefam_memories_read",
+    compile_data = glob([
+        "templates/**",
+    ]),
+)

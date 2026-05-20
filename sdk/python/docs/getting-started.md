@@ -18,7 +18,7 @@ Requirements:
 
 - Python `>=3.10`
 - uv
-- installed `firefam-cli-bin` runtime package, or an explicit `codex_bin` override
+- installed `firefam-cli-bin` runtime package, or an explicit `firefam_bin` override
 
 ## 2) Authenticate when needed
 
@@ -26,7 +26,7 @@ Existing Firefam auth state is reused automatically. To authenticate from the SD
 use the flow that fits your app:
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 with Firefam() as firefam:
     firefam.login_api_key("sk-...")
@@ -52,7 +52,7 @@ and `wait()`.
 ## 3) Run your first turn (sync)
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 with Firefam() as firefam:
     server = firefam.metadata.serverInfo
@@ -79,7 +79,7 @@ What happened:
 ## 4) Continue the same thread (multi-turn)
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 with Firefam() as firefam:
     thread = firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
@@ -93,16 +93,16 @@ with Firefam() as firefam:
 
 ## 5) Async parity
 
-Use `async with AsyncCodex()` as the normal async entrypoint. `AsyncCodex`
+Use `async with AsyncFirefam()` as the normal async entrypoint. `AsyncFirefam`
 initializes lazily, and context entry makes startup/shutdown explicit.
 
 ```python
 import asyncio
-from openai_codex import AsyncCodex
+from firefamai_firefam import AsyncFirefam
 
 
 async def main() -> None:
-    async with AsyncCodex() as firefam:
+    async with AsyncFirefam() as firefam:
         thread = await firefam.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
         result = await thread.run("Continue where we left off.")
         print(result.final_response)
@@ -114,7 +114,7 @@ asyncio.run(main())
 ## 6) Resume an existing thread
 
 ```python
-from openai_codex import Firefam
+from firefamai_firefam import Firefam
 
 THREAD_ID = "thr_123"  # replace with a real id
 
@@ -130,7 +130,7 @@ The convenience wrappers live at the package root. Public app-server value and
 event types live under:
 
 ```python
-from openai_codex.types import ThreadReadResponse, Turn, TurnStatus
+from firefamai_firefam.types import ThreadReadResponse, Turn, TurnStatus
 ```
 
 ## 8) Next stops

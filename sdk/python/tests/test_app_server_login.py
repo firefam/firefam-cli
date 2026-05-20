@@ -5,8 +5,8 @@ import json
 
 from app_server_harness import AppServerHarness
 
-from openai_codex import AppServerConfig, Firefam
-from openai_codex.generated.v2_all import (
+from firefamai_firefam import AppServerConfig, Firefam
+from firefamai_firefam.generated.v2_all import (
     ChatgptAuthTokensLoginAccountParams,
     LoginAccountParams,
 )
@@ -21,12 +21,12 @@ def _app_server_config(harness: AppServerHarness) -> AppServerConfig:
 
 def test_api_key_login_authenticates_follow_up_model_requests(tmp_path) -> None:
     """API-key login should authorize the next Responses request with that key."""
-    with AppServerHarness(tmp_path, requires_openai_auth=True) as harness:
+    with AppServerHarness(tmp_path, requires_firefamai_auth=True) as harness:
         harness.responses.enqueue_assistant_message("api key auth", response_id="api-key-auth")
 
-        with Firefam(config=_app_server_config(harness)) as codex:
-            codex.login_api_key("sk-sdk-login-test")
-            result = codex.thread_start().run("prove api key auth")
+        with Firefam(config=_app_server_config(harness)) as firefam:
+            firefam.login_api_key("sk-sdk-login-test")
+            result = firefam.thread_start().run("prove api key auth")
             request = harness.responses.single_request()
 
     assert {
@@ -59,14 +59,14 @@ def test_chatgpt_token_login_authenticates_follow_up_model_requests(tmp_path) ->
     )
     access_token = f"{header}.{claims}.sig"
 
-    with AppServerHarness(tmp_path, requires_openai_auth=True) as harness:
+    with AppServerHarness(tmp_path, requires_firefamai_auth=True) as harness:
         harness.responses.enqueue_assistant_message(
             "chatgpt token auth",
             response_id="chatgpt-token-auth",
         )
 
-        with Firefam(config=_app_server_config(harness)) as codex:
-            login = codex._client.account_login_start(
+        with Firefam(config=_app_server_config(harness)) as firefam:
+            login = firefam._client.account_login_start(
                 LoginAccountParams(
                     root=ChatgptAuthTokensLoginAccountParams(
                         access_token=access_token,
@@ -76,7 +76,7 @@ def test_chatgpt_token_login_authenticates_follow_up_model_requests(tmp_path) ->
                     )
                 )
             )
-            result = codex.thread_start().run("prove chatgpt token auth")
+            result = firefam.thread_start().run("prove chatgpt token auth")
             request = harness.responses.single_request()
 
     assert {

@@ -31,7 +31,7 @@ jobs:
       contents: read
     defaults:
       run:
-        working-directory: codex-rs
+        working-directory: firefam-rs
     env:
       CARGO_PROFILE_RELEASE_LTO: ${{ inputs.release-lto }}
 
@@ -42,45 +42,45 @@ jobs:
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             bundle: primary
-            binaries: "codex codex-responses-api-proxy"
+            binaries: "firefam firefam-responses-api-proxy"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             bundle: primary
-            binaries: "codex codex-responses-api-proxy"
+            binaries: "firefam firefam-responses-api-proxy"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             bundle: helpers
-            binaries: "codex-windows-sandbox-setup codex-command-runner"
+            binaries: "firefam-windows-sandbox-setup firefam-command-runner"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             bundle: helpers
-            binaries: "codex-windows-sandbox-setup codex-command-runner"
+            binaries: "firefam-windows-sandbox-setup firefam-command-runner"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             bundle: app-server
-            binaries: "codex-app-server"
+            binaries: "firefam-app-server"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             bundle: app-server
-            binaries: "codex-app-server"
+            binaries: "firefam-app-server"
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -117,7 +117,7 @@ jobs:
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: cargo-timings-rust-release-windows-${{ matrix.target }}-${{ matrix.bundle }}
-          path: codex-rs/target/**/cargo-timings/cargo-timing.html
+          path: firefam-rs/target/**/cargo-timings/cargo-timing.html
           if-no-files-found: warn
 
       - name: Stage Windows binaries
@@ -134,7 +134,7 @@ jobs:
         with:
           name: windows-binaries-${{ matrix.target }}-${{ matrix.bundle }}
           path: |
-            codex-rs/target/${{ matrix.target }}/release/staged-${{ matrix.bundle }}/*
+            firefam-rs/target/${{ matrix.target }}/release/staged-${{ matrix.bundle }}/*
 
   build-windows:
     needs:
@@ -147,9 +147,9 @@ jobs:
       id-token: write
     defaults:
       run:
-        working-directory: codex-rs
+        working-directory: firefam-rs
     env:
-      WINDOWS_BINARIES: "codex codex-responses-api-proxy codex-windows-sandbox-setup codex-command-runner codex-app-server"
+      WINDOWS_BINARIES: "firefam firefam-responses-api-proxy firefam-windows-sandbox-setup firefam-command-runner firefam-app-server"
 
     strategy:
       fail-fast: false
@@ -158,13 +158,13 @@ jobs:
           - runner: windows-x64
             target: x86_64-pc-windows-msvc
             runs_on:
-              group: codex-runners
-              labels: codex-windows-x64
+              group: firefam-runners
+              labels: firefam-windows-x64
           - runner: windows-arm64
             target: aarch64-pc-windows-msvc
             runs_on:
-              group: codex-runners
-              labels: codex-windows-arm64
+              group: firefam-runners
+              labels: firefam-windows-arm64
 
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -175,19 +175,19 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: windows-binaries-${{ matrix.target }}-primary
-          path: codex-rs/target/${{ matrix.target }}/release
+          path: firefam-rs/target/${{ matrix.target }}/release
 
       - name: Download prebuilt Windows helper binaries
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: windows-binaries-${{ matrix.target }}-helpers
-          path: codex-rs/target/${{ matrix.target }}/release
+          path: firefam-rs/target/${{ matrix.target }}/release
 
       - name: Download prebuilt Windows app-server binary
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: windows-binaries-${{ matrix.target }}-app-server
-          path: codex-rs/target/${{ matrix.target }}/release
+          path: firefam-rs/target/${{ matrix.target }}/release
 
       - name: Verify binaries
         shell: bash
@@ -225,7 +225,7 @@ jobs:
         run: |
           set -euo pipefail
           for bundle in primary app-server; do
-            bash "${GITHUB_WORKSPACE}/.github/scripts/build-codex-package-archive.sh" \
+            bash "${GITHUB_WORKSPACE}/.github/scripts/build-firefam-package-archive.sh" \
               --target "${{ matrix.target }}" \
               --bundle "$bundle" \
               --entrypoint-dir "target/${{ matrix.target }}/release" \
@@ -253,18 +253,18 @@ jobs:
           python -m venv "${RUNNER_TEMP}/python-runtime-build-venv"
           "${RUNNER_TEMP}/python-runtime-build-venv/Scripts/python.exe" -m pip install build
 
-          stage_dir="${RUNNER_TEMP}/openai-codex-cli-bin-${{ matrix.target }}"
+          stage_dir="${RUNNER_TEMP}/firefamai-firefam-cli-bin-${{ matrix.target }}"
           wheel_dir="${GITHUB_WORKSPACE}/python-runtime-dist/${{ matrix.target }}"
-          # Keep the helpers next to codex.exe in the runtime wheel so Windows
+          # Keep the helpers next to firefam.exe in the runtime wheel so Windows
           # sandbox/elevation lookup matches the standalone release zip.
           python "${GITHUB_WORKSPACE}/sdk/python/scripts/update_sdk_artifacts.py" \
             stage-runtime \
             "$stage_dir" \
-            "${GITHUB_WORKSPACE}/codex-rs/target/${{ matrix.target }}/release/codex.exe" \
-            --codex-version "${GITHUB_REF_NAME}" \
+            "${GITHUB_WORKSPACE}/firefam-rs/target/${{ matrix.target }}/release/firefam.exe" \
+            --firefam-version "${GITHUB_REF_NAME}" \
             --platform-tag "$platform_tag" \
-            --resource-binary "${GITHUB_WORKSPACE}/codex-rs/target/${{ matrix.target }}/release/codex-command-runner.exe" \
-            --resource-binary "${GITHUB_WORKSPACE}/codex-rs/target/${{ matrix.target }}/release/codex-windows-sandbox-setup.exe"
+            --resource-binary "${GITHUB_WORKSPACE}/firefam-rs/target/${{ matrix.target }}/release/firefam-command-runner.exe" \
+            --resource-binary "${GITHUB_WORKSPACE}/firefam-rs/target/${{ matrix.target }}/release/firefam-windows-sandbox-setup.exe"
           "${RUNNER_TEMP}/python-runtime-build-venv/Scripts/python.exe" -m build --wheel --outdir "$wheel_dir" "$stage_dir"
 
       - name: Upload Python runtime wheel
@@ -288,9 +288,9 @@ jobs:
           # For compatibility with environments that lack the `zstd` tool we
           # additionally create a `.tar.gz` and `.zip` for every Windows binary.
           # The end result is:
-          #   codex-<target>.zst
-          #   codex-<target>.tar.gz
-          #   codex-<target>.zip
+          #   firefam-<target>.zst
+          #   firefam-<target>.tar.gz
+          #   firefam-<target>.zip
           for f in "$dest"/*; do
             base="$(basename "$f")"
             # Skip files that are already archives (shouldn't happen, but be
@@ -310,18 +310,18 @@ jobs:
             # Create zip archive for Windows binaries.
             # Must run from inside the dest dir so 7z won't embed the
             # directory path inside the zip.
-            if [[ "$base" == "codex-${{ matrix.target }}.exe" ]]; then
-              # Bundle the sandbox helper binaries into the main codex zip so
-              # WinGet installs include the required helpers next to codex.exe.
+            if [[ "$base" == "firefam-${{ matrix.target }}.exe" ]]; then
+              # Bundle the sandbox helper binaries into the main firefam zip so
+              # WinGet installs include the required helpers next to firefam.exe.
               # Fall back to the single-binary zip if the helpers are missing
               # to avoid breaking releases.
               bundle_dir="$(mktemp -d)"
-              runner_src="$dest/codex-command-runner-${{ matrix.target }}.exe"
-              setup_src="$dest/codex-windows-sandbox-setup-${{ matrix.target }}.exe"
+              runner_src="$dest/firefam-command-runner-${{ matrix.target }}.exe"
+              setup_src="$dest/firefam-windows-sandbox-setup-${{ matrix.target }}.exe"
               if [[ -f "$runner_src" && -f "$setup_src" ]]; then
                 cp "$dest/$base" "$bundle_dir/$base"
-                cp "$runner_src" "$bundle_dir/codex-command-runner.exe"
-                cp "$setup_src" "$bundle_dir/codex-windows-sandbox-setup.exe"
+                cp "$runner_src" "$bundle_dir/firefam-command-runner.exe"
+                cp "$setup_src" "$bundle_dir/firefam-windows-sandbox-setup.exe"
                 # Use an absolute path so bundle zips land in the real dist
                 # dir even when 7z runs from a temp directory.
                 (cd "$bundle_dir" && 7z a "$repo_root/$dest/${base}.zip" .)
@@ -343,4 +343,4 @@ jobs:
         with:
           name: ${{ matrix.target }}
           path: |
-            codex-rs/dist/${{ matrix.target }}/*
+            firefam-rs/dist/${{ matrix.target }}/*
