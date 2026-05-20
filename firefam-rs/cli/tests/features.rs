@@ -25,16 +25,14 @@ fn strict_config_rejects_unknown_config_override() -> Result<()> {
 }
 
 #[test]
-fn strict_config_is_not_supported_for_cloud_command() -> Result<()> {
+fn cloud_command_is_not_registered() -> Result<()> {
     let firefam_home = TempDir::new()?;
 
     let mut cmd = firefam_command(firefam_home.path())?;
-    cmd.args(["--strict-config", "-c", "foo=bar", "cloud", "list"])
+    cmd.args(["cloud", "list"])
         .assert()
         .failure()
-        .stderr(contains(
-            "`--strict-config` is not supported for `firefam cloud`",
-        ));
+        .stderr(contains("unexpected argument 'list' found"));
 
     Ok(())
 }

@@ -21,7 +21,6 @@ use firefam_cli::run_login_with_api_key;
 use firefam_cli::run_login_with_chatgpt;
 use firefam_cli::run_login_with_device_code;
 use firefam_cli::run_logout;
-use firefam_cloud_tasks::Cli as CloudTasksCli;
 use firefam_exec::Cli as ExecCli;
 use firefam_exec::Command as ExecCommand;
 use firefam_exec::ReviewArgs;
@@ -49,7 +48,6 @@ mod app_cmd;
 #[cfg(any(target_os = "macos", target_os = "windows"))]
 mod desktop_app;
 mod doctor;
-mod marketplace_cmd;
 mod mcp_cmd;
 mod plugin_cmd;
 mod remote_control_cmd;
@@ -179,10 +177,6 @@ enum Subcommand {
 
     /// Fork a previous interactive session (picker by default; use --last to fork the most recent).
     Fork(ForkCommand),
-
-    /// [EXPERIMENTAL] Browse tasks from Firefam Cloud and apply changes locally.
-    #[clap(name = "cloud", alias = "cloud-tasks")]
-    Cloud(CloudTasksCli),
 
     /// Internal: run the responses API proxy.
     #[clap(hide = true)]
@@ -946,10 +940,6 @@ async fn cli_main(arg0_paths: Arg0DispatchPaths) -> anyhow::Result<()> {
                         .map_err(anyhow::Error::msg)?;
                     plugin_cmd::run_plugin_list(overrides, args).await?;
                 }
-                PluginSubcommand::Marketplace(mut marketplace_cli) => {
-                    prepend_config_flags(&mut marketplace_cli.config_overrides, config_overrides);
-                    marketplace_cli.run().await?;
-                }
                 PluginSubcommand::Remove(args) => {
                     let overrides = config_overrides
                         .parse_overrides()
@@ -1224,19 +1214,6 @@ async fn cli_main(arg0_paths: Arg0DispatchPaths) -> anyhow::Result<()> {
                 &arg0_paths,
             )
             .await?;
-        }
-        Some(Subcommand::Cloud(mut cloud_cli)) => {
-            reject_remote_mode_for_subcommand(
-                root_remote.as_deref(),
-                root_remote_auth_token_env.as_deref(),
-                "cloud",
-            )?;
-            prepend_config_flags(
-                &mut cloud_cli.config_overrides,
-                root_config_overrides.clone(),
-            );
-            firefam_cloud_tasks::run_main(cloud_cli, arg0_paths.firefam_linux_sandbox_exe.clone())
-                .await?;
         }
         Some(Subcommand::Sandbox(sandbox_args)) => match sandbox_args.cmd {
             SandboxCommand::Macos(mut seatbelt_cli) => {
@@ -1869,7 +1846,7 @@ fn reject_root_strict_config_for_subcommand(
 /// unsupported subcommands need an explicit post-parse reject path.
 ///
 /// `Some(...)` returns the user-facing command name fragment to embed in the
-/// rejection error, such as `cloud` or `app-server proxy`. `None` means the
+/// rejection error, such as `app-server proxy`. `None` means the
 /// selected command is allowed to inherit root `--strict-config`.
 fn unsupported_subcommand_name_for_strict_config(
     subcommand: &Option<Subcommand>,
@@ -1895,7 +1872,6 @@ fn unsupported_subcommand_name_for_strict_config(
         Some(Subcommand::Logout(_)) => Some("logout"),
         Some(Subcommand::Completion(_)) => Some("completion"),
         Some(Subcommand::Update) => Some("update"),
-        Some(Subcommand::Cloud(_)) => Some("cloud"),
         Some(Subcommand::Sandbox(_)) => Some("sandbox"),
         Some(Subcommand::Debug(_)) => Some("debug"),
         Some(Subcommand::Execpolicy(_)) => Some("execpolicy"),
@@ -2442,49 +2418,6 @@ mod tests {
         );
     }
 
-    fn help_from_args(args: &[&str]) -> String {
-        let err = MultitoolCli::try_parse_from(args).expect_err("help should short-circuit");
-        assert_eq!(err.kind(), clap::error::ErrorKind::DisplayHelp);
-        err.to_string()
-    }
-
-    #[test]
-    fn plugin_marketplace_help_uses_plugin_namespace() {
-        let help = help_from_args(&["firefam", "plugin", "marketplace", "--help"]);
-        assert!(
-            help.contains("Usage: firefam plugin marketplace [OPTIONS] <COMMAND>"),
-            "{help}"
-        );
-
-        for (subcommand, usage) in [
-            ("add", "Usage: firefam plugin marketplace add"),
-            ("list", "Usage: firefam plugin marketplace list"),
-            ("upgrade", "Usage: firefam plugin marketplace upgrade"),
-            ("remove", "Usage: firefam plugin marketplace remove"),
-        ] {
-            let help = help_from_args(&["firefam", "plugin", "marketplace", subcommand, "--help"]);
-            assert!(help.contains(usage), "{help}");
-        }
-    }
-
-    #[test]
-    fn plugin_marketplace_add_parses_under_plugin() {
-        let cli =
-            MultitoolCli::try_parse_from(["firefam", "plugin", "marketplace", "add", "owner/repo"])
-                .expect("parse");
-
-        assert!(matches!(cli.subcommand, Some(Subcommand::Plugin(_))));
-    }
-
-    #[test]
-    fn plugin_marketplace_upgrade_parses_under_plugin() {
-        let cli =
-            MultitoolCli::try_parse_from(["firefam", "plugin", "marketplace", "upgrade", "debug"])
-                .expect("parse");
-
-        assert!(matches!(cli.subcommand, Some(Subcommand::Plugin(_))));
-    }
-
     #[test]
     fn plugin_add_parses_under_plugin() {
         let cli = MultitoolCli::try_parse_from([
@@ -2563,12 +2496,20 @@ mod tests {
     }
 
     #[test]
-    fn plugin_marketplace_remove_parses_under_plugin() {
-        let cli =
-            MultitoolCli::try_parse_from(["firefam", "plugin", "marketplace", "remove", "debug"])
-                .expect("parse");
+    fn plugin_marketplace_no_longer_parses_under_plugin() {
+        let result =
+            MultitoolCli::try_parse_from(["firefam", "plugin", "marketplace", "remove", "debug"]);
 
-        assert!(matches!(cli.subcommand, Some(Subcommand::Plugin(_))));
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn cloud_no_longer_parses_at_top_level() {
+        let cloud_result = MultitoolCli::try_parse_from(["firefam", "cloud", "list"]);
+        assert!(cloud_result.is_err());
+
+        let cloud_tasks_result = MultitoolCli::try_parse_from(["firefam", "cloud-tasks", "list"]);
+        assert!(cloud_tasks_result.is_err());
     }
 
     #[test]

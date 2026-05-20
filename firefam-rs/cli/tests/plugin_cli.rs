@@ -2,6 +2,7 @@ use anyhow::Result;
 use firefam_config::CONFIG_TOML_FILE;
 use firefam_config::MarketplaceConfigUpdate;
 use firefam_config::record_user_marketplace;
+use firefam_config::remove_user_marketplace;
 use predicates::prelude::PredicateBooleanExt;
 use predicates::str::contains;
 use std::path::Path;
@@ -116,20 +117,6 @@ fn setup_configured_marketplace_with_malformed_manifest() -> Result<(TempDir, Te
         &configured_local_marketplace(&source_path),
     )?;
     Ok((firefam_home, source))
-}
-
-#[tokio::test]
-async fn marketplace_list_shows_configured_marketplace_names() -> Result<()> {
-    let (firefam_home, source) = setup_local_marketplace()?;
-
-    firefam_command(firefam_home.path())?
-        .args(["plugin", "marketplace", "list"])
-        .assert()
-        .success()
-        .stdout(contains("debug"))
-        .stdout(contains(source.path().display().to_string()));
-
-    Ok(())
 }
 
 #[tokio::test]
@@ -274,10 +261,7 @@ async fn plugin_remove_works_after_marketplace_is_removed() -> Result<()> {
         .assert()
         .success();
 
-    firefam_command(firefam_home.path())?
-        .args(["plugin", "marketplace", "remove", "debug"])
-        .assert()
-        .success();
+    assert!(remove_user_marketplace(firefam_home.path(), "debug")?);
 
     firefam_command(firefam_home.path())?
         .args(["plugin", "remove", "sample@debug"])
@@ -303,10 +287,7 @@ async fn plugin_add_rejects_cached_plugins_without_authorizing_marketplace_snaps
         .assert()
         .success();
 
-    firefam_command(firefam_home.path())?
-        .args(["plugin", "marketplace", "remove", "debug"])
-        .assert()
-        .success();
+    assert!(remove_user_marketplace(firefam_home.path(), "debug")?);
 
     assert!(
         firefam_home

@@ -17,8 +17,6 @@ use firefam_plugin::validate_plugin_segment;
 use firefam_utils_cli::CliConfigOverrides;
 use std::path::PathBuf;
 
-use crate::marketplace_cmd::MarketplaceCli;
-
 #[derive(Debug, Parser)]
 #[command(bin_name = "firefam plugin")]
 pub struct PluginCli {
@@ -39,9 +37,6 @@ pub enum PluginSubcommand {
 
     /// List plugins available from configured marketplace snapshots.
     List(ListPluginsArgs),
-
-    /// Add, list, upgrade, or remove configured plugin marketplaces.
-    Marketplace(MarketplaceCli),
 
     /// Remove an installed plugin from local config and cache.
     ///

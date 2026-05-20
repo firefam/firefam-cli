@@ -28,7 +28,6 @@ firefam-app-server-test-client = { workspace = true }
 firefam-arg0 = { workspace = true }
 firefam-api = { workspace = true }
 firefam-chatgpt = { workspace = true }
-firefam-cloud-tasks = { path = "../cloud-tasks" }
 firefam-utils-cli = { workspace = true }
 firefam-config = { workspace = true }
 firefam-core = { workspace = true }
