@@ -1,4 +1,4 @@
-//! Codex Apps support for the host-owned apps MCP server.
+//! Firefam Apps support for the host-owned apps MCP server.
 //!
 //! This module owns the pieces that are unique to ChatGPT-hosted app
 //! connectors: cache scoping by authenticated user, disk cache reads/writes,

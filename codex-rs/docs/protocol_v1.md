@@ -119,7 +119,7 @@ sequenceDiagram
     participant user as User
     end
     box Daemon
-    participant codex as Codex
+    participant codex as Firefam
     participant session as Session
     participant task as Task
     end

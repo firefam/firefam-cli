@@ -26,7 +26,7 @@ pub(super) fn ensure_codex_app_runtime_bin_readable(
         return Ok(());
     };
 
-    // Codex desktop copies bundled Windows binaries out of WindowsApps to this
+    // Firefam desktop copies bundled Windows binaries out of WindowsApps to this
     // fixed LocalAppData cache before launching codex.exe.
     let runtime_bin_dir = local_app_data.join("OpenAI").join("Codex").join("bin");
     if !runtime_bin_dir.is_dir() {

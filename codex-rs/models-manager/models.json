@@ -1,6 +1,6 @@
 {
   "models": [
-    { 
+    {
       "prefer_websockets": true,
       "support_verbosity": true,
       "default_verbosity": "low",
@@ -48,7 +48,7 @@
       "minimal_client_version": "0.124.0",
       "supported_in_api": true,
       "availability_nux": {
-        "message": "GPT-5.5 is now available in Codex. It's our strongest agentic coding model yet, built to reason through large codebases, check assumptions with tools, and keep going until the work is done.\n\nLearn more: https://openai.com/index/introducing-gpt-5-5/\n\n"
+        "message": "GPT-5.5 is now available in Firefam. It's our strongest agentic coding model yet, built to reason through large codebases, check assumptions with tools, and keep going until the work is done.\n\nLearn more: https://openai.com/index/introducing-gpt-5-5/\n\n"
       },
       "upgrade": null,
       "priority": 0,
@@ -454,7 +454,7 @@
       "default_reasoning_summary": "none",
       "slug": "codex-auto-review",
       "display_name": "Codex Auto Review",
-      "description": "Automatic approval review model for Codex.",
+      "description": "Automatic approval review model for Firefam.",
       "default_reasoning_level": "medium",
       "supported_reasoning_levels": [
         {

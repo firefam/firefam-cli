@@ -20,7 +20,7 @@ const TOKIO_WORKER_STACK_SIZE_BYTES: usize = 16 * 1024 * 1024;
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Arg0DispatchPaths {
-    /// Stable path to the current Codex executable for child re-execs.
+    /// Stable path to the current Firefam executable for child re-execs.
     ///
     /// Prefer this over [`std::env::current_exe()`] in code that may run under
     /// a test harness, where `current_exe()` can point at the harness binary
@@ -141,7 +141,7 @@ pub fn arg0_dispatch() -> Option<Arg0PathEntryGuard> {
     match prepend_path_entry_for_codex_aliases() {
         Ok(path_entry) => Some(path_entry),
         Err(err) => {
-            // It is possible that Codex will proceed successfully even if
+            // It is possible that Firefam will proceed successfully even if
             // updating the PATH fails, so warn the user and move on.
             eprintln!("WARNING: proceeding, even though we could not update PATH: {err}");
             None

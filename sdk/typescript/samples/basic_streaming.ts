@@ -3,11 +3,11 @@
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 
-import { Codex } from "firefam-sdk";
+import { Firefam } from "firefam-sdk";
 import type { ThreadEvent, ThreadItem } from "firefam-sdk";
 import { codexPathOverride } from "./helpers.ts";
 
-const codex = new Codex({ codexPathOverride: codexPathOverride() });
+const codex = new Firefam({ codexPathOverride: codexPathOverride() });
 const thread = codex.startThread();
 const rl = createInterface({ input, output });
 

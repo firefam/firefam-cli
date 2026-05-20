@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Set "chatgpt.cliExecutable": "/Users/<USERNAME>/code/codex/scripts/debug-codex.sh" in VSCode settings to always get the 
-# latest codex-rs binary when debugging Codex Extension.
+# latest codex-rs binary when debugging Firefam Extension.
 
 
 set -euo pipefail

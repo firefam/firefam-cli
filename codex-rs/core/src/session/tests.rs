@@ -1276,7 +1276,7 @@ async fn reload_user_config_layer_refreshes_hooks() -> anyhow::Result<()> {
         config
             .features
             .enable(Feature::CodexHooks)
-            .expect("enable Codex hooks");
+            .expect("enable Firefam hooks");
     })
     .await?;
     let codex_home = session.codex_home().await;
@@ -1353,7 +1353,7 @@ async fn refresh_runtime_config_refreshes_hooks() -> anyhow::Result<()> {
         config
             .features
             .enable(Feature::CodexHooks)
-            .expect("enable Codex hooks");
+            .expect("enable Firefam hooks");
         state.session_configuration.original_config_do_not_use = Arc::new(config);
     }
     let codex_home = session.codex_home().await;
@@ -4989,7 +4989,7 @@ async fn submit_with_id_captures_current_span_trace_context() {
     let (tx_sub, rx_sub) = async_channel::bounded(1);
     let (_tx_event, rx_event) = async_channel::unbounded();
     let (_agent_status_tx, agent_status) = watch::channel(AgentStatus::PendingInit);
-    let codex = Codex {
+    let codex = Firefam {
         tx_sub,
         rx_event,
         agent_status,
@@ -5774,7 +5774,7 @@ async fn shutdown_and_wait_shuts_down_cached_guardian_subagent() {
     let parent_session_loop_handle = tokio::spawn(async move {
         submission_loop(parent_session_for_loop, parent_config, parent_rx_sub).await;
     });
-    let parent_codex = Codex {
+    let parent_codex = Firefam {
         tx_sub: parent_tx_sub,
         rx_event: parent_rx_event,
         agent_status: parent_agent_status,
@@ -5797,7 +5797,7 @@ async fn shutdown_and_wait_shuts_down_cached_guardian_subagent() {
             .send(())
             .expect("child shutdown signal should be delivered");
     });
-    let child_codex = Codex {
+    let child_codex = Firefam {
         tx_sub: child_tx_sub,
         rx_event: child_rx_event,
         agent_status: child_agent_status,
@@ -5830,7 +5830,7 @@ async fn cached_guardian_subagent_exposes_its_rollout_path() {
     let (_child_tx_event, child_rx_event) = async_channel::unbounded();
     let (_child_status_tx, child_agent_status) = watch::channel(AgentStatus::PendingInit);
     let child_session_loop_handle = tokio::spawn(async {});
-    let child_codex = Codex {
+    let child_codex = Firefam {
         tx_sub: child_tx_sub,
         rx_event: child_rx_event,
         agent_status: child_agent_status,
@@ -5863,7 +5863,7 @@ async fn shutdown_and_wait_shuts_down_tracked_ephemeral_guardian_review() {
     let parent_session_loop_handle = tokio::spawn(async move {
         submission_loop(parent_session_for_loop, parent_config, parent_rx_sub).await;
     });
-    let parent_codex = Codex {
+    let parent_codex = Firefam {
         tx_sub: parent_tx_sub,
         rx_event: parent_rx_event,
         agent_status: parent_agent_status,
@@ -5886,7 +5886,7 @@ async fn shutdown_and_wait_shuts_down_tracked_ephemeral_guardian_review() {
             .send(())
             .expect("child shutdown signal should be delivered");
     });
-    let child_codex = Codex {
+    let child_codex = Firefam {
         tx_sub: child_tx_sub,
         rx_event: child_rx_event,
         agent_status: child_agent_status,

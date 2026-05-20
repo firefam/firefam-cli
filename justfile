@@ -55,7 +55,7 @@ install:
 test:
     RUST_MIN_STACK={{ rust_min_stack }} cargo nextest run --no-fail-fast
 
-# Build and run Codex from source using Bazel.
+# Build and run Firefam from source using Bazel.
 # Note we have to use the combination of `[no-cd]` and `--run_under="cd $PWD &&"`
 # to ensure that Bazel runs the command in the current working directory.
 [no-cd]

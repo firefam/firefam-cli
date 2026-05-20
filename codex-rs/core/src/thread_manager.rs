@@ -105,7 +105,7 @@ impl Drop for TempCodexHomeGuard {
     }
 }
 
-/// Represents a newly created Codex thread (formerly called a conversation), including the first event
+/// Represents a newly created Firefam thread (formerly called a conversation), including the first event
 /// (which is [`EventMsg::SessionConfigured`]).
 pub struct NewThread {
     pub thread_id: ThreadId,
@@ -1196,7 +1196,7 @@ impl ThreadManagerState {
         let tracked_session_source = session_source.clone();
         let CodexSpawnOk {
             codex, thread_id, ..
-        } = Codex::spawn(CodexSpawnArgs {
+        } = Firefam::spawn(CodexSpawnArgs {
             config,
             installation_id: self.installation_id.clone(),
             auth_manager,
@@ -1238,7 +1238,7 @@ impl ThreadManagerState {
 
     async fn finalize_thread_spawn(
         &self,
-        codex: Codex,
+        codex: Firefam,
         thread_id: ThreadId,
         session_source: SessionSource,
     ) -> CodexResult<NewThread> {

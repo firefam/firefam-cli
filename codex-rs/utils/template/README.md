@@ -32,7 +32,7 @@ let rendered = template.render([
 
 assert_eq!(
     rendered,
-    "Hello, Codex.\nLiteral braces: {{ and }}.\nMode: strict"
+    "Hello, Firefam.\nLiteral braces: {{ and }}.\nMode: strict"
 );
 
 let one_shot = render("Hi {{ who }}!", [("who", "there")])?;

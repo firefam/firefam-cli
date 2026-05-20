@@ -567,7 +567,7 @@ pub enum PluginAuthPolicy {
 #[ts(export_to = "v2/")]
 pub enum PluginAvailability {
     /// Plugin-service currently sends `"ENABLED"` for available remote plugins.
-    /// Codex app-server exposes `"AVAILABLE"` in its API; the alias keeps
+    /// Firefam app-server exposes `"AVAILABLE"` in its API; the alias keeps
     /// decoding compatible with that upstream response.
     #[serde(rename = "AVAILABLE", alias = "ENABLED")]
     #[ts(rename = "AVAILABLE")]

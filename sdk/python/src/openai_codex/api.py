@@ -73,7 +73,7 @@ from .generated.v2_all import (
 from .models import InitializeResponse, JsonObject, Notification
 
 
-class Codex:
+class Firefam:
     """Typed Python client for app-server v2 workflows."""
 
     def __init__(self, config: AppServerConfig | None = None) -> None:
@@ -125,7 +125,7 @@ class Codex:
         """Clear the current app-server account session."""
         self._client.account_logout()
 
-    # BEGIN GENERATED: Codex.flat_methods
+    # BEGIN GENERATED: Firefam.flat_methods
     def thread_start(
         self,
         *,
@@ -268,7 +268,7 @@ class Codex:
         unarchived = self._client.thread_unarchive(thread_id)
         return Thread(self._client, unarchived.thread.id)
 
-    # END GENERATED: Codex.flat_methods
+    # END GENERATED: Firefam.flat_methods
 
     def models(self, *, include_hidden: bool = False) -> ModelListResponse:
         return self._client.model_list(include_hidden=include_hidden)

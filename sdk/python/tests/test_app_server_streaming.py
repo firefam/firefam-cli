@@ -11,7 +11,7 @@ from app_server_helpers import (
     streaming_response,
 )
 
-from openai_codex import AsyncCodex, Codex
+from openai_codex import AsyncCodex, Firefam
 from openai_codex.generated.v2_all import (
     AgentMessageDeltaNotification,
     TurnCompletedNotification,
@@ -24,7 +24,7 @@ def test_sync_stream_routes_text_deltas_and_completion(tmp_path) -> None:
     with AppServerHarness(tmp_path) as harness:
         harness.responses.enqueue_sse(streaming_response("stream-1", "msg-stream-1", ["he", "llo"]))
 
-        with Codex(config=harness.app_server_config()) as codex:
+        with Firefam(config=harness.app_server_config()) as codex:
             thread = codex.thread_start()
             stream = thread.turn("stream please").stream()
             events = list(stream)
@@ -56,7 +56,7 @@ def test_turn_run_returns_completed_turn(tmp_path) -> None:
     with AppServerHarness(tmp_path) as harness:
         harness.responses.enqueue_assistant_message("turn complete", response_id="turn-run-1")
 
-        with Codex(config=harness.app_server_config()) as codex:
+        with Firefam(config=harness.app_server_config()) as codex:
             thread = codex.thread_start()
             turn = thread.turn("complete this turn")
             completed = turn.run()
@@ -120,7 +120,7 @@ def test_low_level_sync_stream_text_uses_real_turn_routing(tmp_path) -> None:
             streaming_response("low-sync-stream", "msg-low-sync-stream", ["fir", "st"])
         )
 
-        with Codex(config=harness.app_server_config()) as codex:
+        with Firefam(config=harness.app_server_config()) as codex:
             thread = codex.thread_start()
             chunks = list(codex._client.stream_text(thread.id, "low-level sync"))  # noqa: SLF001
 
@@ -181,7 +181,7 @@ def test_interleaved_sync_turn_streams_route_by_turn_id(tmp_path) -> None:
             delay_between_events_s=0.01,
         )
 
-        with Codex(config=harness.app_server_config()) as codex:
+        with Firefam(config=harness.app_server_config()) as codex:
             first_thread = codex.thread_start()
             second_thread = codex.thread_start()
             first_turn = first_thread.turn("first")

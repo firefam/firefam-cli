@@ -491,7 +491,7 @@ async fn discover_skills_under_root(
         }
     }
 
-    // Follow symlinked directories for user, admin, and repo skills. System skills are written by Codex itself.
+    // Follow symlinked directories for user, admin, and repo skills. System skills are written by Firefam itself.
     let follow_symlinks = matches!(
         scope,
         SkillScope::Repo | SkillScope::User | SkillScope::Admin

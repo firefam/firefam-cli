@@ -1,10 +1,10 @@
 #!/usr/bin/env -S NODE_NO_WARNINGS=1 pnpm ts-node-esm --files
 
-import { Codex } from "firefam-sdk";
+import { Firefam } from "firefam-sdk";
 
 import { codexPathOverride } from "./helpers.ts";
 
-const codex = new Codex({ codexPathOverride: codexPathOverride() });
+const codex = new Firefam({ codexPathOverride: codexPathOverride() });
 
 const thread = codex.startThread();
 

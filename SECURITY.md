@@ -1,6 +1,6 @@
 # Security Policy
 
-Thank you for helping us keep Codex secure!
+Thank you for helping us keep Firefam secure!
 
 ## Reporting Security Issues
 
@@ -14,4 +14,4 @@ Our Vulnerability Program Guidelines are defined on our [Bugcrowd program page](
 
 ## How to operate CODEX safely
 
-For details on Codex security boundaries, including sandboxing, approvals, and network controls, see [Agent approvals & security](https://developers.openai.com/codex/agent-approvals-security).
+For details on Firefam security boundaries, including sandboxing, approvals, and network controls, see [Agent approvals & security](https://developers.openai.com/codex/agent-approvals-security).

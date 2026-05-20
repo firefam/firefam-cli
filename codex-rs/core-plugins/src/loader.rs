@@ -1057,7 +1057,7 @@ fn normalize_plugin_mcp_server_value(
         if oauth.remove("callbackPort").is_some() {
             warn!(
                 plugin = %plugin_root.display(),
-                "plugin MCP server OAuth callbackPort is ignored; Codex uses global MCP OAuth callback settings"
+                "plugin MCP server OAuth callbackPort is ignored; Firefam uses global MCP OAuth callback settings"
             );
         }
 

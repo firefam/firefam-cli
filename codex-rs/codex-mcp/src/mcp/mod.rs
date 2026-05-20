@@ -111,7 +111,7 @@ pub struct McpConfig {
     pub apps_mcp_path_override: Option<String>,
     /// Optional product SKU forwarded to the host-owned apps MCP server.
     pub apps_mcp_product_sku: Option<String>,
-    /// Codex home directory used for MCP OAuth state and app-tool cache files.
+    /// Firefam home directory used for MCP OAuth state and app-tool cache files.
     pub codex_home: PathBuf,
     /// Preferred credential store for MCP OAuth tokens.
     pub mcp_oauth_credentials_store_mode: OAuthCredentialsStoreMode,

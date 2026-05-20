@@ -46,7 +46,7 @@ where
     fn spec(&self) -> Option<ToolSpec> {
         Some(memory_function_tool::<ListArgs, ListMemoriesResponse>(
             LIST_TOOL_NAME,
-            "List immediate files and directories under a path in the Codex memories store.",
+            "List immediate files and directories under a path in the Firefam memories store.",
         ))
     }
 

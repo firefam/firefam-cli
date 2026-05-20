@@ -1,4 +1,4 @@
-//! MCP access to Codex memories.
+//! MCP access to Firefam memories.
 //!
 //! This crate only exposes tools for discovering and reading memory files. The
 //! policy that tells a model when to use those tools is injected elsewhere.

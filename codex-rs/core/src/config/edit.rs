@@ -40,7 +40,7 @@ pub enum ConfigEdit {
     SetNoticeHideFullAccessWarning(bool),
     /// Toggle the Windows world-writable directories warning acknowledgement flag.
     SetNoticeHideWorldWritableWarning(bool),
-    /// Toggle the opt-out marker for Codex-managed fast defaults.
+    /// Toggle the opt-out marker for Firefam-managed fast defaults.
     SetNoticeFastDefaultOptOut(bool),
     /// Toggle the rate limit model nudge acknowledgement flag.
     SetNoticeHideRateLimitModelNudge(bool),

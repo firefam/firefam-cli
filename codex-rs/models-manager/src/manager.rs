@@ -34,7 +34,7 @@ pub trait ModelsEndpointClient: fmt::Debug + Send + Sync {
     /// Returns whether this provider can authenticate command-scoped requests.
     fn has_command_auth(&self) -> bool;
 
-    /// Returns whether the currently resolved auth can use Codex backend-only models.
+    /// Returns whether the currently resolved auth can use Firefam backend-only models.
     async fn uses_codex_backend(&self) -> bool;
 
     /// Fetches the latest remote model catalog and optional ETag.

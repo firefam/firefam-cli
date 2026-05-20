@@ -631,7 +631,7 @@ description = "Research role"
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
-Research with Codex carefully."""
+Research with Firefam carefully."""
 "#,
     )
     .expect("parse expected agent");
@@ -703,7 +703,7 @@ async fn import_home_migrates_supported_config_fields_skills_and_agents_md() {
     assert_eq!(
         fs::read_to_string(agents_skills.join("skill-a").join("SKILL.md"))
             .expect("read copied skill"),
-        "Use Codex and Codex utilities."
+        "Use Firefam and Firefam utilities."
     );
 }
 

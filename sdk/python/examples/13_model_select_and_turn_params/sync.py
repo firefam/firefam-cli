@@ -10,7 +10,7 @@ from _bootstrap import ensure_local_sdk_src, runtime_config
 ensure_local_sdk_src()
 
 from openai_codex import (
-    Codex,
+    Firefam,
 )
 from openai_codex.types import (
     Personality,
@@ -73,7 +73,7 @@ SANDBOX_POLICY = SandboxPolicy.model_validate(
 )
 
 
-with Codex(config=runtime_config()) as codex:
+with Firefam(config=runtime_config()) as codex:
     models = codex.models(include_hidden=True)
     selected_model = _pick_highest_model(models.data)
     selected_effort = _pick_highest_turn_effort(selected_model)

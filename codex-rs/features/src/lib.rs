@@ -154,7 +154,7 @@ pub enum Feature {
     ///
     /// Requirements-only gate: this should be set from requirements, not user config.
     BrowserUseExternal,
-    /// Allow Codex Computer Use.
+    /// Allow Firefam Computer Use.
     ///
     /// Requirements-only gate: this should be set from requirements, not user config.
     ComputerUse,
@@ -162,7 +162,7 @@ pub enum Feature {
     RemotePlugin,
     /// Enable remote plugin sharing flows.
     PluginSharing,
-    /// Show the startup prompt for migrating external agent config into Codex.
+    /// Show the startup prompt for migrating external agent config into Firefam.
     ExternalMigration,
     /// Allow the model to invoke the built-in image generation tool.
     ImageGeneration,
@@ -180,7 +180,7 @@ pub enum Feature {
     Goals,
     /// Route MCP tool approval prompts through the MCP elicitation request path.
     ToolCallMcpElicitation,
-    /// Prompt Codex Apps connector auth failures through MCP URL elicitations.
+    /// Prompt Firefam Apps connector auth failures through MCP URL elicitations.
     AuthElicitation,
     /// Enable personality selection in the TUI.
     Personality,
@@ -765,7 +765,7 @@ pub const FEATURES: &[FeatureSpec] = &[
         key: "terminal_resize_reflow",
         stage: Stage::Experimental {
             name: "Terminal resize reflow",
-            menu_description: "Rebuild Codex-owned transcript scrollback when the terminal width changes.",
+            menu_description: "Rebuild Firefam-owned transcript scrollback when the terminal width changes.",
             announcement: "",
         },
         default_enabled: true,
@@ -811,8 +811,8 @@ pub const FEATURES: &[FeatureSpec] = &[
         key: "memories",
         stage: Stage::Experimental {
             name: "Memories",
-            menu_description: "Allow Codex to create new memories from conversations and bring relevant memories into new conversations.",
-            announcement: "NEW: Codex can now generate and use memories. Try it now with `/memories`",
+            menu_description: "Allow Firefam to create new memories from conversations and bring relevant memories into new conversations.",
+            announcement: "NEW: Firefam can now generate and use memories. Try it now with `/memories`",
         },
         default_enabled: false,
     },
@@ -906,7 +906,7 @@ pub const FEATURES: &[FeatureSpec] = &[
         stage: Stage::Experimental {
             name: "Network proxy",
             menu_description: "Apply network proxy restrictions to sandboxed sessions that already have network access.",
-            announcement: "NEW: Network proxy can now be enabled from /experimental. Restart Codex after enabling it.",
+            announcement: "NEW: Network proxy can now be enabled from /experimental. Restart Firefam after enabling it.",
         },
         default_enabled: false,
     },
@@ -1023,7 +1023,7 @@ pub const FEATURES: &[FeatureSpec] = &[
         key: "external_migration",
         stage: Stage::Experimental {
             name: "External migration",
-            menu_description: "Show a startup prompt when Codex detects migratable external agent config for this machine or project.",
+            menu_description: "Show a startup prompt when Firefam detects migratable external agent config for this machine or project.",
             announcement: "",
         },
         default_enabled: false,
@@ -1079,7 +1079,7 @@ pub const FEATURES: &[FeatureSpec] = &[
         key: "goals",
         stage: Stage::Experimental {
             name: "Goals",
-            menu_description: "Set a persistent goal Codex can continue over time",
+            menu_description: "Set a persistent goal Firefam can continue over time",
             announcement: "",
         },
         default_enabled: false,
@@ -1154,7 +1154,7 @@ pub const FEATURES: &[FeatureSpec] = &[
         )) {
             Stage::Experimental {
                 name: "Prevent sleep while running",
-                menu_description: "Keep your computer awake while Codex is running a thread.",
+                menu_description: "Keep your computer awake while Firefam is running a thread.",
                 announcement: "NEW: Prevent sleep while running is now available in /experimental.",
             }
         } else {

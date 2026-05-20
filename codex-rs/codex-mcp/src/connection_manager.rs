@@ -1,4 +1,4 @@
-//! Aggregates MCP server connections for Codex.
+//! Aggregates MCP server connections for Firefam.
 //!
 //! [`McpConnectionManager`] owns the set of running async RMCP clients keyed by
 //! MCP server name. It coordinates startup status events, keeps server origin

@@ -220,7 +220,7 @@ jobs:
               "$dest/${binary}-${{ matrix.target }}.exe"
           done
 
-      - name: Build Codex package archives
+      - name: Build Firefam package archives
         shell: bash
         run: |
           set -euo pipefail

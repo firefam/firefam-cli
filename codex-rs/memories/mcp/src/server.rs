@@ -92,7 +92,7 @@ impl<B: MemoriesBackend> ServerHandler for MemoriesMcpServer<B> {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
             instructions: Some(
-                "Use these tools to list, read, and search Codex memory files.".to_string(),
+                "Use these tools to list, read, and search Firefam memory files.".to_string(),
             ),
             capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..ServerInfo::default()
@@ -210,7 +210,7 @@ fn list_tool() -> Tool {
     let mut tool = Tool::new(
         Cow::Borrowed(LIST_TOOL_NAME),
         Cow::Borrowed(
-            "List immediate files and directories under a path in the Codex memories store.",
+            "List immediate files and directories under a path in the Firefam memories store.",
         ),
         Arc::new(schema::input_schema_for::<ListArgs>()),
     );
@@ -223,7 +223,7 @@ fn read_tool() -> Tool {
     let mut tool = Tool::new(
         Cow::Borrowed(READ_TOOL_NAME),
         Cow::Borrowed(
-            "Read a Codex memory file by relative path, optionally starting at a 1-indexed line offset and limiting the number of lines returned.",
+            "Read a Firefam memory file by relative path, optionally starting at a 1-indexed line offset and limiting the number of lines returned.",
         ),
         Arc::new(schema::input_schema_for::<ReadArgs>()),
     );
@@ -236,7 +236,7 @@ fn search_tool() -> Tool {
     let mut tool = Tool::new(
         Cow::Borrowed(SEARCH_TOOL_NAME),
         Cow::Borrowed(
-            "Search Codex memory files for substring matches, optionally normalizing separators or requiring all query substrings on the same line or within a line window.",
+            "Search Firefam memory files for substring matches, optionally normalizing separators or requiring all query substrings on the same line or within a line window.",
         ),
         Arc::new(schema::input_schema_for::<SearchArgs>()),
     );

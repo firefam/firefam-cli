@@ -9,7 +9,7 @@ Thread starts default to `ApprovalMode.auto_review`; turn starts accept an optio
 
 ```python
 from openai_codex import (
-    Codex,
+    Firefam,
     AsyncCodex,
     ApprovalMode,
     ChatgptLoginHandle,
@@ -48,7 +48,7 @@ from openai_codex.types import (
 - Requires Python >= 3.10
 - Public app-server value and event types live in `openai_codex.types`
 
-## Codex (sync)
+## Firefam (sync)
 
 ```python
 Codex(config: AppServerConfig | None = None)
@@ -74,7 +74,7 @@ Properties/methods:
 Context manager:
 
 ```python
-with Codex() as codex:
+with Firefam() as codex:
     ...
 ```
 
@@ -261,9 +261,9 @@ from openai_codex import (
 ## Example
 
 ```python
-from openai_codex import Codex
+from openai_codex import Firefam
 
-with Codex() as codex:
+with Firefam() as codex:
     thread = codex.thread_start(model="gpt-5.4", config={"model_reasoning_effort": "high"})
     result = thread.run("Say hello in one sentence.")
     print(result.final_response)

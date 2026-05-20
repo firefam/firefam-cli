@@ -56,7 +56,7 @@ pub(crate) fn pre_main_hardening_linux() {
     // For "defense in depth," set the core file size limit to 0.
     set_core_file_size_limit_to_zero();
 
-    // Official Codex releases are MUSL-linked, which means that variables such
+    // Official Firefam releases are MUSL-linked, which means that variables such
     // as LD_PRELOAD are ignored anyway, but just to be sure, clear them here.
     remove_env_vars_with_prefix(b"LD_");
 }
@@ -100,7 +100,7 @@ pub(crate) fn pre_main_hardening_macos() {
     remove_env_vars_with_prefix(b"DYLD_");
 
     // Remove macOS malloc stack-logging controls so allocator diagnostics from
-    // Codex or inherited child processes do not get sprayed into the TUI:
+    // Firefam or inherited child processes do not get sprayed into the TUI:
     // https://github.com/openai/codex/issues/11555
     remove_env_vars_with_prefix(b"MallocStackLogging");
     remove_env_vars_with_prefix(b"MallocLogFile");

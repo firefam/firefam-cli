@@ -1,4 +1,4 @@
-//! Migration helpers for importing external-agent configuration into Codex.
+//! Migration helpers for importing external-agent configuration into Firefam.
 
 use codex_hooks::HOOK_EVENT_NAMES;
 use codex_hooks::HOOK_EVENT_NAMES_WITH_MATCHERS;

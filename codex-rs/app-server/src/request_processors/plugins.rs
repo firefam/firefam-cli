@@ -454,7 +454,7 @@ impl PluginRequestProcessor {
             Ok(enabled) => enabled,
             Err(err) => {
                 warn!(
-                    "failed to fetch workspace Codex plugins setting; allowing Codex plugins: {err:#}"
+                    "failed to fetch workspace Firefam plugins setting; allowing Firefam plugins: {err:#}"
                 );
                 true
             }

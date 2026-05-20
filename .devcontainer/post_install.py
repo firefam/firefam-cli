@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Post-install configuration for the Codex devcontainer."""
+"""Post-install configuration for the Firefam devcontainer."""
 
 from __future__ import annotations
 
@@ -59,7 +59,7 @@ def setup_git_config() -> None:
     gitignore_global = home / ".gitignore_global"
 
     gitignore_global.write_text(
-        """# Codex
+        """# Firefam
 .codex/
 
 # Rust

@@ -89,7 +89,7 @@ struct GuardianReviewSessionState {
 }
 
 struct GuardianReviewSession {
-    codex: Codex,
+    codex: Firefam,
     cancel_token: CancellationToken,
     reuse_key: GuardianReviewSessionReuseKey,
     review_lock: Semaphore,
@@ -415,7 +415,7 @@ impl GuardianReviewSessionManager {
     }
 
     #[cfg(test)]
-    pub(crate) async fn cache_for_test(&self, codex: Codex) {
+    pub(crate) async fn cache_for_test(&self, codex: Firefam) {
         let reuse_key = GuardianReviewSessionReuseKey::from_spawn_config(
             codex.session.get_config().await.as_ref(),
         );
@@ -433,7 +433,7 @@ impl GuardianReviewSessionManager {
     }
 
     #[cfg(test)]
-    pub(crate) async fn register_ephemeral_for_test(&self, codex: Codex) {
+    pub(crate) async fn register_ephemeral_for_test(&self, codex: Firefam) {
         let reuse_key = GuardianReviewSessionReuseKey::from_spawn_config(
             codex.session.get_config().await.as_ref(),
         );
@@ -1038,7 +1038,7 @@ mod tests {
 
         (
             GuardianReviewSession {
-                codex: Codex {
+                codex: Firefam {
                     tx_sub,
                     rx_event,
                     agent_status,

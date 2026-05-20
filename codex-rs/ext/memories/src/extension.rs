@@ -16,7 +16,7 @@ use codex_utils_absolute_path::AbsolutePathBuf;
 use crate::local::LocalMemoriesBackend;
 use crate::tools;
 
-/// Contributes Codex memory read-path prompt context and memory read tools.
+/// Contributes Firefam memory read-path prompt context and memory read tools.
 #[derive(Clone, Copy, Debug, Default)]
 pub(crate) struct MemoriesExtension;
 

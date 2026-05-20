@@ -1,9 +1,9 @@
 ---
 name: codex-issue-digest
-description: Run a GitHub issue digest for openai/codex by feature-area labels, all areas, and configurable time windows. Use when asked to summarize recent Codex bug reports or enhancement requests, especially for owner-specific labels such as tui, exec, app, or similar areas.
+description: Run a GitHub issue digest for openai/codex by feature-area labels, all areas, and configurable time windows. Use when asked to summarize recent Firefam bug reports or enhancement requests, especially for owner-specific labels such as tui, exec, app, or similar areas.
 ---
 
-# Codex Issue Digest
+# Firefam Issue Digest
 
 ## Objective
 
@@ -20,7 +20,7 @@ Include only issues that currently have `bug` or `enhancement` plus at least one
 
 ## Workflow
 
-1. Run the collector from a current Codex repo checkout:
+1. Run the collector from a current Firefam repo checkout:
 
 ```bash
 python3 .codex/skills/codex-issue-digest/scripts/collect_issue_digest.py --labels tui exec --window-hours 24
@@ -101,11 +101,11 @@ The automation should run from a repo checkout that contains this skill. For sha
 ## Sample Owner Prompt
 
 ```text
-Use $codex-issue-digest to run the Codex issue digest for labels tui and exec over the previous 24 hours.
+Use $codex-issue-digest to run the Firefam issue digest for labels tui and exec over the previous 24 hours.
 ```
 
 ```text
-Use $codex-issue-digest to run the Codex issue digest for all areas over the past week.
+Use $codex-issue-digest to run the Firefam issue digest for all areas over the past week.
 ```
 
 ## Validation

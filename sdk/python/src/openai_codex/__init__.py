@@ -7,7 +7,7 @@ from .api import (
     AsyncThread,
     AsyncTurnHandle,
     ChatgptLoginHandle,
-    Codex,
+    Firefam,
     DeviceCodeLoginHandle,
     ImageInput,
     Input,

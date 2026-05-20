@@ -74,7 +74,7 @@ async fn test_create_client_sets_default_headers() {
         .expect("originator header missing");
     assert_eq!(originator_header.to_str().unwrap(), originator().value);
 
-    // User-Agent matches the computed Codex UA for that originator
+    // User-Agent matches the computed Firefam UA for that originator
     let expected_ua = get_codex_user_agent();
     let ua_header = headers
         .get("user-agent")

@@ -565,7 +565,7 @@ async fn slash_init_skips_when_project_doc_exists() {
 
     match op_rx.try_recv() {
         Err(TryRecvError::Empty) => {}
-        other => panic!("expected no Codex op to be sent, got {other:?}"),
+        other => panic!("expected no Firefam op to be sent, got {other:?}"),
     }
 
     let cells = drain_insert_history(&mut rx);

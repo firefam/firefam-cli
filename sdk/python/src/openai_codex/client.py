@@ -95,7 +95,7 @@ def _installed_codex_path() -> Path:
         from codex_cli_bin import bundled_codex_path
     except ImportError as exc:
         raise FileNotFoundError(
-            "Unable to locate the pinned Codex runtime. Install the published SDK build "
+            "Unable to locate the pinned Firefam runtime. Install the published SDK build "
             f"with its {RUNTIME_PKG_NAME} dependency, or set AppServerConfig.codex_bin "
             "explicitly."
         ) from exc

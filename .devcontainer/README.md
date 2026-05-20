@@ -2,25 +2,25 @@
 
 We provide two container paths:
 
-- `devcontainer.json` keeps the existing Codex contributor setup for working on this repository.
+- `devcontainer.json` keeps the existing Firefam contributor setup for working on this repository.
 - `devcontainer.secure.json` adds a customer-oriented profile with stricter outbound network controls.
 
-## Codex contributor profile
+## Firefam contributor profile
 
-Use `devcontainer.json` when you are developing Codex itself. This is the same lightweight arm64 container that already exists in the repo.
+Use `devcontainer.json` when you are developing Firefam itself. This is the same lightweight arm64 container that already exists in the repo.
 
 ## Secure customer profile
 
-Use `devcontainer.secure.json` when you want a stricter runtime profile for running Codex inside a project container:
+Use `devcontainer.secure.json` when you want a stricter runtime profile for running Firefam inside a project container:
 
-- installs the Codex CLI plus common build tools
-- installs bubblewrap in setuid mode for Codex's Linux sandbox
-- disables Docker's outer seccomp and AppArmor profiles so bubblewrap can construct Codex's inner sandbox
+- installs the Firefam CLI plus common build tools
+- installs bubblewrap in setuid mode for Firefam's Linux sandbox
+- disables Docker's outer seccomp and AppArmor profiles so bubblewrap can construct Firefam's inner sandbox
 - enables firewall startup with an allowlist-driven outbound policy
 - blocks IPv6 by default so the allowlist cannot be bypassed over AAAA routes
 - requires `NET_ADMIN` and `NET_RAW` so the firewall can be installed at startup
 
-This profile keeps the stricter networking isolated to the customer path instead of changing the default Codex contributor container.
+This profile keeps the stricter networking isolated to the customer path instead of changing the default Firefam contributor container.
 
 Start it from the CLI with:
 
@@ -46,4 +46,4 @@ For arm64, specify `--platform=linux/arm64` instead for both `docker build` and 
 
 Currently, the contributor `Dockerfile` works for both x64 and arm64 Linux, though you need to run `rustup target add x86_64-unknown-linux-musl` yourself to install the musl toolchain for x64.
 
-The secure profile's capability, seccomp, and AppArmor options are required when you want Codex's bubblewrap sandbox to run inside Docker as the non-root devcontainer user. Without them, Docker's default runtime profile can block bubblewrap's namespace setup before Codex's own seccomp filter is installed. This keeps the Docker relaxation explicit in the profile that is meant to run Codex inside a project container, while the default contributor profile stays lightweight.
+The secure profile's capability, seccomp, and AppArmor options are required when you want Firefam's bubblewrap sandbox to run inside Docker as the non-root devcontainer user. Without them, Docker's default runtime profile can block bubblewrap's namespace setup before Firefam's own seccomp filter is installed. This keeps the Docker relaxation explicit in the profile that is meant to run Firefam inside a project container, while the default contributor profile stays lightweight.

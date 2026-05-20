@@ -431,7 +431,7 @@ def test_stage_runtime_release_copies_resource_binaries(tmp_path: Path) -> None:
 def test_runtime_resource_binaries_are_included_by_wheel_config(
     tmp_path: Path,
 ) -> None:
-    """The runtime wheel config should include helper binaries beside Codex."""
+    """The runtime wheel config should include helper binaries beside Firefam."""
     script = _load_update_script_module()
     fake_binary = tmp_path / script.runtime_binary_name()
     helper = tmp_path / "helper"

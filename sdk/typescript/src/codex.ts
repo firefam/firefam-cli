@@ -4,11 +4,11 @@ import { Thread } from "./thread";
 import { ThreadOptions } from "./threadOptions";
 
 /**
- * Codex is the main class for interacting with the Firefam agent.
+ * Firefam is the main class for interacting with the Firefam agent.
  *
  * Use the `startThread()` method to start a new thread or `resumeThread()` to resume a previously started thread.
  */
-export class Codex {
+export class Firefam {
   private exec: CodexExec;
   private options: CodexOptions;
 

@@ -57,9 +57,9 @@ def staged_runtime_bin_path(root: Path) -> Path:
 
 
 def staged_runtime_resource_path(root: Path, resource: Path) -> Path:
-    """Stage runtime helper binaries beside the main bundled Codex binary."""
+    """Stage runtime helper binaries beside the main bundled Firefam binary."""
     # Runtime wheels include the whole bin/ directory, so helper executables
-    # should be staged beside the main Codex binary instead of changing the
+    # should be staged beside the main Firefam binary instead of changing the
     # package template for each platform.
     return root / "src" / "codex_cli_bin" / "bin" / resource.name
 
@@ -103,7 +103,7 @@ def pinned_runtime_version() -> str:
 
 
 def pinned_runtime_codex_path() -> Path:
-    """Return the bundled Codex binary from the installed pinned runtime wheel."""
+    """Return the bundled Firefam binary from the installed pinned runtime wheel."""
     expected_version = pinned_runtime_version()
     try:
         installed_version = importlib.metadata.version(RUNTIME_DISTRIBUTION_NAME)
@@ -129,7 +129,7 @@ def pinned_runtime_codex_path() -> Path:
 
     codex_path = bundled_codex_path()
     if not codex_path.exists():
-        raise RuntimeError(f"Pinned Codex runtime binary not found at {codex_path}.")
+        raise RuntimeError(f"Pinned Firefam runtime binary not found at {codex_path}.")
     return codex_path
 
 
@@ -145,7 +145,7 @@ def normalize_codex_version(version: str) -> str:
     normalized = re.sub(r"-rc\.?([0-9]+)$", r"rc\1", normalized)
 
     if not re.fullmatch(r"[0-9]+(?:\.[0-9]+)*(?:(?:a|b|rc)[0-9]+)?", normalized):
-        raise RuntimeError(f"Could not normalize Codex version {version!r} to a PEP 440 version")
+        raise RuntimeError(f"Could not normalize Firefam version {version!r} to a PEP 440 version")
     return normalized
 
 

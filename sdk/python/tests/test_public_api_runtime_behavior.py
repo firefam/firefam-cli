@@ -10,7 +10,7 @@ import openai_codex.api as public_api_module
 from openai_codex.api import (
     ApprovalMode,
     AsyncCodex,
-    Codex,
+    Firefam,
 )
 from openai_codex.generated.v2_all import TurnStartParams
 from openai_codex.models import InitializeResponse
@@ -54,7 +54,7 @@ def test_codex_init_failure_closes_client(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(public_api_module, "AppServerClient", FakeClient)
 
     with pytest.raises(RuntimeError, match="missing required metadata"):
-        Codex()
+        Firefam()
 
     assert closed == [True]
 

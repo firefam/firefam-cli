@@ -1,7 +1,7 @@
 {
   "name": "codex-devcontainer-install",
   "private": true,
-  "description": "Locked Codex CLI install boundary for the secure devcontainer.",
+  "description": "Locked Firefam CLI install boundary for the secure devcontainer.",
   "dependencies": {
     "@openai/codex": "0.121.0"
   },

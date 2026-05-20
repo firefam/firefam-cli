@@ -25,7 +25,7 @@ pub enum RemoteSkillScope {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RemoteSkillProductSurface {
     Chatgpt,
-    Codex,
+    Firefam,
     Api,
     Atlas,
 }

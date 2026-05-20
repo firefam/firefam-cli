@@ -106,7 +106,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "properties": {
         "previousAccountId": {
-          "description": "Workspace/account identifier that Codex was previously using.\n\nClients that manage multiple accounts/workspaces can use this as a hint to refresh the token for the correct workspace.\n\nThis may be `null` when the prior auth state did not include a workspace identifier (`chatgpt_account_id`).",
+          "description": "Workspace/account identifier that Firefam was previously using.\n\nClients that manage multiple accounts/workspaces can use this as a hint to refresh the token for the correct workspace.\n\nThis may be `null` when the prior auth state did not include a workspace identifier (`chatgpt_account_id`).",
           "type": [
             "string",
             "null"
@@ -3493,7 +3493,7 @@
           "type": "string"
         },
         "turnId": {
-          "description": "Active Codex turn when this elicitation was observed, if app-server could correlate one.\n\nThis is nullable because MCP models elicitation as a standalone server-to-client request identified by the MCP server request id. It may be triggered during a turn, but turn context is app-server correlation rather than part of the protocol identity of the elicitation itself.",
+          "description": "Active Firefam turn when this elicitation was observed, if app-server could correlate one.\n\nThis is nullable because MCP models elicitation as a standalone server-to-client request identified by the MCP server request id. It may be triggered during a turn, but turn context is app-server correlation rather than part of the protocol identity of the elicitation itself.",
           "type": [
             "string",
             "null"
@@ -6309,14 +6309,14 @@
         "description": "Authentication mode for OpenAI-backed providers.",
         "oneOf": [
           {
-            "description": "OpenAI API key provided by the caller and stored by Codex.",
+            "description": "OpenAI API key provided by the caller and stored by Firefam.",
             "enum": [
               "apikey"
             ],
             "type": "string"
           },
           {
-            "description": "ChatGPT OAuth managed by Codex (tokens persisted and refreshed by Codex).",
+            "description": "ChatGPT OAuth managed by Firefam (tokens persisted and refreshed by Firefam).",
             "enum": [
               "chatgpt"
             ],
@@ -6330,7 +6330,7 @@
             "type": "string"
           },
           {
-            "description": "Programmatic Codex auth backed by a registered Agent Identity.",
+            "description": "Programmatic Firefam auth backed by a registered Agent Identity.",
             "enum": [
               "agentIdentity"
             ],
@@ -6601,7 +6601,7 @@
         "type": "string"
       },
       "CollaborationMode": {
-        "description": "Collaboration mode for a Codex session.",
+        "description": "Collaboration mode for a Firefam session.",
         "properties": {
           "mode": {
             "$ref": "#/definitions/v2/ModeKind"
@@ -10402,7 +10402,7 @@
             "type": "object"
           },
           {
-            "description": "[UNSTABLE] FOR OPENAI INTERNAL USE ONLY - DO NOT USE. The access token must contain the same scopes that Codex-managed ChatGPT auth tokens have.",
+            "description": "[UNSTABLE] FOR OPENAI INTERNAL USE ONLY - DO NOT USE. The access token must contain the same scopes that Firefam-managed ChatGPT auth tokens have.",
             "properties": {
               "accessToken": {
                 "description": "Access token (JWT) supplied by the client. This token is used for backend API requests and email extraction.",
@@ -10413,7 +10413,7 @@
                 "type": "string"
               },
               "chatgptPlanType": {
-                "description": "Optional plan type supplied by the client.\n\nWhen `null`, Codex attempts to derive the plan type from access-token claims. If unavailable, the plan defaults to `unknown`.",
+                "description": "Optional plan type supplied by the client.\n\nWhen `null`, Firefam attempts to derive the plan type from access-token claims. If unavailable, the plan defaults to `unknown`.",
                 "type": [
                   "string",
                   "null"
@@ -11891,7 +11891,7 @@
             "type": "string"
           },
           {
-            "description": "Plugin-service currently sends `\"ENABLED\"` for available remote plugins. Codex app-server exposes `\"AVAILABLE\"` in its API; the alias keeps decoding compatible with that upstream response.",
+            "description": "Plugin-service currently sends `\"ENABLED\"` for available remote plugins. Firefam app-server exposes `\"AVAILABLE\"` in its API; the alias keeps decoding compatible with that upstream response.",
             "enum": [
               "AVAILABLE"
             ],

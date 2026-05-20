@@ -69,7 +69,7 @@ case "$bundle" in
     archive_stem="codex-app-server-package"
     ;;
   *)
-    echo "No Codex package variant for bundle: $bundle" >&2
+    echo "No Firefam package variant for bundle: $bundle" >&2
     exit 1
     ;;
 esac

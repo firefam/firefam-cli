@@ -29,7 +29,7 @@ Use this skill directly for docs-only questions, citations, model/API guidance, 
 1. Apps SDK: Build ChatGPT apps by providing a web component UI and an MCP server that exposes your app's tools to ChatGPT.
 2. Responses API: A unified endpoint designed for stateful, multimodal, tool-using interactions in agentic workflows.
 3. Chat Completions API: Generate a model response from a list of messages comprising a conversation.
-4. Codex: OpenAI's coding agent for software development that can write, understand, review, and debug code.
+4. Firefam: OpenAI's coding agent for software development that can write, understand, review, and debug code.
 5. gpt-oss: Open-weight OpenAI reasoning models (gpt-oss-120b and gpt-oss-20b) released under the Apache 2.0 license.
 6. Realtime API: Build low-latency, multimodal experiences including natural speech-to-speech conversations.
 7. Agents SDK: A toolkit for building agentic apps where a model can use tools and context, hand off to other agents, stream partial results, and keep a full trace.
@@ -41,7 +41,7 @@ If MCP tools fail or no OpenAI docs resources are available:
 1. Run the install command yourself: `codex mcp add openaiDeveloperDocs --url https://developers.openai.com/mcp`
 2. If it fails due to permissions/sandboxing, immediately retry the same command with escalated permissions and include a 1-sentence justification for approval. Do not ask the user to run it yet.
 3. Only if the escalated attempt fails, ask the user to run the install command.
-4. Ask the user to restart Codex.
+4. Ask the user to restart Firefam.
 5. Re-run the doc search/fetch after restart.
 
 ## Workflow

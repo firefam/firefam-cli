@@ -15,9 +15,9 @@ Requires Node.js 18+.
 ## Quickstart
 
 ```typescript
-import { Codex } from "firefam-sdk";
+import { Firefam } from "firefam-sdk";
 
-const codex = new Codex();
+const codex = new Firefam();
 const thread = codex.startThread();
 const turn = await thread.run("Diagnose the test failure and propose a fix");
 
@@ -122,7 +122,7 @@ By default, the Firefam CLI inherits the Node.js process environment. Provide th
 `Codex` client to fully control which variables the CLI receives—useful for sandboxed hosts like Electron apps.
 
 ```typescript
-const codex = new Codex({
+const codex = new Firefam({
   env: {
     PATH: "/usr/local/bin",
   },
@@ -138,7 +138,7 @@ Use the `config` option to provide additional Firefam CLI configuration override
 into dotted paths, and serializes values as TOML literals before passing them as repeated `--config key=value` flags.
 
 ```typescript
-const codex = new Codex({
+const codex = new Firefam({
   config: {
     show_raw_agent_reasoning: true,
     sandbox_workspace_write: { network_access: true },

@@ -103,7 +103,7 @@ pub struct CodexThreadSettingsOverrides {
 }
 
 pub struct CodexThread {
-    pub(crate) codex: Codex,
+    pub(crate) codex: Firefam,
     pub(crate) session_source: SessionSource,
     session_configured: SessionConfiguredEvent,
     rollout_path: Option<PathBuf>,
@@ -111,10 +111,10 @@ pub struct CodexThread {
 }
 
 /// Conduit for the bidirectional stream of messages that compose a thread
-/// (formerly called a conversation) in Codex.
+/// (formerly called a conversation) in Firefam.
 impl CodexThread {
     pub(crate) fn new(
-        codex: Codex,
+        codex: Firefam,
         session_configured: SessionConfiguredEvent,
         rollout_path: Option<PathBuf>,
         session_source: SessionSource,

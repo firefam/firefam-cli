@@ -26,7 +26,7 @@ class GhCommandError(RuntimeError):
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Collect recent GitHub issue activity for a Codex owner digest."
+        description="Collect recent GitHub issue activity for a Firefam owner digest."
     )
     parser.add_argument(
         "--repo", default="openai/codex", help="OWNER/REPO, default openai/codex"

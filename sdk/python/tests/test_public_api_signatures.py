@@ -15,7 +15,7 @@ from openai_codex import (
     AsyncCodex,
     AsyncThread,
     AsyncTurnHandle,
-    Codex,
+    Firefam,
     Thread,
     TurnHandle,
     TurnResult,
@@ -281,7 +281,7 @@ def test_examples_use_public_import_surfaces() -> None:
 def test_generated_public_signatures_are_snake_case_and_typed() -> None:
     """Generated convenience methods should expose typed Pythonic keyword names."""
     expected = {
-        Codex.thread_start: [
+        Firefam.thread_start: [
             "approval_mode",
             "base_instructions",
             "config",
@@ -297,7 +297,7 @@ def test_generated_public_signatures_are_snake_case_and_typed() -> None:
             "session_start_source",
             "thread_source",
         ],
-        Codex.thread_list: [
+        Firefam.thread_list: [
             "archived",
             "cursor",
             "cwd",
@@ -309,7 +309,7 @@ def test_generated_public_signatures_are_snake_case_and_typed() -> None:
             "source_kinds",
             "use_state_db_only",
         ],
-        Codex.thread_resume: [
+        Firefam.thread_resume: [
             "approval_mode",
             "base_instructions",
             "config",
@@ -321,7 +321,7 @@ def test_generated_public_signatures_are_snake_case_and_typed() -> None:
             "sandbox",
             "service_tier",
         ],
-        Codex.thread_fork: [
+        Firefam.thread_fork: [
             "approval_mode",
             "base_instructions",
             "config",
@@ -445,7 +445,7 @@ def test_generated_public_signatures_are_snake_case_and_typed() -> None:
 def test_new_thread_methods_default_to_auto_review() -> None:
     """New threads should start with auto-review unless callers opt out."""
     funcs = [
-        Codex.thread_start,
+        Firefam.thread_start,
         AsyncCodex.thread_start,
     ]
 
@@ -457,8 +457,8 @@ def test_new_thread_methods_default_to_auto_review() -> None:
 def test_existing_thread_methods_default_to_preserving_approval_settings() -> None:
     """Existing thread operations should not serialize approval overrides by default."""
     funcs = [
-        Codex.thread_resume,
-        Codex.thread_fork,
+        Firefam.thread_resume,
+        Firefam.thread_fork,
         Thread.turn,
         Thread.run,
         AsyncCodex.thread_resume,
@@ -493,8 +493,8 @@ def test_lifecycle_methods_are_codex_scoped() -> None:
     assert not hasattr(AsyncThread, "unarchive")
 
     for fn in (
-        Codex.thread_archive,
-        Codex.thread_unarchive,
+        Firefam.thread_archive,
+        Firefam.thread_unarchive,
         AsyncCodex.thread_archive,
         AsyncCodex.thread_unarchive,
     ):

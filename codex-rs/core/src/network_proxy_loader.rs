@@ -56,7 +56,7 @@ async fn build_config_state_with_mtimes() -> Result<(ConfigState, Vec<LayerMtime
         &codex_config::NoopThreadConfigLoader,
     )
     .await
-    .context("failed to load Codex config")?;
+    .context("failed to load Firefam config")?;
 
     let (exec_policy, warning) = match load_exec_policy(&config_layer_stack).await {
         Ok(policy) => (policy, None),

@@ -17,7 +17,7 @@ jobs:
     outputs:
       codex_output: ${{ steps.codex-all.outputs.final-message }}
     steps:
-      - name: Prepare Codex inputs
+      - name: Prepare Firefam inputs
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -153,7 +153,7 @@ jobs:
 
   gather-duplicates-open:
     name: Identify potential duplicates (open issues fallback)
-    # Pass 1 Codex execution drops sudo on its runner, so run the fallback in a fresh job.
+    # Pass 1 Firefam execution drops sudo on its runner, so run the fallback in a fresh job.
     needs: normalize-duplicates-all
     if: ${{ needs.normalize-duplicates-all.result == 'success' && needs.normalize-duplicates-all.outputs.has_matches != 'true' }}
     runs-on: ubuntu-latest
@@ -162,7 +162,7 @@ jobs:
     outputs:
       codex_output: ${{ steps.codex-open.outputs.final-message }}
     steps:
-      - name: Prepare Codex inputs
+      - name: Prepare Firefam inputs
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}

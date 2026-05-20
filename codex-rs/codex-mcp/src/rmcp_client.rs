@@ -64,7 +64,7 @@ use rmcp::model::Tool as RmcpTool;
 use tokio_util::sync::CancellationToken;
 use tracing::warn;
 
-/// MCP server capability indicating that Codex should include [`SandboxState`]
+/// MCP server capability indicating that Firefam should include [`SandboxState`]
 /// in tool-call request `_meta` under this key.
 pub const MCP_SANDBOX_STATE_META_CAPABILITY: &str = "codex/sandbox-state-meta";
 

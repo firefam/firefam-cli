@@ -447,7 +447,7 @@ impl FeedbackSnapshot {
 
         let mut envelope = Envelope::new();
         let title = format!(
-            "[{}]: Codex session {}",
+            "[{}]: Firefam session {}",
             display_classification(options.classification),
             self.thread_id
         );

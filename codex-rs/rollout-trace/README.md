@@ -1,19 +1,19 @@
 # Rollout Trace
 
-> **Privacy:** Rollout tracing is not telemetry. Codex does **not** upload or
+> **Privacy:** Rollout tracing is not telemetry. Firefam does **not** upload or
 > report these traces; it writes local bundles only when
 > `CODEX_ROLLOUT_TRACE_ROOT` is set. Those local bundles can contain prompts,
 > responses, tool inputs/outputs, terminal output, and paths, so treat them as
 > sensitive.
 
 Rollout tracing is an opt-in diagnostic path for understanding what happened
-during a Codex session. It records raw runtime evidence into a local bundle on
+during a Firefam session. It records raw runtime evidence into a local bundle on
 disk, then replays that bundle into a semantic graph that a debugger or UI can
 inspect.
 
 The key design choice is: **observe first, interpret later**.
 
-Hot-path Codex code does not try to build the final graph while the session is
+Hot-path Firefam code does not try to build the final graph while the session is
 running. It writes ordered raw events and payload references. The offline reducer
 then decides which events became model-visible conversation, which events were
 runtime work, and how information moved between threads, tools, code cells, and
@@ -33,7 +33,7 @@ They preserve enough evidence to answer questions like:
   child thread?
 
 The reduced `state.json` is intentionally not just a transcript. It is a graph of
-model-visible conversation plus the runtime objects that explain how Codex got
+model-visible conversation plus the runtime objects that explain how Firefam got
 there.
 
 ## System Shape
