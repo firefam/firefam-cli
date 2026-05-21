@@ -46,7 +46,7 @@ const ALTERNATE_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".claude-plugin/plugin.jso
 
 fn write_plugins_enabled_config(firefam_home: &std::path::Path) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"[features]
 plugins = true
 "#,
@@ -58,7 +58,7 @@ fn write_plugins_enabled_config_with_base_url(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{base_url}"
 
@@ -137,7 +137,7 @@ async fn plugin_installed_includes_installed_plugins_and_explicit_install_sugges
     )?;
     write_installed_plugin(&firefam_home, "firefamai-curated", "linear")?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -185,7 +185,7 @@ async fn plugin_installed_ignores_local_cache_without_catalog() -> Result<()> {
     let firefam_home = TempDir::new()?;
     write_installed_plugin(&firefam_home, "firefamai-curated", "linear")?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -842,7 +842,7 @@ async fn plugin_list_includes_install_and_enabled_state_from_config() -> Result<
 }"#,
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -957,7 +957,7 @@ async fn plugin_list_uses_home_config_for_enabled_state() -> Result<()> {
 }"#,
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -986,9 +986,9 @@ enabled = true
   ]
 }"#,
     )?;
-    std::fs::create_dir_all(workspace_enabled.path().join(".firefam"))?;
+    std::fs::create_dir_all(workspace_enabled.path().join(".agents"))?;
     std::fs::write(
-        workspace_enabled.path().join(".firefam/config.toml"),
+        workspace_enabled.path().join(".agents/firefam-config.toml"),
         r#"[plugins."shared-plugin@firefam-curated"]
 enabled = false
 "#,
@@ -1289,7 +1289,7 @@ async fn plugin_list_returns_installed_git_source_interface_from_cache() -> Resu
 }"##,
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -1439,7 +1439,7 @@ async fn app_server_startup_remote_plugin_sync_runs_once() -> Result<()> {
             .await?;
     }
 
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(config.contains(r#"[plugins."linear@firefamai-curated"]"#));
 
     {
@@ -1514,7 +1514,7 @@ async fn app_server_startup_sync_downloads_remote_installed_plugin_bundles() -> 
         serde_json::from_str(&std::fs::read_to_string(installed_path.join(".app.json"))?)?;
     assert_eq!(installed_app_manifest, remote_app_manifest);
     assert!(installed_path.join("skills/plan-work/SKILL.md").is_file());
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config.contains("linear@firefamai-curated-remote"));
     Ok(())
 }
@@ -1629,7 +1629,7 @@ async fn plugin_list_sync_upgrades_and_removes_remote_installed_plugin_bundles()
     assert_eq!(installed_app_manifest, remote_app_manifest);
     wait_for_path_missing(&old_path).await?;
     wait_for_path_missing(&stale_path).await?;
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config.contains("linear@firefamai-curated-remote"));
     Ok(())
 }
@@ -2145,7 +2145,7 @@ async fn plugin_installed_includes_remote_shared_with_me_plugins() -> Result<()>
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{}/backend-api/"
 
@@ -2246,7 +2246,7 @@ async fn plugin_installed_starts_remote_installed_bundle_sync() -> Result<()> {
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{}/backend-api/"
 
@@ -2607,7 +2607,7 @@ async fn plugin_list_omits_shared_with_me_kind_when_plugin_sharing_disabled() ->
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{}/backend-api/"
 
@@ -2801,7 +2801,7 @@ async fn plugin_list_does_not_fetch_remote_marketplaces_when_plugins_disabled() 
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{}/backend-api/"
@@ -3278,7 +3278,7 @@ fn write_installed_plugin_with_version(
 
 fn write_plugin_sync_config(firefam_home: &std::path::Path, base_url: &str) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"
@@ -3304,7 +3304,7 @@ fn write_remote_plugin_catalog_config(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"

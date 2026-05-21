@@ -505,7 +505,7 @@ fn create_config_toml(
         .collect::<Vec<_>>()
         .join("\n");
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

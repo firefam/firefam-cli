@@ -184,7 +184,7 @@ impl McpProcess {
         cmd.stdout(Stdio::piped());
         cmd.stderr(Stdio::piped());
         cmd.current_dir(firefam_home);
-        cmd.env("FIREFAM_HOME", firefam_home);
+        cmd.env("AGENTS_HOME", firefam_home);
         cmd.env("RUST_LOG", "warn");
         // Keep integration tests isolated from host managed configuration.
         cmd.env(

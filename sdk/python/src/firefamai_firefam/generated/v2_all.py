@@ -864,7 +864,7 @@ class ExternalAgentConfigDetectParams(BaseModel):
         bool | None,
         Field(
             alias="includeHome",
-            description="If true, include detection under the user's home (~/.claude, ~/.firefam, etc.).",
+            description="If true, include detection under the user's home (~/.claude, ~/.agents, etc.).",
         ),
     ] = None
 

@@ -331,7 +331,7 @@ fn create_config_toml(
     approval_policy: &str,
     sandbox_mode: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

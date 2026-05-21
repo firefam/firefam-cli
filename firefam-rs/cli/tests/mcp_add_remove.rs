@@ -9,7 +9,7 @@ use tempfile::TempDir;
 
 fn firefam_command(firefam_home: &Path) -> Result<assert_cmd::Command> {
     let mut cmd = assert_cmd::Command::new(firefam_utils_cargo_bin::cargo_bin("firefam")?);
-    cmd.env("FIREFAM_HOME", firefam_home);
+    cmd.env("AGENTS_HOME", firefam_home);
     Ok(cmd)
 }
 

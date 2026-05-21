@@ -2803,7 +2803,7 @@ async fn denying_network_policy_amendment_persists_policy_and_skips_future_netwo
     let server = start_mock_server().await;
     let home = Arc::new(TempDir::new()?);
     fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"default_permissions = "workspace"
 
 [permissions.workspace.filesystem]
@@ -3083,7 +3083,7 @@ async fn network_approval_flow_survives_danger_full_access_session_start() -> Re
     let server = start_mock_server().await;
     let home = Arc::new(TempDir::new()?);
     fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"default_permissions = "workspace"
 
 [permissions.workspace.filesystem]

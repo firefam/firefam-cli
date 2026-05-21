@@ -2,7 +2,7 @@
 //!
 //! Providers can be defined in two places:
 //!   1. Built-in defaults compiled into the binary so Firefam works out-of-the-box.
-//!   2. User-defined entries inside `~/.firefam/config.toml` under the `model_providers`
+//!   2. User-defined entries inside `~/.agents/firefam-config.toml` under the `model_providers`
 //!      key. These override or extend the defaults at runtime.
 
 use firefam_api::Provider as ApiProvider;

@@ -961,7 +961,7 @@ mod tests {
 
     #[test]
     fn hook_metadata_for_config_layer_source_discards_source_details() {
-        let config_file = test_path_buf("/tmp/.firefam/config.toml").abs();
+        let config_file = test_path_buf("/tmp/.agents/firefam-config.toml").abs();
         let dot_firefam_folder = test_path_buf("/tmp/worktree/.firefam").abs();
 
         assert_eq!(

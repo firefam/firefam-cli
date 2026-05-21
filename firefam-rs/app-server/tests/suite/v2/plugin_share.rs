@@ -346,7 +346,7 @@ async fn plugin_share_save_rejects_when_plugin_sharing_disabled() -> Result<()> 
     let plugin_path = write_test_plugin(plugin_root.path(), "demo-plugin")?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{}/backend-api"
@@ -1073,7 +1073,7 @@ async fn plugin_share_update_targets_rejects_when_plugin_sharing_disabled() -> R
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{}/backend-api"
@@ -1230,7 +1230,7 @@ async fn plugin_share_delete_removes_created_workspace_plugin() -> Result<()> {
 
 fn write_remote_plugin_config(firefam_home: &Path, base_url: &str) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"

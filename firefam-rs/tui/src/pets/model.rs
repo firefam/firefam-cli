@@ -1,7 +1,7 @@
 //! Pet manifest loading and normalization.
 //!
 //! This module converts several user-facing selectors into one normalized
-//! in-memory `Pet`: built-in catalog ids, custom pet ids under FIREFAM_HOME,
+//! in-memory `Pet`: built-in catalog ids, custom pet ids under AGENTS_HOME,
 //! legacy avatar directories, and explicit filesystem paths used by tests or
 //! local iteration.
 //!
@@ -76,7 +76,7 @@ impl Pet {
     ///
     /// Selectors may name a built-in catalog pet, a custom pet id, a legacy
     /// avatar id, or an explicit path. This method assumes any built-in asset
-    /// has already been materialized into FIREFAM_HOME; if callers skip the
+    /// has already been materialized into AGENTS_HOME; if callers skip the
     /// asset-fetch step, they will get a missing-spritesheet error here on
     /// first use.
     pub(super) fn load_with_firefam_home(value: &str, firefam_home: Option<&Path>) -> Result<Self> {
@@ -162,7 +162,7 @@ struct AnimationSpec {
 }
 
 fn load_builtin_pet(pet: catalog::BuiltinPet, firefam_home: Option<&Path>) -> Result<Pet> {
-    let firefam_home = firefam_home.context("FIREFAM_HOME is not available")?;
+    let firefam_home = firefam_home.context("AGENTS_HOME is not available")?;
     let spritesheet_path = super::builtin_spritesheet_path(firefam_home, pet.spritesheet_file);
     if !spritesheet_path.exists() {
         bail!("missing spritesheet {}", spritesheet_path.display());
@@ -183,7 +183,7 @@ fn load_builtin_pet(pet: catalog::BuiltinPet, firefam_home: Option<&Path>) -> Re
 }
 
 fn load_custom_pet(value: &str, firefam_home: Option<&Path>) -> Result<Pet> {
-    let firefam_home = firefam_home.context("FIREFAM_HOME is not available")?;
+    let firefam_home = firefam_home.context("AGENTS_HOME is not available")?;
     let pet_dir = firefam_home.join("pets").join(value);
     if pet_dir.join("pet.json").is_file() {
         return load_pet_manifest(&pet_dir, "pet.json", value, &custom_pet_cache_id(value));

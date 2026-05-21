@@ -101,9 +101,9 @@ async fn find_locates_rollout_file_by_id() {
 #[tokio::test]
 async fn find_handles_gitignore_covering_firefam_home_directory() {
     let repo = TempDir::new().unwrap();
-    let firefam_home = repo.path().join(".firefam");
+    let firefam_home = repo.path().join(".agents");
     std::fs::create_dir_all(&firefam_home).unwrap();
-    std::fs::write(repo.path().join(".gitignore"), ".firefam/**\n").unwrap();
+    std::fs::write(repo.path().join(".gitignore"), ".agents/**\n").unwrap();
     let id = Uuid::new_v4();
     let expected = write_minimal_rollout_with_id(&firefam_home, id);
 

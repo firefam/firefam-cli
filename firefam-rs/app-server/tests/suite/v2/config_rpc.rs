@@ -40,7 +40,7 @@ const DEFAULT_READ_TIMEOUT: std::time::Duration = std::time::Duration::from_secs
 
 fn write_config(firefam_home: &TempDir, contents: &str) -> Result<()> {
     Ok(std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         contents,
     )?)
 }
@@ -56,7 +56,7 @@ sandbox_mode = "workspace-write"
 "#,
     )?;
     let firefam_home_path = firefam_home.path().canonicalize()?;
-    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("config.toml"))?;
+    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("firefam-config.toml"))?;
 
     let mut mcp = McpProcess::new(firefam_home.path()).await?;
     timeout(DEFAULT_READ_TIMEOUT, mcp.initialize()).await??;
@@ -106,7 +106,7 @@ allowed_domains = ["example.com"]
 "#,
     )?;
     let firefam_home_path = firefam_home.path().canonicalize()?;
-    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("config.toml"))?;
+    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("firefam-config.toml"))?;
 
     let mut mcp = McpProcess::new(firefam_home.path()).await?;
     timeout(DEFAULT_READ_TIMEOUT, mcp.initialize()).await??;
@@ -338,7 +338,7 @@ default_tools_approval_mode = "prompt"
 "#,
     )?;
     let firefam_home_path = firefam_home.path().canonicalize()?;
-    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("config.toml"))?;
+    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("firefam-config.toml"))?;
 
     let mut mcp = McpProcess::new(firefam_home.path()).await?;
     timeout(DEFAULT_READ_TIMEOUT, mcp.initialize()).await??;
@@ -463,10 +463,10 @@ async fn config_read_includes_project_layers_for_cwd() -> Result<()> {
     write_config(&firefam_home, r#"model = "gpt-user""#)?;
 
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 model_reasoning_effort = "high"
 "#,
@@ -524,7 +524,7 @@ network_access = true
         ),
     )?;
     let firefam_home_path = firefam_home.path().canonicalize()?;
-    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("config.toml"))?;
+    let user_file = AbsolutePathBuf::try_from(firefam_home_path.join("firefam-config.toml"))?;
 
     let managed_path = firefam_home.path().join("managed_config.toml");
     let managed_file = AbsolutePathBuf::try_from(managed_path.clone())?;
@@ -673,7 +673,7 @@ model = "gpt-old"
     .await??;
     let write: ConfigWriteResponse = to_response(write_resp)?;
     let expected_file_path =
-        AbsolutePathBuf::resolve_path_against_base("config.toml", firefam_home);
+        AbsolutePathBuf::resolve_path_against_base("firefam-config.toml", firefam_home);
 
     assert_eq!(write.status, WriteStatus::Ok);
     assert_eq!(write.file_path, expected_file_path);
@@ -807,7 +807,7 @@ model = "gpt-old"
             file_path: Some(
                 firefam_home
                     .path()
-                    .join("config.toml")
+                    .join("firefam-config.toml")
                     .display()
                     .to_string(),
             ),
@@ -846,7 +846,7 @@ async fn config_batch_write_applies_multiple_edits() -> Result<()> {
     let writable_root = test_tmp_path_buf();
     let batch_id = mcp
         .send_config_batch_write_request(ConfigBatchWriteParams {
-            file_path: Some(firefam_home.join("config.toml").display().to_string()),
+            file_path: Some(firefam_home.join("firefam-config.toml").display().to_string()),
             edits: vec![
                 ConfigEdit {
                     key_path: "sandbox_mode".to_string(),
@@ -874,7 +874,7 @@ async fn config_batch_write_applies_multiple_edits() -> Result<()> {
     let batch_write: ConfigWriteResponse = to_response(batch_resp)?;
     assert_eq!(batch_write.status, WriteStatus::Ok);
     let expected_file_path =
-        AbsolutePathBuf::resolve_path_against_base("config.toml", firefam_home);
+        AbsolutePathBuf::resolve_path_against_base("firefam-config.toml", firefam_home);
     assert_eq!(batch_write.file_path, expected_file_path);
 
     let read_id = mcp
@@ -923,7 +923,7 @@ model = "should-stay-put"
 
     let batch_id = mcp
         .send_config_batch_write_request(ConfigBatchWriteParams {
-            file_path: Some(firefam_home.join("config.toml").display().to_string()),
+            file_path: Some(firefam_home.join("firefam-config.toml").display().to_string()),
             edits: vec![
                 ConfigEdit {
                     key_path: "profiles.\"team.prod\".model".to_string(),
@@ -949,7 +949,7 @@ model = "should-stay-put"
     assert_eq!(batch_write.status, WriteStatus::Ok);
 
     let config: toml::Value =
-        toml::from_str(&std::fs::read_to_string(firefam_home.join("config.toml"))?)?;
+        toml::from_str(&std::fs::read_to_string(firefam_home.join("firefam-config.toml"))?)?;
     assert_eq!(
         config["profiles"]["team.prod"]["model"].as_str(),
         Some("gpt-5.5")
@@ -977,7 +977,7 @@ async fn config_batch_write_updates_multiple_desktop_settings() -> Result<()> {
 
     let batch_id = mcp
         .send_config_batch_write_request(ConfigBatchWriteParams {
-            file_path: Some(firefam_home.join("config.toml").display().to_string()),
+            file_path: Some(firefam_home.join("firefam-config.toml").display().to_string()),
             edits: vec![
                 ConfigEdit {
                     key_path: "desktop.selected-avatar-id".to_string(),

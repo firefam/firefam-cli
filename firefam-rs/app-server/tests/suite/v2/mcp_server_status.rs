@@ -52,7 +52,7 @@ async fn mcp_server_status_list_returns_raw_server_and_tool_names() -> Result<()
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"
@@ -223,7 +223,7 @@ async fn mcp_server_status_list_tools_and_auth_only_skips_slow_inventory_calls()
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"
@@ -284,7 +284,7 @@ async fn mcp_server_status_list_keeps_tools_for_sanitized_name_collisions() -> R
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"

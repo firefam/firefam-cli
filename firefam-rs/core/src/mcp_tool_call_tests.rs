@@ -2189,7 +2189,7 @@ async fn maybe_persist_mcp_tool_approval_writes_project_config_for_project_serve
     let firefam_home = session.firefam_home().await;
     let project_dir = tempdir().expect("tempdir");
     std::fs::write(project_dir.path().join(".git"), "gitdir: nowhere").expect("seed git marker");
-    let project_firefam_dir = project_dir.path().join(".firefam");
+    let project_firefam_dir = project_dir.path().join(".agents");
     std::fs::create_dir_all(&project_firefam_dir).expect("create project .firefam dir");
     std::fs::write(
         project_firefam_dir.join(CONFIG_TOML_FILE),

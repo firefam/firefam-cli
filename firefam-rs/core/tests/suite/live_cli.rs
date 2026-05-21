@@ -24,7 +24,7 @@ fn run_live(prompt: &str) -> (assert_cmd::assert::Assert, TempDir) {
 
     let dir = TempDir::new().unwrap();
     let home = TempDir::new().unwrap();
-    let firefam_home = home.path().join(".firefam");
+    let firefam_home = home.path().join(".agents");
     std::fs::create_dir_all(&firefam_home).unwrap();
 
     // Build a plain `std::process::Command` so we have full control over the underlying stdio
@@ -37,7 +37,7 @@ fn run_live(prompt: &str) -> (assert_cmd::assert::Assert, TempDir) {
     cmd.current_dir(dir.path());
     cmd.env("OPENAI_API_KEY", require_api_key());
     cmd.env("HOME", home.path());
-    cmd.env("FIREFAM_HOME", &firefam_home);
+    cmd.env("AGENTS_HOME", &firefam_home);
 
     // We want three things at once:
     //   1. live streaming of the child’s stdout/stderr while the test is running

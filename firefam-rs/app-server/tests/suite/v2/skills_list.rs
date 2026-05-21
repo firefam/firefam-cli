@@ -45,7 +45,7 @@ fn write_plugins_enabled_config_with_base_url(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{base_url}"
 
@@ -61,7 +61,7 @@ fn write_remote_plugins_enabled_config_with_base_url(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{base_url}"
 
@@ -386,7 +386,7 @@ async fn skills_list_skips_cwd_roots_when_environment_disabled() -> Result<()> {
     let firefam_home = TempDir::new()?;
     let cwd = TempDir::new()?;
     write_skill(&firefam_home, "home-skill")?;
-    let repo_skill_dir = cwd.path().join(".firefam/skills/repo-skill");
+    let repo_skill_dir = cwd.path().join(".agents/skills/repo-skill");
     std::fs::create_dir_all(&repo_skill_dir)?;
     std::fs::write(
         repo_skill_dir.join("SKILL.md"),
@@ -525,7 +525,7 @@ async fn skills_list_uses_cached_result_until_force_reload() -> Result<()> {
             .all(|skill| skill.name != "late-extra-skill")
     );
 
-    let skill_dir = cwd.path().join(".firefam/skills/late-extra-skill");
+    let skill_dir = cwd.path().join(".agents/skills/late-extra-skill");
     std::fs::create_dir_all(&skill_dir)?;
     std::fs::write(
         skill_dir.join("SKILL.md"),

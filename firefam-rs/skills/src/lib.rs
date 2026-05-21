@@ -14,14 +14,14 @@ const SKILLS_DIR_NAME: &str = "skills";
 const SYSTEM_SKILLS_MARKER_FILENAME: &str = ".firefam-system-skills.marker";
 const SYSTEM_SKILLS_MARKER_SALT: &str = "v1";
 
-/// Returns the on-disk cache location for embedded system skills from an absolute FIREFAM_HOME.
+/// Returns the on-disk cache location for embedded system skills from an absolute AGENTS_HOME.
 pub fn system_cache_root_dir(firefam_home: &AbsolutePathBuf) -> AbsolutePathBuf {
     firefam_home
         .join(SKILLS_DIR_NAME)
         .join(SYSTEM_SKILLS_DIR_NAME)
 }
 
-/// Installs embedded system skills into `FIREFAM_HOME/skills/.system`.
+/// Installs embedded system skills into `AGENTS_HOME/skills/.system`.
 ///
 /// Clears any existing system skills directory first and then writes the embedded
 /// skills directory into place.

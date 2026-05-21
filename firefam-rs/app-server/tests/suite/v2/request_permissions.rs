@@ -156,7 +156,7 @@ async fn request_permissions_round_trip() -> Result<()> {
 }
 
 fn create_config_toml(firefam_home: &std::path::Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

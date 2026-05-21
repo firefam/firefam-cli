@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Install a skill from a GitHub repo path into $FIREFAM_HOME/skills."""
+"""Install a skill from a GitHub repo path into $AGENTS_HOME/skills."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ class InstallError(Exception):
 
 
 def _firefam_home() -> str:
-    return os.environ.get("FIREFAM_HOME", os.path.expanduser("~/.firefam"))
+    return os.environ.get("AGENTS_HOME", os.path.expanduser("~/.agents"))
 
 
 def _tmp_root() -> str:

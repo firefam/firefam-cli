@@ -42,7 +42,7 @@ no_memories_if_mcp_or_web_search = true
 #[test]
 fn active_user_layer_is_highest_precedence_user_layer() {
     let temp_dir = TempDir::new().expect("tempdir");
-    let base_file = test_user_config_path(&temp_dir, "config.toml");
+    let base_file = test_user_config_path(&temp_dir, "firefam-config.toml");
     let profile_file = test_user_config_path(&temp_dir, "work.config.toml");
     let base_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {
@@ -93,7 +93,7 @@ approval_policy = "on-failure"
 #[test]
 fn with_user_config_updates_matching_user_layer_without_replacing_active_profile() {
     let temp_dir = TempDir::new().expect("tempdir");
-    let base_file = test_user_config_path(&temp_dir, "config.toml");
+    let base_file = test_user_config_path(&temp_dir, "firefam-config.toml");
     let profile_file = test_user_config_path(&temp_dir, "work.config.toml");
     let base_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {

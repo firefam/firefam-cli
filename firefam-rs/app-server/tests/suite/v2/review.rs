@@ -494,7 +494,7 @@ fn create_config_toml_with_approval_policy(
     server_uri: &str,
     approval_policy: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

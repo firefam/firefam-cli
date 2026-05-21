@@ -291,7 +291,7 @@ async fn thread_list_reports_system_error_idle_flag_after_failed_turn() -> Resul
 
 // Minimal config.toml for listing.
 fn create_minimal_config(firefam_home: &std::path::Path) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         r#"
@@ -302,7 +302,7 @@ approval_policy = "never"
 }
 
 fn create_runtime_config(firefam_home: &std::path::Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -566,7 +566,7 @@ async fn thread_list_respects_cwd_filters() -> Result<()> {
 async fn thread_list_respects_search_term_filter() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 model = "mock-model"
 approval_policy = "never"
@@ -671,7 +671,7 @@ sqlite = true
 async fn thread_list_state_db_only_returns_sqlite_without_jsonl_repair() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 model = "mock-model"
 approval_policy = "never"

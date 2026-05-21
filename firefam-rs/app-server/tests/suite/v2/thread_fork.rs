@@ -764,7 +764,7 @@ async fn thread_fork_ephemeral_remains_pathless_and_omits_listing() -> Result<()
 
 // Helper to create a config.toml pointing at the mock model server.
 fn create_config_toml(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -791,7 +791,7 @@ fn create_config_toml_with_chatgpt_base_url(
     server_uri: &str,
     chatgpt_base_url: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

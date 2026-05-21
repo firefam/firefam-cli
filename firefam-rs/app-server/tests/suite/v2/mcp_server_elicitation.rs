@@ -468,7 +468,7 @@ fn write_config_toml(
     apps_server_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

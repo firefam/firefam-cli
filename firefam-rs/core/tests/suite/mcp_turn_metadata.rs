@@ -45,7 +45,7 @@ fn set_calendar_approval_mode(config: &mut Config, approval_mode: AppToolApprova
         AppToolApproval::Prompt => "prompt",
         AppToolApproval::Approve => "approve",
     };
-    let user_config_path = config.firefam_home.join("config.toml").abs();
+    let user_config_path = config.firefam_home.join("firefam-config.toml").abs();
     let user_config = toml::from_str(&format!(
         r#"
 [apps.calendar]

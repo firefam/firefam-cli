@@ -64,7 +64,7 @@ impl McpProcess {
         cmd.stdin(Stdio::piped());
         cmd.stdout(Stdio::piped());
         cmd.stderr(Stdio::piped());
-        cmd.env("FIREFAM_HOME", firefam_home);
+        cmd.env("AGENTS_HOME", firefam_home);
         cmd.env("RUST_LOG", "debug");
 
         for (k, v) in env_overrides {

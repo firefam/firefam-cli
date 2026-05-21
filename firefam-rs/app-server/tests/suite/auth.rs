@@ -32,7 +32,7 @@ fn create_config_toml_custom_provider(
     firefam_home: &Path,
     requires_firefamai_auth: bool,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     let requires_line = if requires_firefamai_auth {
         "requires_firefamai_auth = true\n"
     } else {
@@ -62,7 +62,7 @@ stream_max_retries = 0
 }
 
 fn create_config_toml(firefam_home: &Path) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         r#"
@@ -80,7 +80,7 @@ fn create_config_toml_forced_login(
     firefam_home: &Path,
     forced_method: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     let contents = format!(
         r#"
 model = "mock-model"

@@ -16,7 +16,7 @@ use tokio::io::AsyncWriteExt;
 const TEST_TIMESTAMP: &str = "2025-01-01T00-00-00";
 
 async fn read_config_toml(firefam_home: &Path) -> io::Result<ConfigToml> {
-    let contents = tokio::fs::read_to_string(firefam_home.join("config.toml")).await?;
+    let contents = tokio::fs::read_to_string(firefam_home.join("firefam-config.toml")).await?;
     toml::from_str(&contents).map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))
 }
 
@@ -124,7 +124,7 @@ async fn skips_when_marker_exists() -> io::Result<()> {
     let status = maybe_migrate_personality(temp.path(), &config_toml, /*state_db*/ None).await?;
 
     assert_eq!(status, PersonalityMigrationStatus::SkippedMarker);
-    assert!(!temp.path().join("config.toml").exists());
+    assert!(!temp.path().join("firefam-config.toml").exists());
     Ok(())
 }
 
@@ -159,6 +159,6 @@ async fn skips_when_no_sessions() -> io::Result<()> {
 
     assert_eq!(status, PersonalityMigrationStatus::SkippedNoSessions);
     assert!(temp.path().join(PERSONALITY_MIGRATION_FILENAME).exists());
-    assert!(!temp.path().join("config.toml").exists());
+    assert!(!temp.path().join("firefam-config.toml").exists());
     Ok(())
 }

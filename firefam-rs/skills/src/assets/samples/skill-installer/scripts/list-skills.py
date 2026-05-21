@@ -32,7 +32,7 @@ def _request(url: str) -> bytes:
 
 
 def _firefam_home() -> str:
-    return os.environ.get("FIREFAM_HOME", os.path.expanduser("~/.firefam"))
+    return os.environ.get("AGENTS_HOME", os.path.expanduser("~/.agents"))
 
 
 def _installed_skills() -> set[str]:

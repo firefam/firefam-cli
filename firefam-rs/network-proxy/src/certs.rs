@@ -98,7 +98,7 @@ const MANAGED_MITM_CA_KEY: &str = "ca.key";
 
 fn managed_ca_paths() -> Result<(PathBuf, PathBuf)> {
     let firefam_home =
-        find_firefam_home().context("failed to resolve FIREFAM_HOME for managed MITM CA")?;
+        find_firefam_home().context("failed to resolve AGENTS_HOME for managed MITM CA")?;
     let proxy_dir = firefam_home.join(MANAGED_MITM_CA_DIR);
     Ok((
         proxy_dir.join(MANAGED_MITM_CA_CERT).to_path_buf(),

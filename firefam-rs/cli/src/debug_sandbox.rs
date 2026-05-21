@@ -773,7 +773,7 @@ mod tests {
             escape_toml_path(docs),
             escape_toml_path(private),
         );
-        std::fs::write(firefam_home.path().join("config.toml"), config)?;
+        std::fs::write(firefam_home.path().join("firefam-config.toml"), config)?;
         Ok(())
     }
 
@@ -984,7 +984,7 @@ mod tests {
     -> anyhow::Result<()> {
         let firefam_home = TempDir::new()?;
         std::fs::write(
-            firefam_home.path().join("config.toml"),
+            firefam_home.path().join("firefam-config.toml"),
             "profile = \"legacy\"\n\
              \n\
              [profiles.legacy]\n\

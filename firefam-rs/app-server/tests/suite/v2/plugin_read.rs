@@ -126,7 +126,7 @@ async fn plugin_read_reads_remote_plugin_details_when_remote_plugin_is_disabled(
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{}/backend-api/"
@@ -652,7 +652,7 @@ async fn plugin_read_rejects_remote_marketplace_when_plugins_are_disabled() -> R
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{}/backend-api/"
@@ -754,7 +754,7 @@ async fn plugin_read_returns_canonical_firefamai_curated_marketplace_name() -> R
 }"#,
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -1279,7 +1279,7 @@ description: Visible only for ChatGPT
 }"#,
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 plugin_hooks = true
@@ -1758,7 +1758,7 @@ fn write_installed_plugin(
 
 fn write_plugins_enabled_config(firefam_home: &TempDir) -> Result<()> {
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 "#,
@@ -1900,7 +1900,7 @@ fn connector_tool(connector_id: &str, connector_name: &str) -> Result<Tool> {
 
 fn write_connectors_config(firefam_home: &std::path::Path, base_url: &str) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"
@@ -1919,7 +1919,7 @@ fn write_remote_plugin_catalog_config(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"

@@ -644,4 +644,4 @@ class AppServerClient:
 
 
 def default_firefam_home() -> str:
-    return str(Path.home() / ".firefam")
+    return str(Path.home() / ".agents")

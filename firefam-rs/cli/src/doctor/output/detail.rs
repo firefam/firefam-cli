@@ -246,7 +246,7 @@ fn config_details(parsed: &[ParsedDetail], options: HumanOutputOptions) -> Vec<H
         });
     }
     push_row_if_present(&mut out, parsed, "cwd", "cwd");
-    push_row_if_present(&mut out, parsed, "config.toml", "config.toml");
+    push_row_if_present(&mut out, parsed, "firefam-config.toml", "firefam-config.toml");
     push_row_if_present(&mut out, parsed, "config.toml parse", "config.toml parse");
     push_row_if_present(&mut out, parsed, "config.toml read", "config.toml read");
     push_row_if_present(&mut out, parsed, "mcp servers", "MCP servers");
@@ -267,7 +267,7 @@ fn config_details(parsed: &[ParsedDetail], options: HumanOutputOptions) -> Vec<H
         &mut out,
         parsed,
         &[
-            "FIREFAM_HOME",
+            "AGENTS_HOME",
             "cwd",
             "model",
             "model provider",
@@ -278,7 +278,7 @@ fn config_details(parsed: &[ParsedDetail], options: HumanOutputOptions) -> Vec<H
             "enabled feature flags",
             "feature flag overrides",
             "legacy feature flag",
-            "config.toml",
+            "firefam-config.toml",
             "config.toml parse",
             "config.toml read",
         ],
@@ -289,7 +289,7 @@ fn config_details(parsed: &[ParsedDetail], options: HumanOutputOptions) -> Vec<H
 
 fn state_details(parsed: &[ParsedDetail]) -> Vec<HumanDetail> {
     let mut out = Vec::new();
-    push_row_if_present(&mut out, parsed, "FIREFAM_HOME", "FIREFAM_HOME");
+    push_row_if_present(&mut out, parsed, "AGENTS_HOME", "AGENTS_HOME");
     push_row_if_present(&mut out, parsed, "log dir", "log dir");
     push_row_if_present(&mut out, parsed, "sqlite home", "sqlite home");
     push_database_row(&mut out, parsed, "state DB");
@@ -313,7 +313,7 @@ fn state_details(parsed: &[ParsedDetail]) -> Vec<HumanDetail> {
         &mut out,
         parsed,
         &[
-            "FIREFAM_HOME",
+            "AGENTS_HOME",
             "log dir",
             "sqlite home",
             "state DB",

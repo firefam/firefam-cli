@@ -626,9 +626,9 @@ async fn external_agent_config_import_returns_before_background_session_import_f
         .to_string(),
     )?;
 
-    let project_config_dir = project_root.join(".firefam");
+    let project_config_dir = project_root.join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
-    let project_config = project_config_dir.join("config.toml");
+    let project_config = project_config_dir.join("firefam-config.toml");
     let status = std::process::Command::new("mkfifo")
         .arg(&project_config)
         .status()?;
@@ -995,7 +995,7 @@ async fn external_agent_config_import_compacts_huge_session_before_first_follow_
 
 fn create_config_toml(firefam_home: &std::path::Path, server_uri: &str) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

@@ -457,6 +457,6 @@ async fn login_with_api_key(mcp: &mut McpProcess, api_key: &str) -> Result<()> {
 }
 
 fn write_chatgpt_base_url(firefam_home: &Path, base_url: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(config_toml, format!("chatgpt_base_url = \"{base_url}\"\n"))
 }

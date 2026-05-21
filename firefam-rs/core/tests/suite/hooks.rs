@@ -420,7 +420,7 @@ statusMessage = "running pre tool use hook"
     );
 
     fs::write(&script_path, script).context("write TOML pre tool use hook script")?;
-    fs::write(home.join("config.toml"), config_toml).context("write config.toml hooks")?;
+    fs::write(home.join("firefam-config.toml"), config_toml).context("write config.toml hooks")?;
     Ok(())
 }
 
@@ -1775,7 +1775,7 @@ async fn permission_request_hook_allows_network_approval_without_prompt() -> Res
     let server = start_mock_server().await;
     let home = Arc::new(TempDir::new()?);
     fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"default_permissions = "workspace"
 
 [permissions.workspace.filesystem]
@@ -2454,7 +2454,7 @@ async fn plugin_pre_tool_use_blocks_shell_command_before_execution() -> Result<(
     )
     .context("write plugin manifest")?;
     fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"[plugins."sample@test"]
 enabled = true
 "#,

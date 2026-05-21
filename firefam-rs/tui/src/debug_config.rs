@@ -725,7 +725,7 @@ mod tests {
         let user_file = if cfg!(windows) {
             absolute_path("C:\\users\\alice\\.firefam\\config.toml")
         } else {
-            absolute_path("/home/alice/.firefam/config.toml")
+            absolute_path("/home/alice/.agents/firefam-config.toml")
         };
         let stack = ConfigLayerStack::new(
             vec![ConfigLayerEntry::new(

@@ -14,7 +14,7 @@ async fn exits_non_zero_when_required_mcp_server_fails_to_initialize() -> anyhow
         command = "firefam-definitely-not-a-real-binary"
         required = true
     "#;
-    std::fs::write(test.home_path().join("config.toml"), config_toml)?;
+    std::fs::write(test.home_path().join("firefam-config.toml"), config_toml)?;
 
     let server = responses::start_mock_server().await;
     let body = responses::sse(vec![

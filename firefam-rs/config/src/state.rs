@@ -59,7 +59,7 @@ impl LoaderOverrides {
             user_config_path: None,
             user_config_profile: None,
             managed_config_path: Some(base.join("managed_config.toml")),
-            system_config_path: Some(base.join("config.toml")),
+            system_config_path: Some(base.join("firefam-config.toml")),
             system_requirements_path: Some(base.join("requirements.toml")),
             ignore_managed_requirements: false,
             ignore_user_config: false,
@@ -176,7 +176,7 @@ impl ConfigLayerEntry {
         }
     }
 
-    // Get the `.firefam/` folder associated with this config layer, if any.
+    // Get the `.agents/` folder associated with this config layer, if any.
     pub fn config_folder(&self) -> Option<AbsolutePathBuf> {
         match &self.name {
             ConfigLayerSource::Mdm { .. } => None,
@@ -189,7 +189,7 @@ impl ConfigLayerEntry {
         }
     }
 
-    /// Returns the `.firefam/` folder that should be used for hook declarations.
+    /// Returns the `.agents/` folder that should be used for hook declarations.
     ///
     /// Project layers normally use their own config folder. Linked Git worktrees
     /// can instead point hook discovery at the matching folder from the root
@@ -217,7 +217,7 @@ pub struct ConfigLayerStack {
     /// Index into [layers] of the active user config layer, if any.
     ///
     /// When profile config is active, there can be more than one user layer:
-    /// the base `$FIREFAM_HOME/config.toml` layer followed by the profile override
+    /// the base `$AGENTS_HOME/config.toml` layer followed by the profile override
     /// layer. This index points at the highest-precedence user layer because that
     /// is the writable layer for profile-aware edits.
     user_layer_index: Option<usize>,
@@ -283,7 +283,7 @@ impl ConfigLayerStack {
     ///
     /// This does not merge other config layers or apply any requirements. When
     /// a profile-v2 layer is active, this returns that profile layer rather than
-    /// the base `$FIREFAM_HOME/config.toml` layer because the active layer is the
+    /// the base `$AGENTS_HOME/config.toml` layer because the active layer is the
     /// writable target for profile-aware edits.
     pub fn get_active_user_layer(&self) -> Option<&ConfigLayerEntry> {
         self.user_layer_index

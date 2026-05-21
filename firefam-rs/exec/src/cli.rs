@@ -31,7 +31,7 @@ pub struct Cli {
     #[arg(long = "ephemeral", global = true, default_value_t = false)]
     pub ephemeral: bool,
 
-    /// Do not load `$FIREFAM_HOME/config.toml`; auth still uses `FIREFAM_HOME`.
+    /// Do not load `$AGENTS_HOME/config.toml`; auth still uses `AGENTS_HOME`.
     #[arg(long = "ignore-user-config", global = true, default_value_t = false)]
     pub ignore_user_config: bool,
 

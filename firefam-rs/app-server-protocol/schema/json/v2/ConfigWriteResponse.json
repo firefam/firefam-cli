@@ -74,7 +74,7 @@
           "type": "object"
         },
         {
-          "description": "User config layer from $FIREFAM_HOME/config.toml. This layer is special in that it is expected to be: - writable by the user - generally outside the workspace directory",
+          "description": "User config layer from $AGENTS_HOME/config.toml. This layer is special in that it is expected to be: - writable by the user - generally outside the workspace directory",
           "properties": {
             "file": {
               "allOf": [
@@ -107,7 +107,7 @@
           "type": "object"
         },
         {
-          "description": "Path to a .firefam/ folder within a project. There could be multiple of these between `cwd` and the project/repo root.",
+          "description": "Path to a .agents/ folder within a project. There could be multiple of these between `cwd` and the project/repo root.",
           "properties": {
             "dotFirefamFolder": {
               "$ref": "#/definitions/AbsolutePathBuf"

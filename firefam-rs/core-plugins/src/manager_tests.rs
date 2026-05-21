@@ -1277,7 +1277,7 @@ async fn install_plugin_updates_config_with_relative_path_and_plugin_key() {
         }
     );
 
-    let config = fs::read_to_string(tmp.path().join("config.toml")).unwrap();
+    let config = fs::read_to_string(tmp.path().join("firefam-config.toml")).unwrap();
     assert!(config.contains(r#"[plugins."sample-plugin@debug"]"#));
     assert!(config.contains("enabled = true"));
 }
@@ -1843,7 +1843,7 @@ enabled = true
 "#,
     );
     write_file(
-        &repo_root.join(".firefam/config.toml"),
+        &repo_root.join(".agents/firefam-config.toml"),
         r#"[[skills.config]]
 name = "enabled-plugin:sample-search"
 enabled = false
@@ -3709,14 +3709,14 @@ async fn load_plugins_ignores_project_config_files() {
         r#"{"name":"sample"}"#,
     );
     write_file(
-        &project_root.join(".firefam/config.toml"),
+        &project_root.join(".agents/firefam-config.toml"),
         &plugin_config_toml(/*enabled*/ true, /*plugins_feature_enabled*/ true),
     );
 
     let stack = ConfigLayerStack::new(
         vec![ConfigLayerEntry::new(
             ConfigLayerSource::Project {
-                dot_firefam_folder: AbsolutePathBuf::try_from(project_root.join(".firefam"))
+                dot_firefam_folder: AbsolutePathBuf::try_from(project_root.join(".agents"))
                     .unwrap(),
             },
             toml::from_str(&plugin_config_toml(

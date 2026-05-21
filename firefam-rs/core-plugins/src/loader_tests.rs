@@ -29,7 +29,7 @@ fn configured_plugins_from_stack_merges_user_layers() {
     let stack = ConfigLayerStack::new(
         vec![
             user_layer(
-                user_config_path(&temp_dir, "config.toml"),
+                user_config_path(&temp_dir, "firefam-config.toml"),
                 "[plugins.base]\nenabled = true\n",
             ),
             user_layer(

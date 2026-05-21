@@ -627,7 +627,7 @@ async fn thread_archive_clears_stale_subscriptions_before_resume() -> Result<()>
 }
 
 fn create_config_toml(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(config_toml, config_contents(server_uri))
 }
 

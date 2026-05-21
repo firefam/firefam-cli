@@ -492,7 +492,7 @@ async fn turn_start_emits_thread_scoped_warning_notification_for_trimmed_skills(
         .to_string();
     entry["context_window"] = serde_json::Value::from(100);
     std::fs::write(&cache_path, serde_json::to_string_pretty(&cache)?)?;
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let config = std::fs::read_to_string(&config_path)?;
     std::fs::write(
         &config_path,
@@ -1618,7 +1618,7 @@ async fn turn_start_uses_migrated_pragmatic_personality_without_override_v2() ->
     timeout(DEFAULT_READ_TIMEOUT, mcp.initialize()).await??;
 
     let persisted_toml: ConfigToml = toml::from_str(&std::fs::read_to_string(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
     )?)?;
     assert_eq!(persisted_toml.personality, Some(Personality::Pragmatic));
     assert!(
@@ -2204,7 +2204,7 @@ async fn turn_start_permission_profile_rebinds_runtime_workspace_roots_between_t
     .await;
     let server_uri = server.uri();
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"
@@ -3157,7 +3157,7 @@ async fn turn_start_emits_spawn_agent_item_with_effective_role_model_metadata_v2
         firefam_home.path().join("custom-role.toml"),
         format!("model = \"{ROLE_MODEL}\"\nmodel_reasoning_effort = \"{ROLE_REASONING_EFFORT}\"\n",),
     )?;
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let base_config = std::fs::read_to_string(&config_path)?;
     std::fs::write(
         &config_path,
@@ -3803,7 +3803,7 @@ async fn turn_start_with_elevated_override_does_not_persist_project_trust() -> R
     )
     .await??;
 
-    let config_toml = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_toml = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config_toml.contains("trust_level = \"trusted\""));
     assert!(!config_toml.contains(&workspace.path().display().to_string()));
 
@@ -3849,7 +3849,7 @@ fn create_config_toml_with_sandbox(
         })
         .collect::<Vec<_>>()
         .join("\n");
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

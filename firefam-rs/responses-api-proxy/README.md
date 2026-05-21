@@ -11,7 +11,7 @@ echo $OPENAI_API_KEY | ./target/debug/firefam-responses-api-proxy \
     --dump-dir /tmp/proxy
 
 
-# Add this to ~/.firefam/config.toml:
+# Add this to ~/.agents/firefam-config.toml:
 
 [model_providers.firefam-responses-api-proxy]
 name = 'firefam-responses-api-proxy'

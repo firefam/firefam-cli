@@ -280,7 +280,7 @@
       "description": "Determine where Firefam should store CLI auth credentials.",
       "oneOf": [
         {
-          "description": "Persist credentials in FIREFAM_HOME/auth.json.",
+          "description": "Persist credentials in AGENTS_HOME/auth.json.",
           "enum": [
             "file"
           ],
@@ -294,7 +294,7 @@
           "type": "string"
         },
         {
-          "description": "Use keyring when available; otherwise, fall back to a file in FIREFAM_HOME.",
+          "description": "Use keyring when available; otherwise, fall back to a file in AGENTS_HOME.",
           "enum": [
             "auto"
           ],
@@ -953,7 +953,7 @@
     },
     "History": {
       "additionalProperties": false,
-      "description": "Settings that govern if and what will be written to `~/.firefam/history.jsonl`.",
+      "description": "Settings that govern if and what will be written to `~/.agents/history.jsonl`.",
       "properties": {
         "max_bytes": {
           "default": null,
@@ -1807,7 +1807,7 @@
           "type": "string"
         },
         {
-          "description": "FIREFAM_HOME/.credentials.json This file will be readable to Firefam and other applications running as the same user.",
+          "description": "AGENTS_HOME/.credentials.json This file will be readable to Firefam and other applications running as the same user.",
           "enum": [
             "file"
           ],
@@ -2782,7 +2782,7 @@
         },
         "pet": {
           "default": null,
-          "description": "Pet id to preselect in the terminal pet picker.\n\nCustom pet ids resolve against FIREFAM_HOME/pets/<pet-id>/pet.json.",
+          "description": "Pet id to preselect in the terminal pet picker.\n\nCustom pet ids resolve against AGENTS_HOME/pets/<pet-id>/pet.json.",
           "type": "string"
         },
         "pet_anchor": {
@@ -2843,7 +2843,7 @@
         },
         "theme": {
           "default": null,
-          "description": "Syntax highlighting theme name (kebab-case).\n\nWhen set, overrides automatic light/dark theme detection. Use `/theme` in the TUI or see `$FIREFAM_HOME/themes` for custom themes.",
+          "description": "Syntax highlighting theme name (kebab-case).\n\nWhen set, overrides automatic light/dark theme detection. Use `/theme` in the TUI or see `$AGENTS_HOME/themes` for custom themes.",
           "type": "string"
         },
         "vim_mode_default": {
@@ -4013,7 +4013,7 @@
       "type": "object"
     }
   },
-  "description": "Base config deserialized from ~/.firefam/config.toml.",
+  "description": "Base config deserialized from ~/.agents/firefam-config.toml.",
   "properties": {
     "agents": {
       "allOf": [
@@ -4497,7 +4497,7 @@
         "max_bytes": null,
         "persistence": "save-all"
       },
-      "description": "Settings that govern if and what will be written to `~/.firefam/history.jsonl`."
+      "description": "Settings that govern if and what will be written to `~/.agents/history.jsonl`."
     },
     "hooks": {
       "allOf": [
@@ -4533,7 +4533,7 @@
           "$ref": "#/definitions/AbsolutePathBuf"
         }
       ],
-      "description": "Directory where Firefam writes log files, for example `firefam-tui.log`. Defaults to `$FIREFAM_HOME/log`."
+      "description": "Directory where Firefam writes log files, for example `firefam-tui.log`. Defaults to `$AGENTS_HOME/log`."
     },
     "marketplaces": {
       "additionalProperties": {
@@ -4809,7 +4809,7 @@
           "$ref": "#/definitions/AbsolutePathBuf"
         }
       ],
-      "description": "Directory where Firefam stores the SQLite state DB. Defaults to `$FIREFAM_SQLITE_HOME` when set. Otherwise uses `$FIREFAM_HOME`."
+      "description": "Directory where Firefam stores the SQLite state DB. Defaults to `$FIREFAM_SQLITE_HOME` when set. Otherwise uses `$AGENTS_HOME`."
     },
     "suppress_unstable_features_warning": {
       "description": "Suppress warnings about unstable (under development) features.",

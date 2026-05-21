@@ -226,7 +226,7 @@ fn assert_no_local_persistence_artifacts(firefam_home: &Path) -> Result<()> {
     assert_eq!(
         entries,
         BTreeSet::from([
-            "config.toml".to_string(),
+            "firefam-config.toml".to_string(),
             "installation_id".to_string(),
             "memories".to_string(),
             "skills".to_string(),
@@ -262,7 +262,7 @@ fn create_config_toml_with_thread_store(
     store_id: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

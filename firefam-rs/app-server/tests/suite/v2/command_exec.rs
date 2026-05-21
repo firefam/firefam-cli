@@ -152,7 +152,7 @@ async fn command_exec_env_overrides_merge_with_server_environment_and_support_un
             command: vec![
                 "/bin/sh".to_string(),
                 "-lc".to_string(),
-                "printf '%s|%s|%s|%s' \"$COMMAND_EXEC_BASELINE\" \"$COMMAND_EXEC_EXTRA\" \"${RUST_LOG-unset}\" \"$FIREFAM_HOME\"".to_string(),
+                "printf '%s|%s|%s|%s' \"$COMMAND_EXEC_BASELINE\" \"$COMMAND_EXEC_EXTRA\" \"${RUST_LOG-unset}\" \"$AGENTS_HOME\"".to_string(),
             ],
             process_id: None,
             tty: false,
@@ -1215,7 +1215,7 @@ enable_socks5 = false
 }
 
 fn insert_command_exec_config(firefam_home: &Path, inserted_config: &str) -> Result<()> {
-    let config_path = firefam_home.join("config.toml");
+    let config_path = firefam_home.join("firefam-config.toml");
     let config = std::fs::read_to_string(&config_path)?;
     let marker = "\n[model_providers.mock_provider]\n";
     let (prefix, suffix) = config

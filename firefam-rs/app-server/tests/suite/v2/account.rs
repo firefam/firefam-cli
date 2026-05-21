@@ -75,7 +75,7 @@ struct CreateConfigTomlParams {
 }
 
 fn create_config_toml(firefam_home: &Path, params: CreateConfigTomlParams) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     let base_url = params
         .base_url
         .unwrap_or_else(|| "http://127.0.0.1:0/v1".to_string());

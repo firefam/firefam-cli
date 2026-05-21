@@ -44,25 +44,25 @@ Accept any of the following:
 ### One-shot snapshot
 
 ```bash
-python3 .firefam/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --once
+python3 .agents/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --once
 ```
 
 ### Continuous watch (JSONL)
 
 ```bash
-python3 .firefam/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --watch
+python3 .agents/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --watch
 ```
 
 ### Trigger flaky retry cycle (only when watcher indicates)
 
 ```bash
-python3 .firefam/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --retry-failed-now
+python3 .agents/skills/babysit-pr/scripts/gh_pr_watch.py --pr auto --retry-failed-now
 ```
 
 ### Explicit PR target
 
 ```bash
-python3 .firefam/skills/babysit-pr/scripts/gh_pr_watch.py --pr <number-or-url> --once
+python3 .agents/skills/babysit-pr/scripts/gh_pr_watch.py --pr <number-or-url> --once
 ```
 
 ## CI Failure Classification
@@ -83,7 +83,7 @@ Do not attempt to fix flaky/unrelated failures by changing tests, build scripts,
 
 If classification is ambiguous, perform one manual diagnosis attempt before choosing rerun.
 
-Read `.firefam/skills/babysit-pr/references/heuristics.md` for a concise checklist.
+Read `.agents/skills/babysit-pr/references/heuristics.md` for a concise checklist.
 
 ## Review Comment Handling
 The watcher surfaces review items from:
@@ -190,5 +190,5 @@ Provide concise progress updates while monitoring and a final summary that inclu
 
 ## References
 
-- Heuristics and decision tree: `.firefam/skills/babysit-pr/references/heuristics.md`
-- GitHub CLI/API details used by the watcher: `.firefam/skills/babysit-pr/references/github-api-notes.md`
+- Heuristics and decision tree: `.agents/skills/babysit-pr/references/heuristics.md`
+- GitHub CLI/API details used by the watcher: `.agents/skills/babysit-pr/references/github-api-notes.md`

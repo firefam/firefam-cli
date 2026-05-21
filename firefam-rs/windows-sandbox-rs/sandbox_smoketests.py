@@ -355,7 +355,7 @@ def main() -> int:
             proxy_home.mkdir(parents=True, exist_ok=True)
             proxy_url = f"http://127.0.0.1:{proxy_port}"
             proxy_env = {
-                "FIREFAM_HOME": str(proxy_home),
+                "AGENTS_HOME": str(proxy_home),
                 "HTTP_PROXY": proxy_url,
                 "http_proxy": proxy_url,
                 "ALL_PROXY": proxy_url,
@@ -399,7 +399,7 @@ def main() -> int:
                 "workspace-write",
                 direct_cmd,
                 WS_ROOT,
-                env_extra={"FIREFAM_HOME": str(proxy_home)},
+                env_extra={"AGENTS_HOME": str(proxy_home)},
             )
             add("WS: direct loopback blocked", rc_direct != 0, f"rc={rc_direct}, err={err_direct}")
     else:
@@ -509,7 +509,7 @@ def main() -> int:
     add("WS: protected path case-variation denied", rc != 0 and assert_not_exists(git_variation), f"rc={rc}")
 
     # 34. WS: policy tamper (.firefam artifacts) denied
-    firefam_home = Path(os.environ["USERPROFILE"]) / ".firefam"
+    firefam_home = Path(os.environ["USERPROFILE"]) / ".agents"
     cap_sid_target = firefam_home / "cap_sid"
     rc, out, err = run_sbx(
         "workspace-write",

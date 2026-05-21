@@ -615,7 +615,7 @@
           ]
         },
         "includeHome": {
-          "description": "If true, include detection under the user's home (~/.claude, ~/.firefam, etc.).",
+          "description": "If true, include detection under the user's home (~/.claude, ~/.agents, etc.).",
           "type": "boolean"
         }
       },

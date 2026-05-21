@@ -388,7 +388,7 @@ pub fn main() -> Result<()> {
     let ret = real_main();
     if let Err(e) = &ret {
         // Best-effort: log unexpected top-level errors.
-        if let Ok(firefam_home) = std::env::var("FIREFAM_HOME") {
+        if let Ok(firefam_home) = std::env::var("AGENTS_HOME") {
             let sbx_dir = sandbox_dir(Path::new(&firefam_home));
             let _ = std::fs::create_dir_all(&sbx_dir);
             let log_path = sbx_dir.join(LOG_FILE_NAME);
@@ -1087,7 +1087,7 @@ mod tests {
         let temp = tempfile::tempdir().expect("tempdir");
         let firefam_home = temp.path().join("firefam-home");
         let workspace = temp.path().join("workspace");
-        let protected_dir = workspace.join(".firefam");
+        let protected_dir = workspace.join(".agents");
         let nested_root = protected_dir.join("nested-root");
         fs::create_dir_all(&firefam_home).expect("create firefam home");
         fs::create_dir_all(&workspace).expect("create workspace");

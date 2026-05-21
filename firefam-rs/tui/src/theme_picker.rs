@@ -1,7 +1,7 @@
 //! Builds the `/theme` picker dialog for the TUI.
 //!
 //! The picker lists all bundled themes plus any custom `.tmTheme` files found
-//! under `{FIREFAM_HOME}/themes/`.  It provides:
+//! under `{AGENTS_HOME}/themes/`.  It provides:
 //!
 //! - **Live preview:** the `on_selection_changed` callback swaps the runtime
 //!   syntax theme as the user navigates, giving instant visual feedback in both
@@ -602,7 +602,7 @@ mod tests {
     #[test]
     fn subtitle_uses_tilde_path_when_firefam_home_under_home_directory() {
         let home = dirs::home_dir().expect("home directory should be available");
-        let firefam_home = home.join(".firefam");
+        let firefam_home = home.join(".agents");
 
         let subtitle = theme_picker_subtitle(Some(&firefam_home), Some(200));
 
@@ -614,7 +614,7 @@ mod tests {
     fn subtitle_falls_back_when_tilde_path_subtitle_is_too_wide() {
         let home = dirs::home_dir().expect("home directory should be available");
         let long_segment = "a".repeat(120);
-        let firefam_home = home.join(long_segment).join(".firefam");
+        let firefam_home = home.join(long_segment).join(".agents");
 
         let subtitle = theme_picker_subtitle(Some(&firefam_home), Some(140));
 
@@ -631,7 +631,7 @@ mod tests {
     #[test]
     fn subtitle_falls_back_for_94_column_terminal_side_by_side_layout() {
         let home = dirs::home_dir().expect("home directory should be available");
-        let firefam_home = home.join(".firefam");
+        let firefam_home = home.join(".agents");
 
         let subtitle = theme_picker_subtitle(Some(&firefam_home), Some(94));
 

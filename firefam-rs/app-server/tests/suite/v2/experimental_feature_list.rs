@@ -107,7 +107,7 @@ async fn experimental_feature_list_marks_apps_and_plugins_disabled_by_workspace_
     let firefam_home = TempDir::new()?;
     let server = MockServer::start().await;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"chatgpt_base_url = "{}/backend-api/"
 "#,
@@ -167,7 +167,7 @@ async fn experimental_feature_list_resolves_thread_project_config() -> Result<()
     let server_uri = server.uri();
     let workspace_key = workspace.path().to_string_lossy().replace('\\', "\\\\");
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"model = "mock-model"
 approval_policy = "never"
@@ -186,10 +186,10 @@ stream_max_retries = 0
 "#
         ),
     )?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"[features]
 memories = true
 "#,
@@ -296,7 +296,7 @@ async fn experimental_feature_enablement_set_applies_to_global_and_thread_config
 async fn experimental_feature_enablement_set_does_not_override_user_config() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         "[features]\nmemories = false\n",
     )?;
     let mut mcp = McpProcess::new(firefam_home.path()).await?;

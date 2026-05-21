@@ -13,7 +13,7 @@
           "$ref": "#/definitions/AbsolutePathBuf"
         }
       ],
-      "description": "Absolute path to the server's $FIREFAM_HOME directory."
+      "description": "Absolute path to the server's $AGENTS_HOME directory."
     },
     "platformFamily": {
       "description": "Platform family for the running app-server target, for example `\"unix\"` or `\"windows\"`.",

@@ -49,12 +49,12 @@ where
                 .tempdir()
             {
                 Ok(firefam_home) => firefam_home,
-                Err(error) => panic!("failed to create test FIREFAM_HOME: {error}"),
+                Err(error) => panic!("failed to create test AGENTS_HOME: {error}"),
             };
-            let previous_firefam_home = std::env::var_os("FIREFAM_HOME");
+            let previous_firefam_home = std::env::var_os("AGENTS_HOME");
             // Safety: this runs from a test ctor before test threads begin.
             unsafe {
-                std::env::set_var("FIREFAM_HOME", firefam_home.path());
+                std::env::set_var("AGENTS_HOME", firefam_home.path());
             }
 
             let arg0 = match arg0_dispatch() {
@@ -63,10 +63,10 @@ where
             };
             match previous_firefam_home.as_ref() {
                 Some(value) => unsafe {
-                    std::env::set_var("FIREFAM_HOME", value);
+                    std::env::set_var("AGENTS_HOME", value);
                 },
                 None => unsafe {
-                    std::env::remove_var("FIREFAM_HOME");
+                    std::env::remove_var("AGENTS_HOME");
                 },
             }
 

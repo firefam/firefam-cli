@@ -231,7 +231,7 @@ async fn web_search_tool_config_from_config_toml_is_forwarded_to_request() {
 
     let home = Arc::new(tempfile::TempDir::new().expect("create firefam home"));
     std::fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"web_search = "live"
 
 [tools.web_search]

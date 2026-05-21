@@ -13,11 +13,11 @@ The word `batch` in a user request is not CLI opt-in by itself.
 Real API calls require **network access** + `OPENAI_API_KEY`. `--dry-run` does not.
 
 ## Quick start (works from any repo)
-Set a stable path to the skill CLI (default `FIREFAM_HOME` is `~/.firefam`):
+Set a stable path to the skill CLI (default `AGENTS_HOME` is `~/.agents`):
 
 ```
-export FIREFAM_HOME="${FIREFAM_HOME:-$HOME/.firefam}"
-export IMAGE_GEN="$FIREFAM_HOME/skills/.system/imagegen/scripts/image_gen.py"
+export AGENTS_HOME="${AGENTS_HOME:-$HOME/.firefam}"
+export IMAGE_GEN="$AGENTS_HOME/skills/.system/imagegen/scripts/image_gen.py"
 ```
 
 Install dependencies into that environment with its package manager. In uv-managed environments, `uv pip install ...` remains the preferred path.
@@ -239,4 +239,4 @@ Notes:
 - API parameter quick reference for fallback CLI mode: `references/image-api.md`
 - Prompt examples shared across both top-level modes: `references/sample-prompts.md`
 - Network/sandbox notes for fallback CLI mode: `references/firefam-network.md`
-- Built-in-first transparent image workflow: `SKILL.md` and `$FIREFAM_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`
+- Built-in-first transparent image workflow: `SKILL.md` and `$AGENTS_HOME/skills/.system/imagegen/scripts/remove_chroma_key.py`

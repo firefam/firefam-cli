@@ -42,7 +42,7 @@ pub enum InstallMethod {
     Standalone {
         /// The managed standalone release directory. Legacy installs use paths
         /// such as
-        /// `~/.firefam/packages/standalone/releases/0.111.0-x86_64-unknown-linux-musl`.
+        /// `~/.agents/packages/standalone/releases/0.111.0-x86_64-unknown-linux-musl`.
         /// Package-layout installs use the package root that contains `bin/`,
         /// `firefam-resources/`, and `firefam-path/`.
         release_dir: AbsolutePathBuf,

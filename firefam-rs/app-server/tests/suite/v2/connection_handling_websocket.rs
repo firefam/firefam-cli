@@ -395,7 +395,7 @@ pub(super) async fn spawn_websocket_server_with_args(
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
-        .env("FIREFAM_HOME", firefam_home)
+        .env("AGENTS_HOME", firefam_home)
         .env("RUST_LOG", "warn");
     let mut process = cmd
         .kill_on_drop(true)
@@ -531,7 +531,7 @@ async fn run_websocket_server_to_completion_with_args(
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::piped())
-        .env("FIREFAM_HOME", firefam_home)
+        .env("AGENTS_HOME", firefam_home)
         .env("RUST_LOG", "warn");
     timeout(DEFAULT_READ_TIMEOUT, cmd.output())
         .await
@@ -829,7 +829,7 @@ pub(super) fn create_config_toml(
     server_uri: &str,
     approval_policy: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

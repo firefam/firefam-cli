@@ -248,7 +248,7 @@ async fn thread_inject_items_adds_raw_response_items_after_a_turn() -> Result<()
 }
 
 fn create_config_toml(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

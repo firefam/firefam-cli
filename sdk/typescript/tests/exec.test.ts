@@ -110,7 +110,7 @@ describe("FirefamExec", () => {
 
     try {
       const exec = new FirefamExec("firefam", {
-        FIREFAM_HOME: "/tmp/firefam-home",
+        AGENTS_HOME: "/tmp/firefam-home",
         CUSTOM_ENV: "custom",
       });
 
@@ -131,7 +131,7 @@ describe("FirefamExec", () => {
         throw new Error("Spawn args missing");
       }
 
-      expect(spawnEnv.FIREFAM_HOME).toBe("/tmp/firefam-home");
+      expect(spawnEnv.AGENTS_HOME).toBe("/tmp/firefam-home");
       expect(spawnEnv.CUSTOM_ENV).toBe("custom");
       expect(spawnEnv.FIREFAM_ENV_SHOULD_NOT_LEAK).toBeUndefined();
       expect(spawnEnv.CODEX_API_KEY).toBe("test");

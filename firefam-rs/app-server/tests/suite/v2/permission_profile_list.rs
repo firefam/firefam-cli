@@ -23,7 +23,7 @@ const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30);
 async fn permission_profile_list_returns_builtin_and_configured_profiles() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 default_permissions = "dev"
 
@@ -88,16 +88,16 @@ description = "Inspect without writes."
 async fn permission_profile_list_resolves_project_profiles_and_paginates() -> Result<()> {
     let firefam_home = TempDir::new()?;
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 default_permissions = ":workspace"
 "#,
     )?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 [permissions.project]
 description = "Project-scoped profile."
@@ -167,10 +167,10 @@ async fn permission_profile_list_discovers_project_profiles_without_default_sele
 {
     let firefam_home = TempDir::new()?;
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 [permissions.project]
 description = "Project-scoped profile."

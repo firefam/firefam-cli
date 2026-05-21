@@ -158,7 +158,7 @@ mod tests {
         let hidden_root = AbsolutePathBuf::try_from(if cfg!(windows) {
             "C:\\Users\\test\\.firefam\\memories"
         } else {
-            "/Users/test/.firefam/memories"
+            "/Users/test/.agents/memories"
         })
         .unwrap();
         let profile = PermissionProfile::workspace_write_with(

@@ -587,7 +587,7 @@ mod tests {
         let temp = TempDir::new().expect("tempdir");
         let firefam_home = temp.path().join("firefam-home");
         let workspace = temp.path().join("workspace");
-        let protected_dir = workspace.join(".firefam");
+        let protected_dir = workspace.join(".agents");
         let nested_root = protected_dir.join("nested-root");
         let unrelated_root = temp.path().join("unrelated-root");
         std::fs::create_dir_all(&firefam_home).expect("create firefam home");

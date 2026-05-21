@@ -26,7 +26,7 @@ mod thread_config;
 mod tui_keymap;
 pub mod types;
 
-pub const CONFIG_TOML_FILE: &str = "config.toml";
+pub const CONFIG_TOML_FILE: &str = "firefam-config.toml";
 
 pub use cloud_requirements::CloudRequirementsLoadError;
 pub use cloud_requirements::CloudRequirementsLoadErrorCode;

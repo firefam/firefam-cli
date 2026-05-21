@@ -52,7 +52,7 @@ pub fn compute_allow_paths(
                 let canonical = canonicalize(&candidate).unwrap_or(candidate);
                 add_allow(canonical.clone());
 
-                for protected_subdir in [".git", ".firefam", ".agents"] {
+                for protected_subdir in [".git", ".agents", ".agents"] {
                     let protected_entry = canonical.join(protected_subdir);
                     if protected_entry.exists() {
                         add_deny(protected_entry);
@@ -219,7 +219,7 @@ mod tests {
     fn denies_firefam_and_agents_inside_writable_root() {
         let tmp = TempDir::new().expect("tempdir");
         let command_cwd = tmp.path().join("workspace");
-        let firefam_dir = command_cwd.join(".firefam");
+        let firefam_dir = command_cwd.join(".agents");
         let agents_dir = command_cwd.join(".agents");
         let _ = fs::create_dir_all(&firefam_dir);
         let _ = fs::create_dir_all(&agents_dir);

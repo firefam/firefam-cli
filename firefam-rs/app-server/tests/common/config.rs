@@ -57,7 +57,7 @@ supports_websockets = false
         String::new()
     };
     // Phase 3: write the final config file.
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -84,7 +84,7 @@ pub fn write_mock_responses_config_toml_with_chatgpt_base_url(
     server_uri: &str,
     chatgpt_base_url: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

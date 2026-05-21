@@ -19,7 +19,7 @@ use std::sync::Arc;
 use tempfile::TempDir;
 use toml::Value as TomlValue;
 
-const REPO_ROOT_CONFIG_DIR_NAME: &str = ".firefam";
+const REPO_ROOT_CONFIG_DIR_NAME: &str = ".agents";
 
 struct TestConfig {
     cwd: AbsolutePathBuf,
@@ -156,8 +156,8 @@ async fn skill_roots_from_layer_stack_maps_user_to_user_and_system_cache_and_sys
     fs::create_dir_all(&user_folder)?;
 
     // The file path doesn't need to exist; it's only used to derive the config folder.
-    let system_file = system_folder.join("config.toml").abs();
-    let user_file = user_folder.join("config.toml").abs();
+    let system_file = system_folder.join("firefam-config.toml").abs();
+    let user_file = user_folder.join("firefam-config.toml").abs();
 
     let layers = vec![
         ConfigLayerEntry::new(
@@ -218,10 +218,10 @@ async fn skill_roots_from_layer_stack_includes_disabled_project_layers() -> anyh
     fs::create_dir_all(&user_folder)?;
 
     let project_root = tmp.path().join("repo");
-    let dot_firefam = project_root.join(".firefam");
+    let dot_firefam = project_root.join(".agents");
     fs::create_dir_all(&dot_firefam)?;
 
-    let user_file = user_folder.join("config.toml").abs();
+    let user_file = user_folder.join("firefam-config.toml").abs();
     let project_dot_firefam = dot_firefam.abs();
 
     let layers = vec![
@@ -286,7 +286,7 @@ async fn loads_skills_from_home_agents_dir_for_user_scope() -> anyhow::Result<()
     let user_folder = home_folder.join("firefam");
     fs::create_dir_all(&user_folder)?;
 
-    let user_file = user_folder.join("config.toml").abs();
+    let user_file = user_folder.join("firefam-config.toml").abs();
     let layers = vec![ConfigLayerEntry::new(
         ConfigLayerSource::User {
             file: user_file,
@@ -896,7 +896,7 @@ async fn does_not_loop_on_symlink_cycle_for_user_scope() {
     let firefam_home = tempfile::tempdir().expect("tempdir");
 
     // Create a cycle:
-    //   $FIREFAM_HOME/skills/cycle/loop -> $FIREFAM_HOME/skills/cycle
+    //   $AGENTS_HOME/skills/cycle/loop -> $AGENTS_HOME/skills/cycle
     let cycle_dir = firefam_home.path().join("skills/cycle");
     fs::create_dir_all(&cycle_dir).unwrap();
     symlink_dir(&cycle_dir, &cycle_dir.join("loop"));

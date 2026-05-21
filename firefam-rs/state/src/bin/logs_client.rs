@@ -15,8 +15,8 @@ use owo_colors::OwoColorize;
 #[command(name = "firefam-state-logs")]
 #[command(about = "Tail Firefam logs from the dedicated logs SQLite DB with simple filters")]
 struct Args {
-    /// Path to FIREFAM_HOME. Defaults to $FIREFAM_HOME or ~/.firefam.
-    #[arg(long, env = "FIREFAM_HOME")]
+    /// Path to AGENTS_HOME. Defaults to $AGENTS_HOME or ~/.agents.
+    #[arg(long, env = "AGENTS_HOME")]
     firefam_home: Option<PathBuf>,
 
     /// Direct path to the logs SQLite database. Overrides --firefam-home.
@@ -144,9 +144,9 @@ fn resolve_db_path(args: &Args) -> anyhow::Result<PathBuf> {
 
 fn default_firefam_home() -> PathBuf {
     if let Some(home) = home_dir() {
-        return home.join(".firefam");
+        return home.join(".agents");
     }
-    PathBuf::from(".firefam")
+    PathBuf::from(".agents")
 }
 
 fn build_filter(args: &Args) -> anyhow::Result<LogFilter> {

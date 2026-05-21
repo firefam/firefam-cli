@@ -288,7 +288,7 @@ fn explicit_read_only_subpaths_prevent_auto_approval_for_external_sandbox() {
 fn missing_project_dot_firefam_config_requires_approval() {
     let tmp = TempDir::new().unwrap();
     let cwd = tmp.path().abs();
-    let config_path = cwd.join(".firefam").join("config.toml");
+    let config_path = cwd.join(".agents").join("firefam-config.toml");
     let action = ApplyPatchAction::new_add_for_test(&config_path, "".to_string());
     let permission_profile = PermissionProfile::workspace_write_with(
         &[],
@@ -301,7 +301,7 @@ fn missing_project_dot_firefam_config_requires_approval() {
         .entries
         .push(FileSystemSandboxEntry {
             path: FileSystemPath::Path {
-                path: cwd.join(".firefam"),
+                path: cwd.join(".agents"),
             },
             access: FileSystemAccessMode::Read,
         });

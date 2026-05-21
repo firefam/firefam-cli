@@ -426,13 +426,13 @@ impl PluginsManager {
         firefam_home: PathBuf,
         restriction_product: Option<Product>,
     ) -> Self {
-        // Product restrictions are enforced at marketplace admission time for a given FIREFAM_HOME:
+        // Product restrictions are enforced at marketplace admission time for a given AGENTS_HOME:
         // listing, install, and curated refresh all consult this restriction context before new
         // plugins enter local config or cache. After admission, runtime plugin loading trusts the
-        // contents of that FIREFAM_HOME and does not re-filter configured plugins by product, so
+        // contents of that AGENTS_HOME and does not re-filter configured plugins by product, so
         // already-admitted plugins may continue exposing MCP servers/tools from shared local state.
         //
-        // This assumes a single FIREFAM_HOME is only used by one product.
+        // This assumes a single AGENTS_HOME is only used by one product.
         Self {
             firefam_home: firefam_home.clone(),
             store: PluginStore::new(firefam_home),

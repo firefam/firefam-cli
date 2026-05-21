@@ -247,7 +247,7 @@ fn create_config_toml_with_in_memory_thread_store(
     store_id: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

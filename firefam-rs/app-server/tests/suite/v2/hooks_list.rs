@@ -68,7 +68,7 @@ fn command_hook_hash(
 
 fn write_user_hook_config(firefam_home: &std::path::Path) -> Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"[hooks]
 
 [[hooks.PreToolUse]]
@@ -94,7 +94,7 @@ fn write_plugin_hook_config(firefam_home: &std::path::Path, hooks_json: &str) ->
     )?;
     std::fs::write(plugin_root.join("hooks/hooks.json"), hooks_json)?;
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"[features]
 plugins = true
 plugin_hooks = true
@@ -110,7 +110,7 @@ enabled = true
 fn write_project_hook_config(dot_firefam_folder: &std::path::Path, command: &str) -> Result<()> {
     std::fs::create_dir_all(dot_firefam_folder)?;
     std::fs::write(
-        dot_firefam_folder.join("config.toml"),
+        dot_firefam_folder.join("firefam-config.toml"),
         format!(
             r#"[features]
 hooks = true
@@ -151,7 +151,7 @@ async fn hooks_list_shows_discovered_hook() -> Result<()> {
     .await??;
     let HooksListResponse { data } = to_response(response)?;
     let config_path = AbsolutePathBuf::from_absolute_path(std::fs::canonicalize(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
     )?)?;
     assert_eq!(
         data,
@@ -302,15 +302,15 @@ async fn hooks_list_uses_each_cwds_effective_feature_enablement() -> Result<()> 
     let firefam_home = TempDir::new()?;
     let workspace = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 hooks = false
 "#,
     )?;
     std::fs::create_dir_all(workspace.path().join(".git"))?;
-    std::fs::create_dir_all(workspace.path().join(".firefam"))?;
+    std::fs::create_dir_all(workspace.path().join(".agents"))?;
     std::fs::write(
-        workspace.path().join(".firefam/config.toml"),
+        workspace.path().join(".agents/firefam-config.toml"),
         r#"[features]
 hooks = true
 
@@ -345,7 +345,7 @@ timeout = 5
     .await??;
     let HooksListResponse { data } = to_response(response)?;
     let project_config_path =
-        AbsolutePathBuf::try_from(workspace.path().join(".firefam/config.toml"))?;
+        AbsolutePathBuf::try_from(workspace.path().join(".agents/firefam-config.toml"))?;
     assert_eq!(
         data,
         vec![
@@ -405,8 +405,8 @@ async fn hooks_list_uses_root_repo_hooks_for_linked_worktrees() -> Result<()> {
         worktree_root.join(".git"),
         format!("gitdir: {}\n", worktree_git_dir.display()),
     )?;
-    write_project_hook_config(&repo_root.join(".firefam"), "echo root hook")?;
-    write_project_hook_config(&worktree_root.join(".firefam"), "echo worktree hook")?;
+    write_project_hook_config(&repo_root.join(".agents"), "echo root hook")?;
+    write_project_hook_config(&worktree_root.join(".agents"), "echo worktree hook")?;
     set_project_trust_level(firefam_home.path(), &repo_root, TrustLevel::Trusted)?;
 
     let mut mcp = McpProcess::new(firefam_home.path()).await?;
@@ -426,7 +426,7 @@ async fn hooks_list_uses_root_repo_hooks_for_linked_worktrees() -> Result<()> {
     let repo_hook = data[0].hooks[0].clone();
     let worktree_hook = data[1].hooks[0].clone();
     let repo_config_path =
-        AbsolutePathBuf::from_absolute_path(repo_root.join(".firefam/config.toml"))?;
+        AbsolutePathBuf::from_absolute_path(repo_root.join(".agents/firefam-config.toml"))?;
 
     assert_eq!(repo_hook.command.as_deref(), Some("echo root hook"));
     assert_eq!(worktree_hook.command.as_deref(), Some("echo root hook"));
@@ -603,7 +603,7 @@ with Path(r"{hook_log_path}").open("a", encoding="utf-8") as handle:
         ),
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"
@@ -852,7 +852,7 @@ with Path(r"{hook_log_path}").open("a", encoding="utf-8") as handle:
         ),
     )?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

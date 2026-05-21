@@ -450,10 +450,10 @@ async fn thread_start_respects_project_config_from_cwd() -> Result<()> {
     create_config_toml_without_approval_policy(firefam_home.path(), &server.uri())?;
 
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 model_reasoning_effort = "high"
 "#,
@@ -809,10 +809,10 @@ async fn thread_start_with_elevated_sandbox_trusts_project_and_followup_loads_pr
     create_config_toml_without_approval_policy(firefam_home.path(), &server.uri())?;
 
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 model_reasoning_effort = "high"
 "#,
@@ -854,7 +854,7 @@ model_reasoning_effort = "high"
     assert_eq!(approval_policy, AskForApproval::OnRequest);
     assert_eq!(reasoning_effort, Some(ReasoningEffort::High));
 
-    let config_toml = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_toml = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     let workspace_abs = workspace.path().to_path_buf().abs();
     let trusted_root = resolve_root_git_project_for_trust(LOCAL_FS.as_ref(), &workspace_abs)
         .await
@@ -894,7 +894,7 @@ async fn thread_start_with_nested_git_cwd_trusts_repo_root() -> Result<()> {
     )
     .await??;
 
-    let config_toml = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_toml = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     let nested_abs = nested.abs();
     let trusted_root = resolve_root_git_project_for_trust(LOCAL_FS.as_ref(), &nested_abs)
         .await
@@ -931,7 +931,7 @@ async fn thread_start_with_read_only_sandbox_does_not_persist_project_trust() ->
     )
     .await??;
 
-    let config_toml = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_toml = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config_toml.contains("trust_level = \"trusted\""));
     assert!(!config_toml.contains(&workspace.path().display().to_string()));
 
@@ -946,7 +946,7 @@ async fn thread_start_preserves_untrusted_project_trust() -> Result<()> {
     create_config_toml_without_approval_policy(firefam_home.path(), &server.uri())?;
 
     let workspace = TempDir::new()?;
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let workspace_key = workspace.path().display().to_string();
     let mut config_toml =
         std::fs::read_to_string(&config_path)?.parse::<toml_edit::DocumentMut>()?;
@@ -984,16 +984,16 @@ async fn thread_start_skips_trust_write_when_project_is_already_trusted() -> Res
     create_config_toml_without_approval_policy(firefam_home.path(), &server.uri())?;
 
     let workspace = TempDir::new()?;
-    let project_config_dir = workspace.path().join(".firefam");
+    let project_config_dir = workspace.path().join(".agents");
     std::fs::create_dir_all(&project_config_dir)?;
     std::fs::write(
-        project_config_dir.join("config.toml"),
+        project_config_dir.join("firefam-config.toml"),
         r#"
 model_reasoning_effort = "high"
 "#,
     )?;
     set_project_trust_level(firefam_home.path(), workspace.path(), TrustLevel::Trusted)?;
-    let config_before = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_before = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
 
     let mut mcp = McpProcess::new(firefam_home.path()).await?;
     timeout(DEFAULT_READ_TIMEOUT, mcp.initialize()).await??;
@@ -1019,7 +1019,7 @@ model_reasoning_effort = "high"
     assert_eq!(approval_policy, AskForApproval::OnRequest);
     assert_eq!(reasoning_effort, Some(ReasoningEffort::High));
 
-    let config_after = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config_after = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert_eq!(config_after, config_before);
 
     Ok(())
@@ -1041,7 +1041,7 @@ fn create_config_toml_with_optional_approval_policy(
     server_uri: &str,
     approval_policy: Option<&str>,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     let approval_policy = approval_policy
         .map(|policy| format!("approval_policy = \"{policy}\"\n"))
         .unwrap_or_default();
@@ -1070,7 +1070,7 @@ fn create_config_toml_with_profile_workspace_root(
     server_uri: &str,
     profile_root: &Path,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     let profile_root_key = profile_root
         .display()
         .to_string()
@@ -1106,7 +1106,7 @@ fn create_config_toml_with_chatgpt_base_url(
     server_uri: &str,
     chatgpt_base_url: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -1133,7 +1133,7 @@ fn create_config_toml_with_required_broken_mcp(
     firefam_home: &Path,
     server_uri: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -1164,7 +1164,7 @@ fn create_config_toml_with_optional_broken_mcp(
     firefam_home: &Path,
     server_uri: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

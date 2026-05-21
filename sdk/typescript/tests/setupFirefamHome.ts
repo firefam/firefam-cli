@@ -4,12 +4,12 @@ import path from "node:path";
 
 import { afterEach, beforeEach } from "@jest/globals";
 
-const originalFirefamHome = process.env.FIREFAM_HOME;
+const originalFirefamHome = process.env.AGENTS_HOME;
 let currentFirefamHome: string | undefined;
 
 beforeEach(async () => {
   currentFirefamHome = await fs.mkdtemp(path.join(os.tmpdir(), "firefam-sdk-test-"));
-  process.env.FIREFAM_HOME = currentFirefamHome;
+  process.env.AGENTS_HOME = currentFirefamHome;
 });
 
 afterEach(async () => {
@@ -17,9 +17,9 @@ afterEach(async () => {
   currentFirefamHome = undefined;
 
   if (originalFirefamHome === undefined) {
-    delete process.env.FIREFAM_HOME;
+    delete process.env.AGENTS_HOME;
   } else {
-    process.env.FIREFAM_HOME = originalFirefamHome;
+    process.env.AGENTS_HOME = originalFirefamHome;
   }
 
   if (firefamHomeToDelete) {

@@ -7,14 +7,14 @@ use tempfile::TempDir;
 fn strict_config_rejects_unknown_config_fields_for_standalone_app_server() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 foo = "bar"
 "#,
     )?;
 
     let output = Command::new(firefam_utils_cargo_bin::cargo_bin("firefam-app-server")?)
-        .env("FIREFAM_HOME", firefam_home.path())
+        .env("AGENTS_HOME", firefam_home.path())
         .env(
             "FIREFAM_APP_SERVER_MANAGED_CONFIG_PATH",
             firefam_home.path().join("managed_config.toml"),

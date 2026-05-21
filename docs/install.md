@@ -53,10 +53,10 @@ cargo test --all-features
 
 Firefam is written in Rust, so it honors the `RUST_LOG` environment variable to configure its logging behavior.
 
-The TUI defaults to `RUST_LOG=firefam_core=info,firefam_tui=info,firefam_rmcp_client=info` and log messages are written to `~/.firefam/log/firefam-tui.log` by default. For a single run, you can override the log directory with `-c log_dir=...` (for example, `-c log_dir=./.firefam-log`).
+The TUI defaults to `RUST_LOG=firefam_core=info,firefam_tui=info,firefam_rmcp_client=info` and log messages are written to `~/.agents/log/firefam-tui.log` by default. For a single run, you can override the log directory with `-c log_dir=...` (for example, `-c log_dir=./.firefam-log`).
 
 ```bash
-tail -F ~/.firefam/log/firefam-tui.log
+tail -F ~/.agents/log/firefam-tui.log
 ```
 
 By comparison, the non-interactive mode (`firefam exec`) defaults to `RUST_LOG=error`, but messages are printed inline, so there is no need to monitor a separate file.

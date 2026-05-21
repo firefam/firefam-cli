@@ -65,7 +65,7 @@ fn stage_windows_sandbox_helpers() -> anyhow::Result<()> {
 #[serial(firefam_home)]
 async fn windows_restricted_token_rejects_exact_and_glob_deny_read_policy() -> anyhow::Result<()> {
     let temp_home = TempDir::new()?;
-    let _firefam_home_guard = EnvVarGuard::set("FIREFAM_HOME", temp_home.path().as_os_str());
+    let _firefam_home_guard = EnvVarGuard::set("AGENTS_HOME", temp_home.path().as_os_str());
     let workspace = TempDir::new()?;
     let cwd = dunce::canonicalize(workspace.path())?.abs();
     let secret = cwd.join("secret.env");
@@ -145,7 +145,7 @@ async fn windows_restricted_token_rejects_exact_and_glob_deny_read_policy() -> a
 #[serial(firefam_home)]
 async fn windows_elevated_enforces_exact_and_glob_deny_read_policy() -> anyhow::Result<()> {
     let temp_home = TempDir::new()?;
-    let _firefam_home_guard = EnvVarGuard::set("FIREFAM_HOME", temp_home.path().as_os_str());
+    let _firefam_home_guard = EnvVarGuard::set("AGENTS_HOME", temp_home.path().as_os_str());
     stage_windows_sandbox_helpers()?;
     let workspace = TempDir::new()?;
     let cwd = dunce::canonicalize(workspace.path())?.abs();

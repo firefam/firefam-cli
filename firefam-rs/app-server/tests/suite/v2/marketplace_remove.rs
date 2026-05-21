@@ -84,7 +84,7 @@ async fn marketplace_remove_deletes_config_and_installed_root() -> Result<()> {
         canonicalize_path_with_existing_parent(&installed_root)?,
     );
 
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config.contains("[marketplaces.debug]"));
     assert!(
         !marketplace_install_root(firefam_home.path())

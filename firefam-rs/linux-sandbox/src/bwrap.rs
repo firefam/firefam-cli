@@ -413,7 +413,7 @@ fn create_filesystem_args(
                 let project_subpath = subpath.as_path();
                 if project_subpath != Path::new(".git")
                     && project_subpath != Path::new(".agents")
-                    && project_subpath != Path::new(".firefam")
+                    && project_subpath != Path::new(".agents")
                 {
                     return None;
                 }
@@ -1577,7 +1577,7 @@ mod tests {
         let temp_dir = TempDir::new().expect("temp dir");
         let logical_home = temp_dir.path().join("home");
         let real_firefam = temp_dir.path().join("real-firefam");
-        let logical_firefam = logical_home.join(".firefam");
+        let logical_firefam = logical_home.join(".agents");
         let real_memories = real_firefam.join("memories");
         let logical_memories = logical_firefam.join("memories");
         std::fs::create_dir_all(&logical_home).expect("create logical home");
@@ -1718,7 +1718,7 @@ mod tests {
         assert_empty_file_bound_without_perms(&args.args, &blocked);
         assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".git"));
         assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
-        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".firefam"));
+        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
         assert_eq!(args.preserved_files.len(), 1);
         assert_eq!(
             synthetic_mount_target_paths(&args),
@@ -1726,7 +1726,7 @@ mod tests {
                 blocked.clone(),
                 workspace.join(".git"),
                 workspace.join(".agents"),
-                workspace.join(".firefam"),
+                workspace.join(".agents"),
             ]
         );
         assert!(
@@ -1759,13 +1759,13 @@ mod tests {
 
         assert_empty_file_bound_without_perms(&args.args, &dot_git);
         assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
-        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".firefam"));
+        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
         assert_eq!(
             synthetic_mount_target_paths(&args),
             vec![
                 dot_git.clone(),
                 workspace.join(".agents"),
-                workspace.join(".firefam"),
+                workspace.join(".agents"),
             ]
         );
         assert!(
@@ -1804,7 +1804,7 @@ mod tests {
         let args = create_filesystem_args(&policy, &workspace, NO_UNREADABLE_GLOB_SCAN_MAX_DEPTH)
             .expect("filesystem args");
         assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
-        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".firefam"));
+        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
         let dot_git_str = path_to_string(&dot_git);
         assert!(
             !args
@@ -1851,7 +1851,7 @@ mod tests {
             create_filesystem_args(&policy, &link_workspace, NO_UNREADABLE_GLOB_SCAN_MAX_DEPTH)
                 .expect("filesystem args");
         assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
-        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".firefam"));
+        assert_empty_directory_mounted_read_only(&args.args, &workspace.join(".agents"));
         let dot_git_str = path_to_string(&dot_git);
         assert!(
             !args
@@ -1935,7 +1935,7 @@ mod tests {
             },
             FileSystemSandboxEntry {
                 path: FileSystemPath::Special {
-                    value: FileSystemSpecialPath::project_roots(Some(".firefam".into())),
+                    value: FileSystemSpecialPath::project_roots(Some(".agents".into())),
                 },
                 access: FileSystemAccessMode::Read,
             },
@@ -1946,7 +1946,7 @@ mod tests {
                 .expect("filesystem args");
         let dot_git = path_to_string(&temp_dir.path().join(".git"));
         let dot_agents = path_to_string(&temp_dir.path().join(".agents"));
-        let dot_firefam = path_to_string(&temp_dir.path().join(".firefam"));
+        let dot_firefam = path_to_string(&temp_dir.path().join(".agents"));
 
         assert_empty_directory_mounted_read_only(&args.args, Path::new(&dot_git));
         assert_empty_directory_mounted_read_only(&args.args, Path::new(&dot_agents));

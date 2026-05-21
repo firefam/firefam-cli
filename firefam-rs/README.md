@@ -90,8 +90,8 @@ firefam --sandbox workspace-write
 firefam --sandbox danger-full-access
 ```
 
-The same setting can be persisted in `~/.firefam/config.toml` via the top-level `sandbox_mode = "MODE"` key, e.g. `sandbox_mode = "workspace-write"`.
-In `workspace-write`, Firefam also includes `~/.firefam/memories` in its writable roots so memory maintenance does not require an extra approval.
+The same setting can be persisted in `~/.agents/firefam-config.toml` via the top-level `sandbox_mode = "MODE"` key, e.g. `sandbox_mode = "workspace-write"`.
+In `workspace-write`, Firefam also includes `~/.agents/memories` in its writable roots so memory maintenance does not require an extra approval.
 
 ## Code Organization
 

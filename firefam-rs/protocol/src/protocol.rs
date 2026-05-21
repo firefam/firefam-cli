@@ -4243,7 +4243,7 @@ mod tests {
     fn restricted_file_system_policy_derives_effective_paths() {
         let cwd = TempDir::new().expect("tempdir");
         std::fs::create_dir_all(cwd.path().join(".agents")).expect("create .agents");
-        std::fs::create_dir_all(cwd.path().join(".firefam")).expect("create .firefam");
+        std::fs::create_dir_all(cwd.path().join(".agents")).expect("create .firefam");
         let canonical_cwd =
             firefam_utils_absolute_path::canonicalize_preserving_symlinks(cwd.path())
                 .expect("canonicalize cwd");
@@ -4254,7 +4254,7 @@ mod tests {
             .expect("canonical secret");
         let expected_agents = AbsolutePathBuf::from_absolute_path(canonical_cwd.join(".agents"))
             .expect("canonical .agents");
-        let expected_firefam = AbsolutePathBuf::from_absolute_path(canonical_cwd.join(".firefam"))
+        let expected_firefam = AbsolutePathBuf::from_absolute_path(canonical_cwd.join(".agents"))
             .expect("canonical .firefam");
         let policy = FileSystemSandboxPolicy::restricted(vec![
             FileSystemSandboxEntry {
@@ -4324,7 +4324,7 @@ mod tests {
             AbsolutePathBuf::from_absolute_path(canonical_cwd.join("docs/public"))
                 .expect("canonical docs/public");
         let expected_dot_firefam =
-            AbsolutePathBuf::from_absolute_path(canonical_cwd.join(".firefam"))
+            AbsolutePathBuf::from_absolute_path(canonical_cwd.join(".agents"))
                 .expect("canonical .firefam");
         let policy = FileSystemSandboxPolicy::restricted(vec![
             FileSystemSandboxEntry {

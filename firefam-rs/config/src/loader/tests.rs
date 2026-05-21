@@ -124,7 +124,7 @@ model = "gpt-work"
         "unexpected error message: {message}"
     );
     assert!(
-        message.contains("config.toml"),
+        message.contains("firefam-config.toml"),
         "unexpected error message: {message}"
     );
     assert!(

@@ -160,7 +160,7 @@ pub fn arg0_dispatch() -> Option<Arg0PathEntryGuard> {
 /// `firefam-linux-sandbox` we *directly* execute
 /// [`firefam_linux_sandbox::run_main`] (which never returns). Otherwise we:
 ///
-/// 1.  Load `.env` values from `~/.firefam/.env` before creating any threads.
+/// 1.  Load `.env` values from `~/.agents/.env` before creating any threads.
 /// 2.  Construct a Tokio multi-thread runtime.
 /// 3.  Capture the current executable path and derive the
 ///     `firefam-linux-sandbox` helper path (falling back to the current
@@ -242,7 +242,7 @@ fn build_runtime() -> anyhow::Result<tokio::runtime::Runtime> {
 
 const ILLEGAL_ENV_VAR_PREFIX: &str = "FIREFAM_";
 
-/// Load env vars from ~/.firefam/.env.
+/// Load env vars from ~/.agents/.env.
 ///
 /// Security: Do not allow `.env` files to create or modify any variables
 /// with names starting with `FIREFAM_`.
@@ -299,7 +299,7 @@ pub fn prepend_path_entry_for_firefam_aliases() -> std::io::Result<Arg0PathEntry
     }
 
     std::fs::create_dir_all(&firefam_home)?;
-    // Use a FIREFAM_HOME-scoped temp root to avoid cluttering the top-level directory.
+    // Use a AGENTS_HOME-scoped temp root to avoid cluttering the top-level directory.
     let temp_root = firefam_home.join("tmp").join("arg0");
     std::fs::create_dir_all(&temp_root)?;
     #[cfg(unix)]

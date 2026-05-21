@@ -938,8 +938,8 @@ fn user_profile_child_name(path: &Path, user_profile: &Path) -> Option<String> {
 }
 
 fn filter_sensitive_write_roots(mut roots: Vec<PathBuf>, firefam_home: &Path) -> Vec<PathBuf> {
-    // Never grant capability write access to FIREFAM_HOME or anything under FIREFAM_HOME/.sandbox,
-    // FIREFAM_HOME/.sandbox-bin, or FIREFAM_HOME/.sandbox-secrets. These locations contain sandbox
+    // Never grant capability write access to AGENTS_HOME or anything under AGENTS_HOME/.sandbox,
+    // AGENTS_HOME/.sandbox-bin, or AGENTS_HOME/.sandbox-secrets. These locations contain sandbox
     // control/state and helper binaries and must remain tamper-resistant.
     let firefam_home_key = canonical_path_key(firefam_home);
     let sbx_dir_key = canonical_path_key(&sandbox_dir(firefam_home));
@@ -1486,7 +1486,7 @@ mod tests {
         let command_cwd = tmp.path().join("workspace");
         let extra_write_root = tmp.path().join("extra-write-root");
         let command_git = command_cwd.join(".git");
-        let extra_firefam = extra_write_root.join(".firefam");
+        let extra_firefam = extra_write_root.join(".agents");
         let explicit_deny = tmp.path().join("explicit-deny");
         fs::create_dir_all(&command_git).expect("create command .git");
         fs::create_dir_all(&extra_firefam).expect("create extra .firefam");

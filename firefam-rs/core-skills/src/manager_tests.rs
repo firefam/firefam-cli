@@ -268,7 +268,7 @@ async fn skills_for_config_disables_plugin_skills_by_name() {
 async fn skills_for_cwd_loads_repo_and_user_roots_with_local_fs() {
     let firefam_home = tempfile::tempdir().expect("tempdir");
     let cwd = tempfile::tempdir().expect("tempdir");
-    let repo_dot_firefam = cwd.path().join(".firefam");
+    let repo_dot_firefam = cwd.path().join(".agents");
     fs::create_dir_all(&repo_dot_firefam).expect("create repo config dir");
 
     write_user_skill(&firefam_home, "user", "user-skill", "from local user root");
@@ -331,7 +331,7 @@ async fn skills_for_cwd_loads_repo_and_user_roots_with_local_fs() {
 async fn skills_for_cwd_without_fs_skips_repo_roots() {
     let firefam_home = tempfile::tempdir().expect("tempdir");
     let cwd = tempfile::tempdir().expect("tempdir");
-    let repo_dot_firefam = cwd.path().join(".firefam");
+    let repo_dot_firefam = cwd.path().join(".agents");
     fs::create_dir_all(&repo_dot_firefam).expect("create repo config dir");
 
     write_user_skill(&firefam_home, "user", "user-skill", "from local user root");
@@ -495,7 +495,7 @@ fn disabled_paths_for_skills_allows_session_flags_to_override_user_layer() {
     let tempdir = tempfile::tempdir().expect("tempdir");
     let skill_path = write_demo_skill(&tempdir);
     let skill = test_skill("demo-skill", skill_path.clone());
-    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("config.toml"))
+    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("firefam-config.toml"))
         .expect("user config path should be absolute");
     let user_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {
@@ -530,7 +530,7 @@ fn disabled_paths_for_skills_allows_session_flags_to_disable_user_enabled_skill(
     let tempdir = tempfile::tempdir().expect("tempdir");
     let skill_path = write_demo_skill(&tempdir);
     let skill = test_skill("demo-skill", skill_path.clone());
-    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("config.toml"))
+    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("firefam-config.toml"))
         .expect("user config path should be absolute");
     let user_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {
@@ -568,7 +568,7 @@ fn disabled_paths_for_skills_disables_matching_name_selectors() {
     let tempdir = tempfile::tempdir().expect("tempdir");
     let skill_path = write_demo_skill(&tempdir);
     let skill = test_skill("github:yeet", skill_path.clone());
-    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("config.toml"))
+    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("firefam-config.toml"))
         .expect("user config path should be absolute");
     let user_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {
@@ -601,7 +601,7 @@ fn disabled_paths_for_skills_allows_name_selector_to_override_path_selector() {
     let tempdir = tempfile::tempdir().expect("tempdir");
     let skill_path = write_demo_skill(&tempdir);
     let skill = test_skill("github:yeet", skill_path.clone());
-    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("config.toml"))
+    let user_file = AbsolutePathBuf::try_from(tempdir.path().join("firefam-config.toml"))
         .expect("user config path should be absolute");
     let user_layer = ConfigLayerEntry::new(
         ConfigLayerSource::User {

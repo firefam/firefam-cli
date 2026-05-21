@@ -1541,7 +1541,7 @@ mod tests {
         let (tx_raw, _rx) = unbounded_channel::<AppEvent>();
         let tx = AppEventSender::new(tx_raw);
         let home = dirs::home_dir().expect("home directory should be available");
-        let firefam_home = home.join(".firefam");
+        let firefam_home = home.join(".agents");
         let params = crate::theme_picker::build_theme_picker_params(
             /*current_name*/ None,
             Some(&firefam_home),

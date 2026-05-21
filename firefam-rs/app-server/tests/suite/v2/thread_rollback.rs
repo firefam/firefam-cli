@@ -180,7 +180,7 @@ async fn thread_rollback_drops_last_turns_and_persists_to_rollout() -> Result<()
 }
 
 fn create_config_toml(firefam_home: &std::path::Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

@@ -207,7 +207,7 @@ struct PluginCommandContext {
 async fn load_plugin_command_context(
     overrides: Vec<(String, toml::Value)>,
 ) -> Result<PluginCommandContext> {
-    let firefam_home = find_firefam_home().context("failed to resolve FIREFAM_HOME")?;
+    let firefam_home = find_firefam_home().context("failed to resolve AGENTS_HOME")?;
     let config = Config::load_with_cli_overrides(overrides)
         .await
         .context("failed to load configuration")?;

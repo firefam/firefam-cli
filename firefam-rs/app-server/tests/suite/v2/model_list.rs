@@ -197,7 +197,7 @@ async fn list_models_uses_chatgpt_remote_catalog_as_source_of_truth() -> Result<
     let firefam_home = TempDir::new()?;
     let server_uri = server.uri();
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

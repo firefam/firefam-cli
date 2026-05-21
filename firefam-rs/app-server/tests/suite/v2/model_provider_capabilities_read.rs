@@ -42,7 +42,7 @@ async fn read_default_provider_capabilities() -> Result<()> {
 async fn read_amazon_bedrock_provider_capabilities() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"model_provider = "amazon-bedrock"
 "#,
     )?;

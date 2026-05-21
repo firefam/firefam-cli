@@ -106,7 +106,7 @@ fn record_git_marketplace(
 }
 
 fn disable_plugin_startup_tasks(firefam_home: &Path) -> Result<()> {
-    let config_path = firefam_home.join("config.toml");
+    let config_path = firefam_home.join("firefam-config.toml");
     let config = std::fs::read_to_string(&config_path)?;
     std::fs::write(
         config_path,
@@ -192,7 +192,7 @@ async fn marketplace_upgrade_all_configured_git_marketplaces() -> Result<()> {
         std::fs::read_to_string(tools_root.as_path().join("marker.txt"))?,
         "tools new"
     );
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(config.contains(&debug_new_revision));
     assert!(config.contains(&tools_new_revision));
     Ok(())

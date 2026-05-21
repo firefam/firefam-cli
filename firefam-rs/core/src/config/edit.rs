@@ -1099,7 +1099,7 @@ fn apply_blocking_to_resolved_file(
 /// Persist edits asynchronously by offloading the blocking writer.
 ///
 /// `profile` selects a legacy `[profiles.<name>]` section inside
-/// `$FIREFAM_HOME/config.toml`; profile-v2 callers should resolve their target
+/// `$AGENTS_HOME/config.toml`; profile-v2 callers should resolve their target
 /// file before constructing a [ConfigEditsBuilder].
 pub async fn apply(
     firefam_home: &Path,

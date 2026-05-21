@@ -16,7 +16,7 @@ impl TestFirefamExecBuilder {
                 .expect("should find binary for firefam-exec"),
         );
         cmd.current_dir(self.cwd.path())
-            .env("FIREFAM_HOME", self.home.path())
+            .env("AGENTS_HOME", self.home.path())
             .env("FIREFAM_SQLITE_HOME", self.home.path())
             .env(CODEX_API_KEY_ENV_VAR, "dummy");
         cmd

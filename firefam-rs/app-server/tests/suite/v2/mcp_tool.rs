@@ -84,7 +84,7 @@ async fn mcp_server_tool_call_returns_tool_result() -> Result<()> {
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"
@@ -202,7 +202,7 @@ async fn mcp_server_tool_call_round_trips_elicitation() -> Result<()> {
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"
@@ -312,7 +312,7 @@ async fn mcp_server_tool_call_forwards_url_elicitation() -> Result<()> {
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"
@@ -432,7 +432,7 @@ async fn mcp_tool_call_completion_notification_contains_truncated_large_result()
         "compact",
     )?;
 
-    let config_path = firefam_home.path().join("config.toml");
+    let config_path = firefam_home.path().join("firefam-config.toml");
     let mut config_toml = std::fs::read_to_string(&config_path)?;
     config_toml.push_str(&format!(
         r#"

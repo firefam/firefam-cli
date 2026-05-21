@@ -45,7 +45,7 @@ fn write_sample_plugin_manifest_and_config(home: &TempDir) -> std::path::PathBuf
     )
     .expect("write plugin manifest");
     std::fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         format!(
             "[features]\nplugins = true\n\n[plugins.\"{SAMPLE_PLUGIN_CONFIG_NAME}\"]\nenabled = true\n"
         ),

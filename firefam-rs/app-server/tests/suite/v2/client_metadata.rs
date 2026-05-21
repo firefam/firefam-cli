@@ -321,7 +321,7 @@ fn create_config_toml(
     server_uri: &str,
     supports_websockets: bool,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

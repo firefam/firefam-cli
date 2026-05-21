@@ -49,7 +49,7 @@ const DEFAULT_SKILLS_DIR_NAME: &str = "skills";
 const DEFAULT_HOOKS_CONFIG_FILE: &str = "hooks/hooks.json";
 const DEFAULT_MCP_CONFIG_FILE: &str = ".mcp.json";
 const DEFAULT_APP_CONFIG_FILE: &str = ".app.json";
-const CONFIG_TOML_FILE: &str = "config.toml";
+const CONFIG_TOML_FILE: &str = "firefam-config.toml";
 const CURATED_PLUGIN_CACHE_VERSION_SHA_PREFIX_LEN: usize = 8;
 
 #[derive(Clone, Copy, PartialEq, Eq)]

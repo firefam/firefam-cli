@@ -211,7 +211,7 @@ async fn turn_start_output_schema_is_per_turn_v2() -> Result<()> {
 }
 
 fn create_config_toml(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

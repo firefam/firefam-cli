@@ -252,7 +252,7 @@ struct Daemon {
 
 impl Daemon {
     fn from_environment() -> Result<Self> {
-        let firefam_home = find_firefam_home().context("failed to resolve FIREFAM_HOME")?;
+        let firefam_home = find_firefam_home().context("failed to resolve AGENTS_HOME")?;
         let socket_path = app_server_control_socket_path(firefam_home.as_path())?
             .as_path()
             .to_path_buf();

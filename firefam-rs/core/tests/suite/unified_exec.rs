@@ -893,7 +893,7 @@ async fn unified_exec_network_denial_test(
 
     let home = Arc::new(TempDir::new()?);
     fs::write(
-        home.path().join("config.toml"),
+        home.path().join("firefam-config.toml"),
         r#"default_permissions = "workspace"
 
 [permissions.workspace.filesystem]

@@ -7,7 +7,7 @@ use tempfile::TempDir;
 
 fn firefam_command(firefam_home: &Path) -> Result<assert_cmd::Command> {
     let mut cmd = assert_cmd::Command::new(firefam_utils_cargo_bin::cargo_bin("firefam")?);
-    cmd.env("FIREFAM_HOME", firefam_home);
+    cmd.env("AGENTS_HOME", firefam_home);
     Ok(cmd)
 }
 
@@ -47,7 +47,7 @@ async fn features_enable_writes_feature_flag_to_config() -> Result<()> {
         .success()
         .stdout(contains("Enabled feature `unified_exec` in config.toml."));
 
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(config.contains("[features]"));
     assert!(config.contains("unified_exec = true"));
 
@@ -64,7 +64,7 @@ async fn features_disable_writes_feature_flag_to_config() -> Result<()> {
         .success()
         .stdout(contains("Disabled feature `shell_tool` in config.toml."));
 
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(config.contains("[features]"));
     assert!(config.contains("shell_tool = false"));
 

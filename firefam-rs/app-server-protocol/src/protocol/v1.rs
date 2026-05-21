@@ -60,7 +60,7 @@ pub struct InitializeCapabilities {
 #[serde(rename_all = "camelCase")]
 pub struct InitializeResponse {
     pub user_agent: String,
-    /// Absolute path to the server's $FIREFAM_HOME directory.
+    /// Absolute path to the server's $AGENTS_HOME directory.
     pub firefam_home: AbsolutePathBuf,
     /// Platform family for the running app-server target, for example
     /// `"unix"` or `"windows"`.

@@ -509,12 +509,12 @@ async fn sandbox_blocks_git_and_firefam_writes_inside_writable_root() {
 
     let tmpdir = tempfile::tempdir().expect("tempdir");
     let dot_git = tmpdir.path().join(".git");
-    let dot_firefam = tmpdir.path().join(".firefam");
+    let dot_firefam = tmpdir.path().join(".agents");
     std::fs::create_dir_all(&dot_git).expect("create .git");
     std::fs::create_dir_all(&dot_firefam).expect("create .firefam");
 
     let git_target = dot_git.join("config");
-    let firefam_target = dot_firefam.join("config.toml");
+    let firefam_target = dot_firefam.join("firefam-config.toml");
 
     let git_output = expect_denied(
         run_cmd_result_with_writable_roots(
@@ -564,10 +564,10 @@ async fn sandbox_blocks_firefam_symlink_replacement_attack() {
     let decoy = tmpdir.path().join("decoy-firefam");
     std::fs::create_dir_all(&decoy).expect("create decoy dir");
 
-    let dot_firefam = tmpdir.path().join(".firefam");
+    let dot_firefam = tmpdir.path().join(".agents");
     symlink(&decoy, &dot_firefam).expect("create .firefam symlink");
 
-    let firefam_target = dot_firefam.join("config.toml");
+    let firefam_target = dot_firefam.join("firefam-config.toml");
 
     let firefam_output = expect_denied(
         run_cmd_result_with_writable_roots(
@@ -600,7 +600,7 @@ async fn sandbox_reports_firefam_symlink_build_failure_without_panicking() {
     let decoy = tmpdir.path().join("decoy-firefam");
     std::fs::create_dir_all(&decoy).expect("create decoy dir");
 
-    let dot_firefam = tmpdir.path().join(".firefam");
+    let dot_firefam = tmpdir.path().join(".agents");
     symlink(&decoy, &dot_firefam).expect("create .firefam symlink");
 
     let output = match run_cmd_result_with_writable_roots(
@@ -721,7 +721,7 @@ fi
 
     let mkdir_firefam_output = expect_denied(
         run_cmd_result_with_cwd_and_writable_roots(
-            &["mkdir", ".firefam"],
+            &["mkdir", ".agents"],
             &subdir,
             std::slice::from_ref(&subdir),
             LONG_TIMEOUT_MS,
@@ -732,7 +732,7 @@ fi
         "child .firefam directory creation should be denied",
     );
     assert_ne!(mkdir_firefam_output.exit_code, 0);
-    assert!(!subdir.join(".firefam").exists());
+    assert!(!subdir.join(".agents").exists());
 
     let script = format!(
         r#"set -e
@@ -759,7 +759,7 @@ printf '%s\n' '{{"message":"ok"}}' | python3 jsonl_viewer.py | grep -q ok
 
     assert!(subdir.join("jsonl_viewer.py").is_file());
     assert!(!subdir.join(".git").exists());
-    assert!(!subdir.join(".firefam").exists());
+    assert!(!subdir.join(".agents").exists());
     assert!(!subdir.join(".agents").exists());
 }
 

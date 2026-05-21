@@ -230,7 +230,7 @@ class AppServerHarness:
         return AppServerConfig(
             cwd=str(self.workspace),
             env={
-                "FIREFAM_HOME": str(self.firefam_home),
+                "AGENTS_HOME": str(self.firefam_home),
                 "FIREFAM_APP_SERVER_DISABLE_MANAGED_CONFIG": "1",
                 "RUST_LOG": "warn",
             },
@@ -238,7 +238,7 @@ class AppServerHarness:
 
     def _write_config(self) -> None:
         """Write config.toml that routes model calls to the mock server."""
-        config_toml = self.firefam_home / "config.toml"
+        config_toml = self.firefam_home / "firefam-config.toml"
         requires_firefamai_auth = (
             "requires_firefamai_auth = true\n" if self.requires_firefamai_auth else ""
         )

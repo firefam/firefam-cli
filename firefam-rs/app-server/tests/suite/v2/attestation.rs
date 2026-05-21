@@ -172,7 +172,7 @@ async fn attestation_generate_round_trip_adds_header_to_responses_websocket_hand
 
 fn create_chatgpt_websocket_config(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"

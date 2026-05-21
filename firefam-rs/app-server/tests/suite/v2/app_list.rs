@@ -259,7 +259,7 @@ async fn list_apps_uses_thread_feature_flag_when_thread_id_is_provided() -> Resu
     let ThreadStartResponse { thread, .. } = to_response(start_response)?;
 
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{server_url}"
@@ -339,7 +339,7 @@ async fn list_apps_reports_is_enabled_from_config() -> Result<()> {
 
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{server_url}"
@@ -1645,7 +1645,7 @@ fn connector_tool(connector_id: &str, connector_name: &str) -> Result<Tool> {
 }
 
 fn write_connectors_config(firefam_home: &std::path::Path, base_url: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(

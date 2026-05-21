@@ -74,7 +74,7 @@ where
     child.stdout(Stdio::piped());
     child.stderr(Stdio::inherit());
     child.kill_on_drop(true);
-    child.env("FIREFAM_HOME", firefam_home.path());
+    child.env("AGENTS_HOME", firefam_home.path());
     child.envs(env);
     let mut child = child.spawn()?;
 

@@ -31,7 +31,7 @@ use firefam_utils_cli::format_env_display;
 /// Subcommands:
 /// - `list`   — list configured servers (with `--json`)
 /// - `get`    — show a single server (with `--json`)
-/// - `add`    — add a server launcher entry to `~/.firefam/config.toml`
+/// - `add`    — add a server launcher entry to `~/.agents/firefam-config.toml`
 /// - `remove` — delete a server entry
 /// - `login`  — authenticate with MCP server using OAuth
 /// - `logout` — remove OAuth credentials for MCP server
@@ -255,7 +255,7 @@ async fn run_add(config_overrides: &CliConfigOverrides, add_args: AddArgs) -> Re
 
     validate_server_name(&name)?;
 
-    let firefam_home = find_firefam_home().context("failed to resolve FIREFAM_HOME")?;
+    let firefam_home = find_firefam_home().context("failed to resolve AGENTS_HOME")?;
     let mut servers = load_global_mcp_servers(&firefam_home)
         .await
         .with_context(|| format!("failed to load MCP servers from {}", firefam_home.display()))?;
@@ -368,7 +368,7 @@ async fn run_remove(config_overrides: &CliConfigOverrides, remove_args: RemoveAr
 
     validate_server_name(&name)?;
 
-    let firefam_home = find_firefam_home().context("failed to resolve FIREFAM_HOME")?;
+    let firefam_home = find_firefam_home().context("failed to resolve AGENTS_HOME")?;
     let mut servers = load_global_mcp_servers(&firefam_home)
         .await
         .with_context(|| format!("failed to load MCP servers from {}", firefam_home.display()))?;

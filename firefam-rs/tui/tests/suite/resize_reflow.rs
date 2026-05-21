@@ -59,7 +59,7 @@ async fn tmux_split_preserves_fresh_session_composer_row_after_resize_reflow() -
             .arg(&session_name)
             .arg("--")
             .arg("env")
-            .arg(format!("FIREFAM_HOME={}", firefam_home.path().display()))
+            .arg(format!("AGENTS_HOME={}", firefam_home.path().display()))
             .arg("OPENAI_API_KEY=dummy")
             .arg(firefam)
             .arg("-c")
@@ -230,7 +230,7 @@ async fn tmux_width_resize_restore_keeps_visible_content_anchored() -> Result<()
             .arg(&session_name)
             .arg("--")
             .arg("env")
-            .arg(format!("FIREFAM_HOME={}", firefam_home.path().display()))
+            .arg(format!("AGENTS_HOME={}", firefam_home.path().display()))
             .arg("OPENAI_API_KEY=dummy")
             .arg(firefam)
             .arg("-c")
@@ -358,7 +358,7 @@ async fn run_repeated_resize_smoke(terminal_resize_reflow_enabled: bool) -> Resu
             .arg(&session_name)
             .arg("--")
             .arg("env")
-            .arg(format!("FIREFAM_HOME={}", firefam_home.path().display()))
+            .arg(format!("AGENTS_HOME={}", firefam_home.path().display()))
             .arg("OPENAI_API_KEY=dummy")
             .arg(firefam)
             .arg("-c")
@@ -504,7 +504,7 @@ terminal_resize_reflow = {terminal_resize_reflow_enabled}
 trust_level = "trusted"
 "#
     );
-    std::fs::write(firefam_home.join("config.toml"), config)?;
+    std::fs::write(firefam_home.join("firefam-config.toml"), config)?;
     Ok(())
 }
 

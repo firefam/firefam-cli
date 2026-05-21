@@ -14,7 +14,7 @@ const SOURCE_EXTERNAL_AGENT_UPPER_PRODUCT_NAME: &str = "CLAUDE-CODE";
 fn fixture_paths() -> (TempDir, PathBuf, PathBuf) {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     (root, external_agent_home, firefam_home)
 }
 
@@ -68,7 +68,7 @@ async fn detect_home_lists_config_skills_and_agents_md() {
             description: format!(
                 "Migrate {} into {}",
                 external_agent_home.join("settings.json").display(),
-                firefam_home.join("config.toml").display()
+                firefam_home.join("firefam-config.toml").display()
             ),
             cwd: None,
             details: None,
@@ -166,7 +166,7 @@ async fn detect_repo_lists_agents_md_for_each_cwd() {
 
     let items = service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .detect(ExternalAgentConfigDetectOptions {
         include_home: false,
@@ -205,7 +205,7 @@ async fn detect_repo_lists_agents_md_for_each_cwd() {
 async fn detect_repo_still_reports_non_plugin_items_when_home_config_is_invalid() {
     let root = TempDir::new().expect("create tempdir");
     let repo_root = root.path().join("repo");
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(
         repo_root
@@ -216,7 +216,7 @@ async fn detect_repo_still_reports_non_plugin_items_when_home_config_is_invalid(
     .expect("create repo skills");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         "this is not valid = [toml",
     )
     .expect("write invalid firefam config");
@@ -263,7 +263,7 @@ async fn detect_repo_still_reports_non_plugin_items_when_home_config_is_invalid(
                         .join(EXTERNAL_AGENT_DIR)
                         .join("settings.json")
                         .display(),
-                    repo_root.join(".firefam").join("config.toml").display()
+                    repo_root.join(".agents").join("firefam-config.toml").display()
                 ),
                 cwd: Some(repo_root.clone()),
                 details: None,
@@ -338,7 +338,7 @@ async fn detect_repo_lists_mcp_hooks_commands_and_subagents() {
 
     let items = service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .detect(ExternalAgentConfigDetectOptions {
         include_home: false,
@@ -355,7 +355,7 @@ async fn detect_repo_lists_mcp_hooks_commands_and_subagents() {
                 description: format!(
                     "Migrate MCP servers from {} into {}",
                     repo_root.display(),
-                    repo_root.join(".firefam").join("config.toml").display()
+                    repo_root.join(".agents").join("firefam-config.toml").display()
                 ),
                 cwd: Some(repo_root.clone()),
                 details: Some(MigrationDetails {
@@ -370,7 +370,7 @@ async fn detect_repo_lists_mcp_hooks_commands_and_subagents() {
                 description: format!(
                     "Migrate hooks from {} to {}",
                     repo_root.join(EXTERNAL_AGENT_DIR).display(),
-                    repo_root.join(".firefam").join("hooks.json").display()
+                    repo_root.join(".agents").join("hooks.json").display()
                 ),
                 cwd: Some(repo_root.clone()),
                 details: Some(MigrationDetails {
@@ -403,7 +403,7 @@ async fn detect_repo_lists_mcp_hooks_commands_and_subagents() {
                 description: format!(
                     "Migrate subagents from {} to {}",
                     repo_root.join(EXTERNAL_AGENT_DIR).join("agents").display(),
-                    repo_root.join(".firefam").join("agents").display()
+                    repo_root.join(".agents").join("agents").display()
                 ),
                 cwd: Some(repo_root),
                 details: Some(MigrationDetails {
@@ -431,7 +431,7 @@ async fn detect_repo_skips_hooks_when_only_unsupported_hooks_exist() {
 
     let items = service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .detect(ExternalAgentConfigDetectOptions {
         include_home: false,
@@ -504,7 +504,7 @@ async fn import_repo_migrates_mcp_hooks_commands_and_subagents() {
 
     service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .import(vec![
         ExternalAgentConfigMigrationItem {
@@ -536,7 +536,7 @@ async fn import_repo_migrates_mcp_hooks_commands_and_subagents() {
     .expect("import");
 
     let config: TomlValue = toml::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("config.toml")).expect("read config"),
+        &fs::read_to_string(repo_root.join(".agents").join("firefam-config.toml")).expect("read config"),
     )
     .expect("parse config");
     let expected_config: TomlValue = toml::from_str(
@@ -572,7 +572,7 @@ STATIC = "yes"
         .expect("migrated MCP config should be supported");
 
     let hooks: JsonValue = serde_json::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("hooks.json")).expect("read hooks"),
+        &fs::read_to_string(repo_root.join(".agents").join("hooks.json")).expect("read hooks"),
     )
     .expect("parse hooks");
     let _supported_hooks: firefam_config::HooksFile =
@@ -600,7 +600,7 @@ STATIC = "yes"
     );
     assert!(
         !repo_root
-            .join(".firefam")
+            .join(".agents")
             .join("hooks.migration-notes.md")
             .exists()
     );
@@ -620,7 +620,7 @@ STATIC = "yes"
     let agent: TomlValue = toml::from_str(
         &fs::read_to_string(
             repo_root
-                .join(".firefam")
+                .join(".agents")
                 .join("agents")
                 .join("researcher.toml"),
         )
@@ -700,7 +700,7 @@ async fn import_home_migrates_supported_config_fields_skills_and_agents_md() {
     );
 
     assert_eq!(
-        fs::read_to_string(firefam_home.join("config.toml")).expect("read config"),
+        fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config"),
         "sandbox_mode = \"workspace-write\"\n\n[shell_environment_policy]\ninherit = \"core\"\n\n[shell_environment_policy.set]\nCI = \"false\"\nFOO = \"bar\"\nMAX_RETRIES = \"3\"\nMY_TEAM = \"firefam\"\n"
     );
     assert_eq!(
@@ -736,7 +736,7 @@ async fn import_home_config_uses_local_settings_over_project_settings() {
         .expect("import");
 
     assert_eq!(
-        fs::read_to_string(firefam_home.join("config.toml")).expect("read config"),
+        fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config"),
         "sandbox_mode = \"workspace-write\"\n\n[shell_environment_policy]\ninherit = \"core\"\n\n[shell_environment_policy.set]\nFOO = \"local\"\nLOCAL_ONLY = \"true\"\nPROJECT_ONLY = \"yes\"\n"
     );
 }
@@ -767,7 +767,7 @@ async fn import_home_config_ignores_invalid_local_settings() {
         .expect("import");
 
     assert_eq!(
-        fs::read_to_string(firefam_home.join("config.toml")).expect("read config"),
+        fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config"),
         "[shell_environment_policy]\ninherit = \"core\"\n\n[shell_environment_policy.set]\nFOO = \"project\"\n"
     );
 }
@@ -792,7 +792,7 @@ async fn import_home_skips_empty_config_migration() {
         .await
         .expect("import");
 
-    assert!(!firefam_home.join("config.toml").exists());
+    assert!(!firefam_home.join("firefam-config.toml").exists());
 }
 
 #[tokio::test]
@@ -859,7 +859,7 @@ async fn import_local_plugins_returns_completed_status() {
         .expect("import");
 
     assert_eq!(outcome, Vec::<PendingPluginImport>::new());
-    let config = fs::read_to_string(firefam_home.join("config.toml")).expect("read config");
+    let config = fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config");
     assert!(config.contains(r#"[plugins."cloudflare@my-plugins"]"#));
     assert!(config.contains("enabled = true"));
 }
@@ -912,7 +912,7 @@ async fn import_git_plugins_returns_pending_async_status() {
             },
         }]
     );
-    assert!(!firefam_home.join("config.toml").exists());
+    assert!(!firefam_home.join("firefam-config.toml").exists());
 }
 
 #[tokio::test]
@@ -926,7 +926,7 @@ async fn detect_home_skips_config_when_target_already_has_supported_fields() {
     )
     .expect("write settings");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"
             sandbox_mode = "workspace-write"
 
@@ -998,7 +998,7 @@ async fn import_repo_agents_md_rewrites_terms_and_skips_non_empty_targets() {
 
     service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .import(vec![
         ExternalAgentConfigMigrationItem {
@@ -1042,7 +1042,7 @@ async fn import_repo_agents_md_overwrites_empty_targets() {
 
     service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .import(vec![ExternalAgentConfigMigrationItem {
         item_type: ExternalAgentConfigMigrationItemType::AgentsMd,
@@ -1076,7 +1076,7 @@ async fn detect_repo_prefers_non_empty_external_agent_agents_source() {
 
     let items = service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .detect(ExternalAgentConfigDetectOptions {
         include_home: false,
@@ -1109,21 +1109,21 @@ async fn import_repo_hooks_preserves_disabled_firefam_hooks_feature() {
     let repo_root = root.path().join("repo");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create external agent dir");
-    fs::create_dir_all(repo_root.join(".firefam")).expect("create firefam dir");
+    fs::create_dir_all(repo_root.join(".agents")).expect("create firefam dir");
     fs::write(
         repo_root.join(EXTERNAL_AGENT_DIR).join("settings.json"),
         r#"{"hooks":{"Stop":[{"hooks":[{"command":"echo done"}]}]}}"#,
     )
     .expect("write hooks");
     fs::write(
-        repo_root.join(".firefam").join("config.toml"),
+        repo_root.join(".agents").join("firefam-config.toml"),
         "[features]\nfirefam_hooks = false\n",
     )
     .expect("write config");
 
     service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .import(vec![ExternalAgentConfigMigrationItem {
         item_type: ExternalAgentConfigMigrationItemType::Hooks,
@@ -1135,11 +1135,11 @@ async fn import_repo_hooks_preserves_disabled_firefam_hooks_feature() {
     .expect("import");
 
     assert_eq!(
-        fs::read_to_string(repo_root.join(".firefam").join("config.toml")).expect("read config"),
+        fs::read_to_string(repo_root.join(".agents").join("firefam-config.toml")).expect("read config"),
         "[features]\nfirefam_hooks = false\n"
     );
     let hooks: JsonValue = serde_json::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("hooks.json")).expect("read hooks"),
+        &fs::read_to_string(repo_root.join(".agents").join("hooks.json")).expect("read hooks"),
     )
     .expect("parse hooks");
     assert_eq!(
@@ -1185,7 +1185,7 @@ async fn import_repo_mcp_uses_home_settings_toggles_when_repo_settings_missing()
     )
     .expect("write external agent project config");
 
-    service_for_paths(external_agent_home, root.path().join(".firefam"))
+    service_for_paths(external_agent_home, root.path().join(".agents"))
         .import(vec![ExternalAgentConfigMigrationItem {
             item_type: ExternalAgentConfigMigrationItemType::McpServerConfig,
             description: String::new(),
@@ -1196,7 +1196,7 @@ async fn import_repo_mcp_uses_home_settings_toggles_when_repo_settings_missing()
         .expect("import");
 
     let config: TomlValue = toml::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("config.toml")).expect("read config"),
+        &fs::read_to_string(repo_root.join(".agents").join("firefam-config.toml")).expect("read config"),
     )
     .expect("parse config");
     let expected: TomlValue = toml::from_str(
@@ -1246,7 +1246,7 @@ async fn import_repo_mcp_uses_local_settings_toggles_over_project_settings() {
     )
     .expect("write local settings");
 
-    service_for_paths(external_agent_home, root.path().join(".firefam"))
+    service_for_paths(external_agent_home, root.path().join(".agents"))
         .import(vec![ExternalAgentConfigMigrationItem {
             item_type: ExternalAgentConfigMigrationItemType::McpServerConfig,
             description: String::new(),
@@ -1257,7 +1257,7 @@ async fn import_repo_mcp_uses_local_settings_toggles_over_project_settings() {
         .expect("import");
 
     let config: TomlValue = toml::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("config.toml")).expect("read config"),
+        &fs::read_to_string(repo_root.join(".agents").join("firefam-config.toml")).expect("read config"),
     )
     .expect("parse config");
     let expected: TomlValue = toml::from_str(
@@ -1294,7 +1294,7 @@ async fn import_repo_mcp_ignores_invalid_home_settings_when_repo_settings_missin
     )
     .expect("write external agent project config");
 
-    service_for_paths(external_agent_home, root.path().join(".firefam"))
+    service_for_paths(external_agent_home, root.path().join(".agents"))
         .import(vec![ExternalAgentConfigMigrationItem {
             item_type: ExternalAgentConfigMigrationItemType::McpServerConfig,
             description: String::new(),
@@ -1305,7 +1305,7 @@ async fn import_repo_mcp_ignores_invalid_home_settings_when_repo_settings_missin
         .expect("import");
 
     let config: TomlValue = toml::from_str(
-        &fs::read_to_string(repo_root.join(".firefam").join("config.toml")).expect("read config"),
+        &fs::read_to_string(repo_root.join(".agents").join("firefam-config.toml")).expect("read config"),
     )
     .expect("parse config");
     let expected: TomlValue = toml::from_str(
@@ -1335,7 +1335,7 @@ async fn import_repo_uses_non_empty_external_agent_agents_source() {
 
     service_for_paths(
         root.path().join(EXTERNAL_AGENT_DIR),
-        root.path().join(".firefam"),
+        root.path().join(".agents"),
     )
     .import(vec![ExternalAgentConfigMigrationItem {
         item_type: ExternalAgentConfigMigrationItemType::AgentsMd,
@@ -1474,7 +1474,7 @@ async fn detect_home_plugins_uses_local_settings_over_project_settings() {
 async fn detect_repo_skips_plugins_that_are_already_configured_in_firefam() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
@@ -1495,7 +1495,7 @@ async fn detect_repo_skips_plugins_that_are_already_configured_in_firefam() {
     )
     .expect("write repo settings");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"
 [plugins."formatter@acme-tools"]
 enabled = true
@@ -1538,7 +1538,7 @@ enabled = true
 async fn detect_repo_skips_plugins_that_are_disabled_in_firefam() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
@@ -1558,7 +1558,7 @@ async fn detect_repo_skips_plugins_that_are_disabled_in_firefam() {
     )
     .expect("write repo settings");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"
 [plugins."formatter@acme-tools"]
 enabled = false
@@ -1581,7 +1581,7 @@ enabled = false
 async fn detect_repo_skips_plugins_without_explicit_enabled_in_firefam() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
@@ -1601,7 +1601,7 @@ async fn detect_repo_skips_plugins_without_explicit_enabled_in_firefam() {
     )
     .expect("write repo settings");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"
 [plugins."formatter@acme-tools"]
 "#,
@@ -1636,11 +1636,11 @@ async fn import_plugins_requires_details() {
 async fn detect_repo_does_not_skip_plugins_only_configured_in_project_firefam() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
-    fs::create_dir_all(repo_root.join(".firefam")).expect("create repo firefam dir");
+    fs::create_dir_all(repo_root.join(".agents")).expect("create repo firefam dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
     fs::write(
         repo_root.join(EXTERNAL_AGENT_DIR).join("settings.json"),
@@ -1657,7 +1657,7 @@ async fn detect_repo_does_not_skip_plugins_only_configured_in_project_firefam() 
     )
     .expect("write repo settings");
     fs::write(
-        repo_root.join(".firefam").join("config.toml"),
+        repo_root.join(".agents").join("firefam-config.toml"),
         r#"
 [plugins."formatter@acme-tools"]
 enabled = true
@@ -1755,7 +1755,7 @@ async fn detect_home_skips_plugins_with_invalid_marketplace_source() {
 async fn detect_repo_filters_plugins_against_installed_marketplace() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     let marketplace_root = firefam_home.join(".tmp").join("marketplaces").join("debug");
     fs::create_dir_all(repo_root.join(".git")).expect("create git dir");
@@ -1793,7 +1793,7 @@ async fn detect_repo_filters_plugins_against_installed_marketplace() {
     )
     .expect("write repo settings");
     fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         r#"
 [marketplaces.debug]
 source_type = "git"
@@ -2031,7 +2031,7 @@ async fn import_plugins_supports_external_agent_plugin_marketplace_layout() {
             failed_plugin_ids: Vec::new(),
         }
     );
-    let config = fs::read_to_string(firefam_home.join("config.toml")).expect("read config");
+    let config = fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config");
     assert!(config.contains(r#"[plugins."cloudflare@my-plugins"]"#));
     assert!(config.contains("enabled = true"));
 }
@@ -2225,7 +2225,7 @@ async fn import_plugins_supports_relative_external_agent_plugin_marketplace_path
             failed_plugin_ids: Vec::new(),
         }
     );
-    let config = fs::read_to_string(firefam_home.join("config.toml")).expect("read config");
+    let config = fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config");
     assert!(config.contains(r#"[plugins."cloudflare@my-plugins"]"#));
     assert!(config.contains("enabled = true"));
 }
@@ -2277,7 +2277,7 @@ async fn import_plugins_infers_external_official_marketplace_when_missing_from_s
 async fn detect_repo_supports_project_relative_external_agent_plugin_marketplace_path() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     let marketplace_root = repo_root.join("my-marketplace");
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
@@ -2359,7 +2359,7 @@ async fn detect_repo_supports_project_relative_external_agent_plugin_marketplace
 async fn import_plugins_supports_project_relative_external_agent_plugin_marketplace_path() {
     let root = TempDir::new().expect("create tempdir");
     let external_agent_home = root.path().join(EXTERNAL_AGENT_DIR);
-    let firefam_home = root.path().join(".firefam");
+    let firefam_home = root.path().join(".agents");
     let repo_root = root.path().join("repo");
     let marketplace_root = repo_root.join("my-marketplace");
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
@@ -2429,7 +2429,7 @@ async fn import_plugins_supports_project_relative_external_agent_plugin_marketpl
             failed_plugin_ids: Vec::new(),
         }
     );
-    let config = fs::read_to_string(firefam_home.join("config.toml")).expect("read config");
+    let config = fs::read_to_string(firefam_home.join("firefam-config.toml")).expect("read config");
     assert!(config.contains(r#"[plugins."cloudflare@my-plugins"]"#));
     assert!(config.contains("enabled = true"));
 }

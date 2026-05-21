@@ -426,7 +426,7 @@ fn user_disablement_filters_non_managed_hooks_but_not_managed_hooks() {
         },
     );
     let config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute path");
     let managed_disabled_key = format!("{}:pre_tool_use:0:0", managed_dir.display());
     let user_disabled_key = format!("{}:pre_tool_use:0:0", config_path.display());
     let user_config = config_with_pre_tool_use_hook_and_states(
@@ -494,7 +494,7 @@ fn user_disablement_does_not_filter_managed_layer_hooks() {
     let managed_config_path =
         AbsolutePathBuf::try_from(temp.path().join("managed_config.toml")).expect("absolute path");
     let user_config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute path");
     let managed_key = format!("{}:pre_tool_use:0:0", managed_config_path.display());
 
     let config_layer_stack = ConfigLayerStack::new(
@@ -717,7 +717,7 @@ fn requirements_managed_hooks_load_when_managed_dir_is_missing() {
 fn allow_managed_hooks_only_false_keeps_unmanaged_hooks() {
     let temp = tempdir().expect("create temp dir");
     let config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path");
     let (requirements, requirements_toml) = requirements_with_managed_hooks_only(
         /*allow_managed_hooks_only*/ false, /*managed_hooks*/ None,
     );
@@ -766,7 +766,7 @@ fn allow_managed_hooks_only_false_keeps_unmanaged_hooks() {
 fn allow_managed_hooks_only_in_config_toml_does_not_enable_policy() {
     let temp = tempdir().expect("create temp dir");
     let config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path");
     let mut config_toml = config_toml_with_pre_tool_use("python3 /tmp/user-hook.py");
     let TomlValue::Table(config_table) = &mut config_toml else {
         unreachable!("config TOML root should be a table");
@@ -820,7 +820,7 @@ fn allow_managed_hooks_only_in_config_toml_does_not_enable_policy() {
 fn allow_managed_hooks_only_skips_unmanaged_json_and_toml_hooks() {
     let temp = tempdir().expect("create temp dir");
     let config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path");
     let hooks_json_path =
         AbsolutePathBuf::try_from(temp.path().join("hooks.json")).expect("absolute hooks path");
     fs::write(
@@ -920,7 +920,7 @@ fn allow_managed_hooks_only_keeps_managed_requirement_and_config_layer_hooks() {
         AbsolutePathBuf::try_from(temp.path().join("managed-hooks")).expect("absolute path");
     fs::create_dir_all(managed_dir.as_path()).expect("create managed hooks dir");
     let system_config_path =
-        AbsolutePathBuf::try_from(temp.path().join("system").join("config.toml"))
+        AbsolutePathBuf::try_from(temp.path().join("system").join("firefam-config.toml"))
             .expect("absolute system config path");
     let system_parent = system_config_path
         .as_path()
@@ -1009,7 +1009,7 @@ fn allow_managed_hooks_only_keeps_managed_requirement_and_config_layer_hooks() {
 fn discovers_hooks_from_json_and_toml_in_the_same_layer() {
     let temp = tempdir().expect("create temp dir");
     let config_path =
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path");
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path");
     let hooks_json_path =
         AbsolutePathBuf::try_from(temp.path().join("hooks.json")).expect("absolute hooks path");
     fs::write(
@@ -1168,7 +1168,7 @@ print(json.dumps({
         },
     }];
     let config_layer_stack = trusted_plugin_hook_stack(
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path"),
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path"),
         &plugin_hook_sources,
     );
     let engine = ClaudeHooksEngine::new(
@@ -1280,7 +1280,7 @@ fn plugin_hook_sources_expand_plugin_placeholders() {
         },
     }];
     let config_layer_stack = trusted_plugin_hook_stack(
-        AbsolutePathBuf::try_from(temp.path().join("config.toml")).expect("absolute config path"),
+        AbsolutePathBuf::try_from(temp.path().join("firefam-config.toml")).expect("absolute config path"),
         &plugin_hook_sources,
     );
     let engine = ClaudeHooksEngine::new(

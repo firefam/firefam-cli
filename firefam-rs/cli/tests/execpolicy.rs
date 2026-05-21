@@ -25,7 +25,7 @@ prefix_rule(
     )?;
 
     let output = Command::new(firefam_utils_cargo_bin::cargo_bin("firefam")?)
-        .env("FIREFAM_HOME", firefam_home.path())
+        .env("AGENTS_HOME", firefam_home.path())
         .args([
             "execpolicy",
             "check",
@@ -82,7 +82,7 @@ prefix_rule(
     )?;
 
     let output = Command::new(firefam_utils_cargo_bin::cargo_bin("firefam")?)
-        .env("FIREFAM_HOME", firefam_home.path())
+        .env("AGENTS_HOME", firefam_home.path())
         .args([
             "execpolicy",
             "check",

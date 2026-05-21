@@ -139,7 +139,7 @@ of strings; comma-separated strings are not supported. Use \
     }
 }
 
-/// Base config deserialized from ~/.firefam/config.toml.
+/// Base config deserialized from ~/.agents/firefam-config.toml.
 #[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq, JsonSchema)]
 #[schemars(deny_unknown_fields)]
 pub struct ConfigToml {
@@ -311,16 +311,16 @@ pub struct ConfigToml {
     #[serde(default)]
     pub profiles: HashMap<String, ConfigProfile>,
 
-    /// Settings that govern if and what will be written to `~/.firefam/history.jsonl`.
+    /// Settings that govern if and what will be written to `~/.agents/history.jsonl`.
     #[serde(default = "default_history")]
     pub history: Option<History>,
 
     /// Directory where Firefam stores the SQLite state DB.
-    /// Defaults to `$FIREFAM_SQLITE_HOME` when set. Otherwise uses `$FIREFAM_HOME`.
+    /// Defaults to `$FIREFAM_SQLITE_HOME` when set. Otherwise uses `$AGENTS_HOME`.
     pub sqlite_home: Option<AbsolutePathBuf>,
 
     /// Directory where Firefam writes log files, for example `firefam-tui.log`.
-    /// Defaults to `$FIREFAM_HOME/log`.
+    /// Defaults to `$AGENTS_HOME/log`.
     pub log_dir: Option<AbsolutePathBuf>,
 
     /// Debugging and reproducibility settings.

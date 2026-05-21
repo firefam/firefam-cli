@@ -60,7 +60,7 @@ async fn mcp_resource_read_returns_resource_contents() -> Result<()> {
     let firefam_home = TempDir::new()?;
     let responses_server_uri = responses_server.uri();
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 model = "mock-model"
@@ -137,7 +137,7 @@ async fn mcp_resource_read_returns_resource_contents_without_thread() -> Result<
 
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{apps_server_url}"

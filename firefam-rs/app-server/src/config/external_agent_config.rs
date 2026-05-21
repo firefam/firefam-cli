@@ -270,8 +270,8 @@ impl ExternalAgentConfigService {
         );
         let settings = effective_external_settings(&source_settings)?;
         let target_config = repo_root.map_or_else(
-            || self.firefam_home.join("config.toml"),
-            |repo_root| repo_root.join(".firefam").join("config.toml"),
+            || self.firefam_home.join("firefam-config.toml"),
+            |repo_root| repo_root.join(".agents").join("firefam-config.toml"),
         );
         if let Some(settings) = settings.as_ref() {
             let migrated = build_config_from_external(settings)?;
@@ -359,7 +359,7 @@ impl ExternalAgentConfigService {
         );
         let target_hooks = repo_root.map_or_else(
             || self.firefam_home.join("hooks.json"),
-            |repo_root| repo_root.join(".firefam").join("hooks.json"),
+            |repo_root| repo_root.join(".agents").join("hooks.json"),
         );
         let hook_event_names =
             hook_migration_event_names(source_external_agent_dir.as_path(), &target_hooks)?;
@@ -442,7 +442,7 @@ impl ExternalAgentConfigService {
         let source_subagents = source_external_agent_dir.join("agents");
         let target_subagents = repo_root.map_or_else(
             || self.firefam_home.join("agents"),
-            |repo_root| repo_root.join(".firefam").join("agents"),
+            |repo_root| repo_root.join(".agents").join("agents"),
         );
         let subagents_count = count_missing_subagents(&source_subagents, &target_subagents)?;
         if subagents_count > 0 {
@@ -775,14 +775,14 @@ impl ExternalAgentConfigService {
         let (source_settings, target_config) = if let Some(repo_root) = repo_root.as_ref() {
             (
                 repo_root.join(EXTERNAL_AGENT_DIR).join("settings.json"),
-                repo_root.join(".firefam").join("config.toml"),
+                repo_root.join(".agents").join("firefam-config.toml"),
             )
         } else if cwd.is_some_and(|cwd| !cwd.as_os_str().is_empty()) {
             return Ok(());
         } else {
             (
                 self.external_agent_home.join("settings.json"),
-                self.firefam_home.join("config.toml"),
+                self.firefam_home.join("firefam-config.toml"),
             )
         };
         let Some(settings) = effective_external_settings(&source_settings)? else {
@@ -824,14 +824,14 @@ impl ExternalAgentConfigService {
         let (source_settings, target_config) = if let Some(repo_root) = repo_root.as_ref() {
             (
                 repo_root.join(EXTERNAL_AGENT_DIR).join("settings.json"),
-                repo_root.join(".firefam").join("config.toml"),
+                repo_root.join(".agents").join("firefam-config.toml"),
             )
         } else if cwd.is_some_and(|cwd| !cwd.as_os_str().is_empty()) {
             return Ok(());
         } else {
             (
                 self.external_agent_home.join("settings.json"),
-                self.firefam_home.join("config.toml"),
+                self.firefam_home.join("firefam-config.toml"),
             )
         };
         let settings = self.mcp_settings(
@@ -873,7 +873,7 @@ impl ExternalAgentConfigService {
         let (source_agents, target_agents) = if let Some(repo_root) = find_repo_root(cwd)? {
             (
                 repo_root.join(EXTERNAL_AGENT_DIR).join("agents"),
-                repo_root.join(".firefam").join("agents"),
+                repo_root.join(".agents").join("agents"),
             )
         } else if cwd.is_some_and(|cwd| !cwd.as_os_str().is_empty()) {
             return Ok(0);
@@ -892,7 +892,7 @@ impl ExternalAgentConfigService {
             if let Some(repo_root) = find_repo_root(cwd)? {
                 (
                     repo_root.join(EXTERNAL_AGENT_DIR),
-                    repo_root.join(".firefam").join("hooks.json"),
+                    repo_root.join(".agents").join("hooks.json"),
                 )
             } else if cwd.is_some_and(|cwd| !cwd.as_os_str().is_empty()) {
                 return Ok(());

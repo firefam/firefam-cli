@@ -6,7 +6,7 @@ use tempfile::TempDir;
 
 fn firefam_command(firefam_home: &Path) -> Result<assert_cmd::Command> {
     let mut cmd = assert_cmd::Command::new(firefam_utils_cargo_bin::cargo_bin("firefam")?);
-    cmd.env("FIREFAM_HOME", firefam_home);
+    cmd.env("AGENTS_HOME", firefam_home);
     Ok(cmd)
 }
 
@@ -14,7 +14,7 @@ fn firefam_command(firefam_home: &Path) -> Result<assert_cmd::Command> {
 fn strict_config_rejects_unknown_config_fields_for_app_server() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"
 foo = "bar"
 "#,

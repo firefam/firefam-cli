@@ -49,7 +49,7 @@ use std::path::PathBuf;
 use toml::Value as TomlValue;
 
 #[cfg(unix)]
-const SYSTEM_CONFIG_TOML_FILE_UNIX: &str = "/etc/firefam/config.toml";
+const SYSTEM_CONFIG_TOML_FILE_UNIX: &str = "/etc/firefam/firefam-config.toml";
 
 #[cfg(windows)]
 const DEFAULT_PROGRAM_DATA_DIR_WINDOWS: &str = r"C:\ProgramData";
@@ -90,13 +90,13 @@ async fn first_layer_config_error_from_entries(layers: &[ConfigLayerEntry]) -> O
 /// Configuration is built up from multiple layers in the following order:
 ///
 /// - admin:    managed preferences (*)
-/// - system    `/etc/firefam/config.toml` (Unix) or
-///   `%ProgramData%\FirefamAI\Firefam\config.toml` (Windows)
-/// - user      `${FIREFAM_HOME}/config.toml`
-/// - profile   `${FIREFAM_HOME}/<name>.config.toml`, when selected
-/// - cwd       `${PWD}/config.toml` (loaded but disabled when the directory is untrusted)
-/// - tree      parent directories up to root looking for `./.firefam/config.toml` (loaded but disabled when untrusted)
-/// - repo      `$(git rev-parse --show-toplevel)/.firefam/config.toml` (loaded but disabled when untrusted)
+/// - system    `/etc/firefam/firefam-config.toml` (Unix) or
+///   `%ProgramData%\FirefamAI\Firefam\firefam-config.toml` (Windows)
+/// - user      `${AGENTS_HOME}/firefam-config.toml`
+/// - profile   `${AGENTS_HOME}/<name>.config.toml`, when selected
+/// - cwd       `${PWD}/firefam-config.toml` (loaded but disabled when the directory is untrusted)
+/// - tree      parent directories up to root looking for `./.agents/firefam-config.toml` (loaded but disabled when untrusted)
+/// - repo      `$(git rev-parse --show-toplevel)/.agents/firefam-config.toml` (loaded but disabled when untrusted)
 /// - runtime   e.g., --config flags, model selector in UI
 ///
 /// (*) Only available on macOS via managed device profiles.
@@ -641,7 +641,7 @@ fn windows_system_requirements_toml_file() -> io::Result<AbsolutePathBuf> {
 
 #[cfg(windows)]
 fn windows_system_config_toml_file() -> io::Result<AbsolutePathBuf> {
-    let config_toml_file = windows_firefam_system_dir().join("config.toml");
+    let config_toml_file = windows_firefam_system_dir().join("firefam-config.toml");
     AbsolutePathBuf::try_from(config_toml_file)
 }
 
@@ -852,7 +852,7 @@ impl ProjectTrustContext {
         }
 
         let relative_dir = dir.as_path().strip_prefix(checkout_root.as_path()).ok()?;
-        Some(repo_root.join(relative_dir).join(".firefam"))
+        Some(repo_root.join(relative_dir).join(".agents"))
     }
 }
 
@@ -1149,9 +1149,9 @@ async fn load_project_layers(
     let mut layers = Vec::new();
     let mut startup_warnings = Vec::new();
     for dir in dirs {
-        let dot_firefam_abs = dir.join(".firefam");
+        let dot_agents_abs = dir.join(".agents");
         if !fs
-            .get_metadata(&dot_firefam_abs, /*sandbox*/ None)
+            .get_metadata(&dot_agents_abs, /*sandbox*/ None)
             .await
             .map(|metadata| metadata.is_directory)
             .unwrap_or(false)
@@ -1162,13 +1162,13 @@ async fn load_project_layers(
         let decision = trust_context.decision_for_dir(&dir);
         let disabled_reason = trust_context.disabled_reason_for_decision(&decision);
         let hooks_config_folder_override = trust_context.root_checkout_hooks_folder_for_dir(&dir);
-        let dot_firefam_normalized = normalize_path(dot_firefam_abs.as_path())
-            .unwrap_or_else(|_| dot_firefam_abs.to_path_buf());
-        if dot_firefam_abs == firefam_home_abs || dot_firefam_normalized == firefam_home_normalized
+        let dot_agents_normalized = normalize_path(dot_agents_abs.as_path())
+            .unwrap_or_else(|_| dot_agents_abs.to_path_buf());
+        if dot_agents_abs == firefam_home_abs || dot_agents_normalized == firefam_home_normalized
         {
             continue;
         }
-        let config_file = dot_firefam_abs.join(CONFIG_TOML_FILE);
+        let config_file = dot_agents_abs.join(CONFIG_TOML_FILE);
         match fs.read_file_text(&config_file, /*sandbox*/ None).await {
             Ok(contents) => {
                 let config: TomlValue = match toml::from_str(&contents) {
@@ -1184,7 +1184,7 @@ async fn load_project_layers(
                             ));
                         }
                         layers.push(project_layer_entry(
-                            &dot_firefam_abs,
+                            &dot_agents_abs,
                             TomlValue::Table(toml::map::Map::new()),
                             disabled_reason.clone(),
                             hooks_config_folder_override.clone(),
@@ -1198,12 +1198,12 @@ async fn load_project_layers(
                         config_file.as_path(),
                         &contents,
                         &config,
-                        dot_firefam_abs.as_path(),
+                        dot_agents_abs.as_path(),
                     )?;
                 }
                 let ignored_project_config_keys = sanitize_project_config(&mut config);
                 let config =
-                    resolve_relative_paths_in_config_toml(config, dot_firefam_abs.as_path())?;
+                    resolve_relative_paths_in_config_toml(config, dot_agents_abs.as_path())?;
                 let config = merge_root_checkout_project_hooks(
                     fs,
                     config,
@@ -1213,12 +1213,12 @@ async fn load_project_layers(
                 .await?;
                 if disabled_reason.is_none() && !ignored_project_config_keys.is_empty() {
                     startup_warnings.push(project_ignored_config_keys_warning(
-                        &dot_firefam_abs,
+                        &dot_agents_abs,
                         &ignored_project_config_keys,
                     ));
                 }
                 let entry = project_layer_entry(
-                    &dot_firefam_abs,
+                    &dot_agents_abs,
                     config,
                     disabled_reason.clone(),
                     hooks_config_folder_override.clone(),
@@ -1238,7 +1238,7 @@ async fn load_project_layers(
                     )
                     .await?;
                     layers.push(project_layer_entry(
-                        &dot_firefam_abs,
+                        &dot_agents_abs,
                         config,
                         disabled_reason,
                         hooks_config_folder_override,
@@ -1495,7 +1495,7 @@ foo = "xyzzy"
             .unwrap_or_else(|_| PathBuf::from(DEFAULT_PROGRAM_DATA_DIR_WINDOWS))
             .join("FirefamAI")
             .join("Firefam")
-            .join("config.toml");
+            .join("firefam-config.toml");
         assert_eq!(
             windows_system_config_toml_file()
                 .expect("config.toml path")
@@ -1506,7 +1506,7 @@ foo = "xyzzy"
             windows_system_config_toml_file()
                 .expect("config.toml path")
                 .as_path()
-                .ends_with(Path::new("FirefamAI").join("Firefam").join("config.toml"))
+                .ends_with(Path::new("FirefamAI").join("Firefam").join("firefam-config.toml"))
         );
     }
 }

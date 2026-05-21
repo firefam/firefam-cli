@@ -1,7 +1,7 @@
 //! TUI keymap config schema and canonical key-spec normalization.
 //!
 //! This module defines the on-disk `[tui.keymap]` contract used by
-//! `~/.firefam/config.toml` and normalizes user-entered key specs into canonical
+//! `~/.agents/firefam-config.toml` and normalizes user-entered key specs into canonical
 //! forms consumed by runtime keymap resolution in `firefam-rs/tui/src/keymap.rs`.
 //!
 //! Responsibilities:

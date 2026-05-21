@@ -48,7 +48,7 @@ pub struct FirefamToolCallParam {
     pub sandbox: Option<FirefamToolCallSandboxMode>,
 
     /// Individual config settings that will override what is in
-    /// FIREFAM_HOME/config.toml.
+    /// AGENTS_HOME/config.toml.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub config: Option<HashMap<String, serde_json::Value>>,
 
@@ -331,7 +331,7 @@ mod tests {
               },
               "config": {
                 "additionalProperties": true,
-                "description": "Individual config settings that will override what is in FIREFAM_HOME/config.toml.",
+                "description": "Individual config settings that will override what is in AGENTS_HOME/config.toml.",
                 "type": "object"
               },
               "cwd": {

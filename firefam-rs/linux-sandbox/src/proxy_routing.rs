@@ -300,7 +300,7 @@ fn create_proxy_socket_dir() -> io::Result<PathBuf> {
 }
 
 fn proxy_socket_parent_dir() -> PathBuf {
-    if let Some(firefam_home) = std::env::var_os("FIREFAM_HOME") {
+    if let Some(firefam_home) = std::env::var_os("AGENTS_HOME") {
         let candidate = PathBuf::from(firefam_home).join("tmp");
         if ensure_private_proxy_socket_parent_dir(candidate.as_path()).is_ok() {
             return candidate;

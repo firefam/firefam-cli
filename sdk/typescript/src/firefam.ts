@@ -28,7 +28,7 @@ export class Firefam {
 
   /**
    * Resumes a conversation with an agent based on the thread id.
-   * Threads are persisted in ~/.firefam/sessions.
+   * Threads are persisted in ~/.agents/sessions.
    *
    * @param id The id of the thread to resume.
    * @returns A new thread instance.

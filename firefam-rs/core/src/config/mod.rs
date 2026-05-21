@@ -192,7 +192,7 @@ pub(crate) const DEFAULT_AGENT_MAX_DEPTH: i32 = 1;
 pub(crate) const DEFAULT_AGENT_JOB_MAX_RUNTIME_SECONDS: Option<u64> = None;
 const LOCAL_DEV_BUILD_VERSION: &str = "0.0.0";
 
-pub const CONFIG_TOML_FILE: &str = "config.toml";
+pub const CONFIG_TOML_FILE: &str = "firefam-config.toml";
 const CONFIG_PROFILE_V2_SUFFIX: &str = ".config.toml";
 
 fn resolve_sqlite_home_env(resolved_cwd: &Path) -> Option<PathBuf> {
@@ -610,7 +610,7 @@ pub struct Config {
     /// appends one extra argument containing a JSON payload describing the
     /// event.
     ///
-    /// Example `~/.firefam/config.toml` snippet:
+    /// Example `~/.agents/firefam-config.toml` snippet:
     ///
     /// ```toml
     /// notify = ["notify-send", "Firefam"]
@@ -718,7 +718,7 @@ pub struct Config {
     /// keyring: Use an OS-specific keyring service.
     ///          Credentials stored in the keyring will only be readable by Firefam unless the user explicitly grants access via OS-level keyring access.
     ///          https://github.com/openai/codex/blob/main/codex-rs/rmcp-client/src/oauth.rs#L2
-    /// file: FIREFAM_HOME/.credentials.json
+    /// file: AGENTS_HOME/.credentials.json
     ///       This file will be readable to Firefam and other applications running as the same user.
     /// auto (default): keyring if available, otherwise file.
     pub mcp_oauth_credentials_store_mode: OAuthCredentialsStoreMode,
@@ -764,14 +764,14 @@ pub struct Config {
     /// Memories subsystem settings.
     pub memories: MemoriesConfig,
 
-    /// Directory containing all Firefam state (defaults to `~/.firefam` but can be
-    /// overridden by the `FIREFAM_HOME` environment variable).
+    /// Directory containing all Firefam state (defaults to `~/.agents` but can be
+    /// overridden by the `AGENTS_HOME` environment variable).
     pub firefam_home: AbsolutePathBuf,
 
     /// Directory where Firefam stores the SQLite state DB.
     pub sqlite_home: PathBuf,
 
-    /// Directory where Firefam writes log files (defaults to `$FIREFAM_HOME/log`).
+    /// Directory where Firefam writes log files (defaults to `$AGENTS_HOME/log`).
     pub log_dir: PathBuf,
 
     /// Directory where Firefam writes effective session config lock files.
@@ -788,7 +788,7 @@ pub struct Config {
     /// Effective config lock used for strict replay validation.
     pub config_lock_toml: Option<Arc<ConfigLockfileToml>>,
 
-    /// Settings that govern if and what will be written to `~/.firefam/history.jsonl`.
+    /// Settings that govern if and what will be written to `~/.agents/history.jsonl`.
     pub history: History,
 
     /// When true, session is not persisted on disk. Default to `false`
@@ -1705,7 +1705,7 @@ pub async fn load_global_mcp_servers(
     // result.
     let cli_overrides = Vec::<(String, TomlValue)>::new();
     // There is no cwd/project context for this query, so this will not include
-    // MCP servers defined in in-repo .firefam/ folders.
+    // MCP servers defined in in-repo .agents/ folders.
     let cwd: Option<AbsolutePathBuf> = None;
     let config_layer_stack = load_config_layers_state(
         LOCAL_FS.as_ref(),
@@ -1820,7 +1820,7 @@ pub(crate) fn set_project_trust_level_inner(
     Ok(())
 }
 
-/// Patch `FIREFAM_HOME/config.toml` project state to set trust level.
+/// Patch `AGENTS_HOME/config.toml` project state to set trust level.
 /// Use with caution.
 pub fn set_project_trust_level(
     firefam_home: &Path,
@@ -3714,12 +3714,12 @@ fn normalize_guardian_policy_config(value: Option<&str>) -> Option<String> {
 }
 
 /// Returns the path to the Firefam configuration directory, which can be
-/// specified by the `FIREFAM_HOME` environment variable. If not set, defaults to
-/// `~/.firefam`.
+/// specified by the `AGENTS_HOME` environment variable. If not set, defaults to
+/// `~/.agents`.
 ///
-/// - If `FIREFAM_HOME` is set, the value must exist and be a directory. The
+/// - If `AGENTS_HOME` is set, the value must exist and be a directory. The
 ///   value will be canonicalized and this function will Err otherwise.
-/// - If `FIREFAM_HOME` is not set, this function does not verify that the
+/// - If `AGENTS_HOME` is not set, this function does not verify that the
 ///   directory exists.
 pub fn find_firefam_home() -> std::io::Result<AbsolutePathBuf> {
     firefam_utils_home_dir::find_firefam_home()

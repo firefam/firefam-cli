@@ -849,14 +849,14 @@ fn create_seatbelt_args_with_read_only_git_and_firefam_subpaths() {
     };
 
     // Create the Seatbelt command to wrap a shell command that tries to
-    // write to .firefam/config.toml in the vulnerable root.
+    // write to .agents/firefam-config.toml in the vulnerable root.
     let shell_command: Vec<String> = [
         "bash",
         "-c",
         "echo 'sandbox_mode = \"danger-full-access\"' > \"$1\"",
         "bash",
         dot_firefam_canonical
-            .join("config.toml")
+            .join("firefam-config.toml")
             .to_string_lossy()
             .as_ref(),
     ]
@@ -920,7 +920,7 @@ fn create_seatbelt_args_with_read_only_git_and_firefam_subpaths() {
             "-DWRITABLE_ROOT_0_EXCLUDED_0={}",
             cwd.canonicalize()
                 .expect("canonicalize cwd")
-                .join(".firefam")
+                .join(".agents")
                 .display()
         ),
         format!(
@@ -969,9 +969,9 @@ fn create_seatbelt_args_with_read_only_git_and_firefam_subpaths() {
         .expect("seatbelt args should include command separator");
     assert_eq!(args[command_index + 1..], shell_command);
 
-    // Verify that .firefam/config.toml cannot be modified under the generated
+    // Verify that .agents/firefam-config.toml cannot be modified under the generated
     // Seatbelt policy.
-    let config_toml = dot_firefam_canonical.join("config.toml");
+    let config_toml = dot_firefam_canonical.join("firefam-config.toml");
     let output = Command::new(MACOS_PATH_TO_SEATBELT_EXECUTABLE)
         .args(&args)
         .current_dir(&cwd)
@@ -1082,8 +1082,8 @@ fn create_seatbelt_args_block_first_time_dot_firefam_creation_with_metadata_name
         .output()
         .expect("git init .");
 
-    let dot_firefam = repo_root.join(".firefam");
-    let config_toml = dot_firefam.join("config.toml");
+    let dot_firefam = repo_root.join(".agents");
+    let config_toml = dot_firefam.join("firefam-config.toml");
     let policy = SandboxPolicy::WorkspaceWrite {
         writable_roots: vec![repo_root.as_path().try_into().expect("absolute repo root")],
         network_access: false,
@@ -1246,7 +1246,7 @@ fn create_seatbelt_args_for_cwd_as_git_repo() {
         "echo 'sandbox_mode = \"danger-full-access\"' > \"$1\"",
         "bash",
         dot_firefam_canonical
-            .join("config.toml")
+            .join("firefam-config.toml")
             .to_string_lossy()
             .as_ref(),
     ]
@@ -1337,7 +1337,7 @@ struct PopulatedTmp {
     /// For the purposes of this test, we consider this a "vulnerable" root
     /// because a bad actor could write to .git/hooks/pre-commit so an
     /// unsuspecting user would run code as privileged the next time they
-    /// ran `git commit` themselves, or modified .firefam/config.toml to
+    /// ran `git commit` themselves, or modified .agents/firefam-config.toml to
     /// contain `sandbox_mode = "danger-full-access"` so the agent would
     /// have full privileges the next time it ran in that repo.
     vulnerable_root: PathBuf,
@@ -1365,12 +1365,12 @@ fn populate_tmpdir(tmp: &Path) -> PopulatedTmp {
         .output()
         .expect("git init .");
 
-    fs::create_dir_all(vulnerable_root.join(".firefam")).expect("create .firefam");
+    fs::create_dir_all(vulnerable_root.join(".agents")).expect("create .firefam");
     fs::write(
-        vulnerable_root.join(".firefam").join("config.toml"),
+        vulnerable_root.join(".agents").join("firefam-config.toml"),
         "sandbox_mode = \"read-only\"\n",
     )
-    .expect("write .firefam/config.toml");
+    .expect("write .agents/firefam-config.toml");
 
     let empty_root = tmp.join("empty_root");
     fs::create_dir_all(&empty_root).expect("create empty_root");
@@ -1381,7 +1381,7 @@ fn populate_tmpdir(tmp: &Path) -> PopulatedTmp {
         .expect("canonicalize vulnerable_root");
     let dot_git_canonical = vulnerable_root_canonical.join(".git");
     let dot_agents_canonical = vulnerable_root_canonical.join(".agents");
-    let dot_firefam_canonical = vulnerable_root_canonical.join(".firefam");
+    let dot_firefam_canonical = vulnerable_root_canonical.join(".agents");
     let empty_root_canonical = empty_root.canonicalize().expect("canonicalize empty_root");
     PopulatedTmp {
         vulnerable_root,

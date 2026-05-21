@@ -1563,7 +1563,7 @@ async fn skills_use_aliases_in_developer_message_under_budget_pressure() {
         .with_auth(FirefamAuth::from_api_key("Test API Key"))
         .with_config(move |config| {
             config.cwd = firefam_home_path.abs();
-            let user_config_path = firefam_home_path.join("config.toml").abs();
+            let user_config_path = firefam_home_path.join("firefam-config.toml").abs();
             config.config_layer_stack = ConfigLayerStack::default().with_user_config(
                 &user_config_path,
                 toml! { skills = { bundled = { enabled = false } } }.into(),

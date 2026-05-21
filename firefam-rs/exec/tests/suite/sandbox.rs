@@ -378,8 +378,8 @@ async fn sandbox_blocks_first_time_dot_firefam_creation() {
     let temp = tempfile::tempdir().expect("should be able to create temp dir");
     let repo_root = temp.path().join("repo").abs();
     create_dir_all(&repo_root).await.expect("mkdir repo");
-    let dot_firefam = repo_root.join(".firefam");
-    let config_toml = dot_firefam.join("config.toml");
+    let dot_firefam = repo_root.join(".agents");
+    let config_toml = dot_firefam.join("firefam-config.toml");
     let permission_profile = PermissionProfile::workspace_write_with(
         &[],
         NetworkSandboxPolicy::Restricted,
@@ -391,7 +391,7 @@ async fn sandbox_blocks_first_time_dot_firefam_creation() {
         vec![
             "bash".to_string(),
             "-lc".to_string(),
-            "mkdir -p .firefam && echo 'sandbox_mode = \"danger-full-access\"' > .firefam/config.toml"
+            "mkdir -p .firefam && echo 'sandbox_mode = \"danger-full-access\"' > .agents/firefam-config.toml"
                 .to_string(),
         ],
         repo_root.clone(),

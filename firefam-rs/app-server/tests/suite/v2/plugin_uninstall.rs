@@ -33,7 +33,7 @@ async fn plugin_uninstall_removes_plugin_cache_and_config_entry() -> Result<()> 
     let firefam_home = TempDir::new()?;
     write_installed_plugin(&firefam_home, "debug", "sample-plugin")?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = true
 
@@ -64,7 +64,7 @@ enabled = true
             .join("plugins/cache/debug/sample-plugin")
             .exists()
     );
-    let config = std::fs::read_to_string(firefam_home.path().join("config.toml"))?;
+    let config = std::fs::read_to_string(firefam_home.path().join("firefam-config.toml"))?;
     assert!(!config.contains(r#"[plugins."sample-plugin@debug"]"#));
 
     let request_id = mcp.send_plugin_uninstall_request(params).await?;
@@ -85,7 +85,7 @@ async fn plugin_uninstall_tracks_analytics_event() -> Result<()> {
     let firefam_home = TempDir::new()?;
     write_installed_plugin(&firefam_home, "debug", "sample-plugin")?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         format!(
             "chatgpt_base_url = \"{}\"\n\n[features]\nplugins = true\n\n[plugins.\"sample-plugin@debug\"]\nenabled = true\n",
             analytics_server.uri()
@@ -156,7 +156,7 @@ async fn plugin_uninstall_tracks_analytics_event() -> Result<()> {
 async fn plugin_uninstall_rejects_remote_plugin_when_plugins_are_disabled() -> Result<()> {
     let firefam_home = TempDir::new()?;
     std::fs::write(
-        firefam_home.path().join("config.toml"),
+        firefam_home.path().join("firefam-config.toml"),
         r#"[features]
 plugins = false
 "#,
@@ -581,7 +581,7 @@ fn write_remote_plugin_catalog_config(
     base_url: &str,
 ) -> std::io::Result<()> {
     std::fs::write(
-        firefam_home.join("config.toml"),
+        firefam_home.join("firefam-config.toml"),
         format!(
             r#"
 chatgpt_base_url = "{base_url}"

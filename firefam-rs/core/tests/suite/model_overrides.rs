@@ -6,7 +6,7 @@ use firefam_protocol::protocol::EventMsg;
 use firefam_protocol::protocol::Op;
 use pretty_assertions::assert_eq;
 
-const CONFIG_TOML: &str = "config.toml";
+const CONFIG_TOML: &str = "firefam-config.toml";
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 async fn thread_settings_update_does_not_persist_when_config_exists() {

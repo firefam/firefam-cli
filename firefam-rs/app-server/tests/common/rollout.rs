@@ -27,7 +27,7 @@ pub fn rollout_path(firefam_home: &Path, filename_ts: &str, thread_id: &str) -> 
         .join(format!("rollout-{filename_ts}-{thread_id}.jsonl"))
 }
 
-/// Create a minimal rollout file under `FIREFAM_HOME/sessions/YYYY/MM/DD/`.
+/// Create a minimal rollout file under `AGENTS_HOME/sessions/YYYY/MM/DD/`.
 ///
 /// - `filename_ts` is the filename timestamp component in `YYYY-MM-DDThh-mm-ss` format.
 /// - `meta_rfc3339` is the envelope timestamp used in JSON lines.

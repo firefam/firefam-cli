@@ -1334,7 +1334,7 @@ fn create_config_toml_with_thread_store(
     firefam_home: &Path,
     store_id: &str,
 ) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
@@ -1359,7 +1359,7 @@ stream_max_retries = 0
 
 // Helper to create a config.toml pointing at the mock model server.
 fn create_config_toml(firefam_home: &Path, server_uri: &str) -> std::io::Result<()> {
-    let config_toml = firefam_home.join("config.toml");
+    let config_toml = firefam_home.join("firefam-config.toml");
     std::fs::write(
         config_toml,
         format!(
