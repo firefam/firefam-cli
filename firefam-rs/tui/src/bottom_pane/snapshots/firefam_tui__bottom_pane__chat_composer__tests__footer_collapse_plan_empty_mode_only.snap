@@ -2,12 +2,12 @@
 source: tui/src/bottom_pane/chat_composer.rs
 expression: terminal.backend()
 ---
-"                          "
+"──────────────────────────"
 "› Ask Firefam to do anyth "
 "                          "
 "                          "
 "                          "
 "                          "
 "                          "
-"                          "
-"  Plan mode               "
+"──────────────────────────"
+"  ? h… 100% context left  "

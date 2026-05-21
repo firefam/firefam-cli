@@ -238,7 +238,7 @@ def main() -> None:
     plugin_root = (Path(args.path).expanduser().resolve() / plugin_name)
     plugin_root.mkdir(parents=True, exist_ok=True)
 
-    plugin_json_path = plugin_root / ".firefam-plugin" / "plugin.json"
+    plugin_json_path = plugin_root / ".agents-plugin" / "plugin.json"
     write_json(
         plugin_json_path,
         build_plugin_json(plugin_name, with_mcp=args.with_mcp, with_apps=args.with_apps),

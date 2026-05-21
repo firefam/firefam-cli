@@ -160,6 +160,7 @@ impl ChatWidget {
     }
 
     fn refresh_status_line_from_selections(&mut self, selections: &StatusSurfaceSelections) {
+        self.refresh_composer_status_context();
         let enabled = !selections.status_line_items.is_empty();
         self.bottom_pane.set_status_line_enabled(enabled);
         if !enabled {
@@ -185,6 +186,30 @@ impl ChatWidget {
             .then(|| self.status_line_pull_request_url())
             .flatten();
         self.set_status_line_hyperlink(hyperlink_url);
+    }
+
+    fn refresh_composer_status_context(&mut self) {
+        let use_theme_colors = self.config.tui_status_line_use_colors;
+        let permissions_line = self
+            .status_line_value_for_item(StatusLineItem::Permissions)
+            .and_then(|value| {
+                status_line_from_segments([(StatusLineItem::Permissions, value)], use_theme_colors)
+            });
+        let model_line = self
+            .status_line_value_for_item(StatusLineItem::ModelWithReasoning)
+            .and_then(|value| {
+                status_line_from_segments(
+                    [(StatusLineItem::ModelWithReasoning, value)],
+                    use_theme_colors,
+                )
+            });
+        let directory_line = self
+            .status_line_value_for_item(StatusLineItem::CurrentDir)
+            .and_then(|value| {
+                status_line_from_segments([(StatusLineItem::CurrentDir, value)], use_theme_colors)
+            });
+        self.bottom_pane
+            .set_composer_status_context(permissions_line, model_line, directory_line);
     }
 
     /// Clears the terminal title Firefam most recently wrote, if any.

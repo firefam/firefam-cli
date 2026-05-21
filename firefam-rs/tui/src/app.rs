@@ -63,6 +63,7 @@ use crate::multi_agents::next_agent_shortcut_matches;
 use crate::multi_agents::previous_agent_shortcut_matches;
 use crate::pager_overlay::Overlay;
 use crate::render::highlight::highlight_bash_to_lines;
+use crate::render::line_utils::push_owned_lines;
 use crate::render::renderable::Renderable;
 use crate::resume_picker::SessionSelection;
 use crate::resume_picker::SessionTarget;
@@ -160,10 +161,13 @@ use firefam_rollout::StateDbHandle;
 use firefam_terminal_detection::user_agent;
 use firefam_utils_absolute_path::AbsolutePathBuf;
 use firefam_utils_approval_presets::builtin_permission_profile_for_active_permission_profile;
+use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
 use ratatui::style::Stylize;
 use ratatui::text::Line;
+use ratatui::widgets::Clear;
 use ratatui::widgets::Paragraph;
+use ratatui::widgets::Widget;
 use ratatui::widgets::Wrap;
 use std::collections::BTreeMap;
 use std::collections::HashMap;
@@ -1244,6 +1248,21 @@ See the Firefam keymap documentation for supported actions and examples."
         tui: &mut tui::Tui,
         terminal_resize_reflow_enabled: bool,
     ) -> Result<Rect> {
+        if tui.is_full_screen_active() {
+            let mut bottom_pane_area = Rect::default();
+            tui.draw(u16::MAX, |frame| {
+                bottom_pane_area =
+                    self.render_full_screen_chat_surface(frame.area(), frame.buffer_mut());
+                if let Some((x, y)) = self.chat_widget.bottom_pane_cursor_pos(bottom_pane_area) {
+                    frame.set_cursor_style(
+                        self.chat_widget.bottom_pane_cursor_style(bottom_pane_area),
+                    );
+                    frame.set_cursor_position((x, y));
+                }
+            })?;
+            return Ok(bottom_pane_area);
+        }
+
         let desired_height = self.chat_widget.desired_height(tui.terminal.size()?.width);
         let mut rendered_area = Rect::default();
         if terminal_resize_reflow_enabled {
@@ -1268,6 +1287,89 @@ See the Firefam keymap documentation for supported actions and examples."
             })?;
         }
         Ok(rendered_area)
+    }
+
+    fn render_full_screen_chat_surface(&mut self, area: Rect, buf: &mut Buffer) -> Rect {
+        Clear.render(area, buf);
+        let bottom_pane_height = self
+            .chat_widget
+            .bottom_pane_desired_height(area.width)
+            .min(area.height);
+        let transcript_height = area.height.saturating_sub(bottom_pane_height);
+        let transcript_area = Rect::new(area.x, area.y, area.width, transcript_height);
+        let bottom_pane_area = Rect::new(
+            area.x,
+            area.y.saturating_add(transcript_height),
+            area.width,
+            bottom_pane_height,
+        );
+
+        self.render_full_screen_transcript(transcript_area, buf);
+        self.chat_widget.render_bottom_pane(bottom_pane_area, buf);
+        bottom_pane_area
+    }
+
+    fn render_full_screen_transcript(&self, area: Rect, buf: &mut Buffer) {
+        if area.is_empty() {
+            return;
+        }
+        let content_width = self.chat_widget.history_wrap_width(area.width);
+        let content_area = Rect::new(area.x, area.y, content_width, area.height);
+        let lines = Self::full_screen_transcript_wrapped_lines(
+            self.full_screen_transcript_lines(content_width),
+            content_area.width,
+        );
+        let scroll_y = lines.len().saturating_sub(usize::from(content_area.height));
+        for (row, line) in lines
+            .into_iter()
+            .skip(scroll_y)
+            .take(usize::from(content_area.height))
+            .enumerate()
+        {
+            line.render(
+                Rect::new(
+                    content_area.x,
+                    content_area
+                        .y
+                        .saturating_add(u16::try_from(row).unwrap_or(u16::MAX)),
+                    content_area.width,
+                    1,
+                ),
+                buf,
+            );
+        }
+    }
+
+    fn full_screen_transcript_wrapped_lines(
+        lines: Vec<Line<'static>>,
+        width: u16,
+    ) -> Vec<Line<'static>> {
+        let width = width.max(1);
+        let mut wrapped_lines = Vec::new();
+        for line in lines {
+            if line.width() <= usize::from(width) {
+                wrapped_lines.push(line);
+            } else {
+                push_owned_lines(
+                    &crate::wrapping::word_wrap_line(&line, usize::from(width)),
+                    &mut wrapped_lines,
+                );
+            }
+        }
+        wrapped_lines
+    }
+
+    fn full_screen_transcript_lines(&self, width: u16) -> Vec<Line<'static>> {
+        let mut lines = Vec::new();
+        for cell in &self.transcript_cells {
+            if !self.chat_widget.work_log_visible() && cell.is_work_log() {
+                continue;
+            }
+            lines
+                .extend(cell.display_lines_for_mode(width, self.chat_widget.history_render_mode()));
+        }
+        lines.extend(self.chat_widget.visible_active_cell_transcript_lines(width));
+        lines
     }
 }
 

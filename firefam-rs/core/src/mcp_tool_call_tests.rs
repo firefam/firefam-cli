@@ -94,10 +94,10 @@ fn mcp_turn_metadata_context(turn_context: &TurnContext) -> McpTurnMetadataConte
 
 fn write_sample_plugin_mcp(firefam_home: &std::path::Path) {
     let plugin_root = firefam_home.join("plugins/cache/test/sample/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))
         .expect("create plugin manifest dir");
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample"
 }"#,

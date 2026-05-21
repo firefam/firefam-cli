@@ -293,6 +293,7 @@ pub(crate) fn render_footer_from_props(
     .render(area, buf);
 }
 
+#[cfg(test)]
 pub(crate) fn left_fits(area: Rect, left_width: u16) -> bool {
     let max_width = area.width.saturating_sub(FOOTER_INDENT_COLS as u16);
     left_width <= max_width
@@ -303,6 +304,7 @@ enum SummaryHintKind {
     None,
     Shortcuts,
     QueueMessage,
+    #[cfg(test)]
     QueueShort,
 }
 
@@ -332,6 +334,7 @@ fn left_side_line(
                 line.push_span(" to queue message".dim());
             }
         }
+        #[cfg(test)]
         SummaryHintKind::QueueShort => {
             if let Some(key) = key_hints.queue {
                 line.push_span(key);
@@ -350,6 +353,7 @@ fn left_side_line(
     line
 }
 
+#[cfg(test)]
 pub(crate) enum SummaryLeft {
     Default,
     Custom(Line<'static>),
@@ -358,6 +362,7 @@ pub(crate) enum SummaryLeft {
 
 /// Compute the single-line footer layout and whether the right-side context
 /// indicator can be shown alongside it.
+#[cfg(test)]
 pub(crate) fn single_line_footer_layout(
     area: Rect,
     context_width: u16,
@@ -529,6 +534,7 @@ pub(crate) fn single_line_footer_layout(
     (SummaryLeft::None, true)
 }
 
+#[cfg(test)]
 pub(crate) fn mode_indicator_line(
     indicator: Option<CollaborationModeIndicator>,
     show_cycle_hint: bool,
@@ -536,6 +542,7 @@ pub(crate) fn mode_indicator_line(
     indicator.map(|indicator| Line::from(vec![indicator.styled_span(show_cycle_hint)]))
 }
 
+#[cfg(test)]
 pub(crate) fn goal_status_indicator_line(
     indicator: Option<&GoalStatusIndicator>,
 ) -> Option<Line<'static>> {
@@ -570,6 +577,7 @@ pub(crate) fn goal_status_indicator_line(
     Some(Line::from(vec![Span::from(label).magenta()]))
 }
 
+#[cfg(test)]
 pub(crate) fn status_line_right_indicator_line(
     collaboration_mode_indicator: Option<CollaborationModeIndicator>,
     goal_status_indicator: Option<&GoalStatusIndicator>,
@@ -643,6 +651,7 @@ pub(crate) fn max_left_width_for_right(area: Rect, right_width: u16) -> Option<u
     Some(context_x.saturating_sub(left_start + gap))
 }
 
+#[cfg(test)]
 pub(crate) fn can_show_left_with_context(area: Rect, left_width: u16, context_width: u16) -> bool {
     let Some(context_x) = right_aligned_x(area, context_width) else {
         return true;
@@ -817,10 +826,12 @@ pub(crate) fn shows_passive_footer_line(props: &FooterProps) -> bool {
 /// The dedicated layout exists for the configurable `/statusline` row. An agent label by itself
 /// can be rendered by the standard footer flow, so this only becomes `true` when the status line
 /// feature is enabled and the current mode allows contextual footer content.
+#[cfg(test)]
 pub(crate) fn uses_passive_footer_status_layout(props: &FooterProps) -> bool {
     props.status_line_enabled && shows_passive_footer_line(props)
 }
 
+#[cfg(test)]
 pub(crate) fn footer_line_width(
     props: &FooterProps,
     collaboration_mode_indicator: Option<CollaborationModeIndicator>,
@@ -838,13 +849,6 @@ pub(crate) fn footer_line_width(
     .last()
     .map(|line| line.width() as u16)
     .unwrap_or(0)
-}
-
-pub(crate) fn footer_hint_items_width(items: &[(String, String)]) -> u16 {
-    if items.is_empty() {
-        return 0;
-    }
-    footer_hint_items_line(items).width() as u16
 }
 
 fn footer_hint_items_line(items: &[(String, String)]) -> Line<'static> {
@@ -890,6 +894,7 @@ fn esc_hint_line(esc_backtrack_hint: bool) -> Line<'static> {
 
 fn shortcut_overlay_lines(state: ShortcutsState) -> Vec<Line<'static>> {
     let mut commands = Line::from("");
+    let mut skills = Line::from("");
     let mut shell_commands = Line::from("");
     let mut newline = Line::from("");
     let mut queue_message_tab = Line::from("");
@@ -908,6 +913,7 @@ fn shortcut_overlay_lines(state: ShortcutsState) -> Vec<Line<'static>> {
         if let Some(text) = descriptor.overlay_entry(state) {
             match descriptor.id {
                 ShortcutId::Commands => commands = text,
+                ShortcutId::Skills => skills = text,
                 ShortcutId::ShellCommands => shell_commands = text,
                 ShortcutId::InsertNewline => newline = text,
                 ShortcutId::QueueMessageTab => queue_message_tab = text,
@@ -927,6 +933,7 @@ fn shortcut_overlay_lines(state: ShortcutsState) -> Vec<Line<'static>> {
 
     let mut ordered = vec![
         commands,
+        skills,
         shell_commands,
         newline,
         queue_message_tab,
@@ -1017,6 +1024,7 @@ pub(crate) fn context_window_line(percent: Option<i64>, used_tokens: Option<i64>
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 enum ShortcutId {
     Commands,
+    Skills,
     ShellCommands,
     InsertNewline,
     QueueMessageTab,
@@ -1088,6 +1096,7 @@ impl ShortcutDescriptor {
             ShortcutId::ReasoningDown => state.key_hints.reasoning_down,
             ShortcutId::ReasoningUp => state.key_hints.reasoning_up,
             ShortcutId::Commands
+            | ShortcutId::Skills
             | ShortcutId::ShellCommands
             | ShortcutId::FilePaths
             | ShortcutId::PasteImage
@@ -1121,7 +1130,16 @@ const SHORTCUTS: &[ShortcutDescriptor] = &[
             condition: DisplayCondition::Always,
         }],
         prefix: "",
-        label: " for commands",
+        label: " for commands and skills",
+    },
+    ShortcutDescriptor {
+        id: ShortcutId::Skills,
+        bindings: &[ShortcutBinding {
+            key: key_hint::plain(KeyCode::Char('$')),
+            condition: DisplayCondition::Always,
+        }],
+        prefix: "",
+        label: " for skills",
     },
     ShortcutDescriptor {
         id: ShortcutId::ShellCommands,

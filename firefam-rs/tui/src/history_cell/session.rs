@@ -108,11 +108,18 @@ impl HistoryCell for TooltipHistoryCell {
             &mut lines,
         );
 
-        prefix_lines(lines, indent.into(), indent.into())
+        let mut lines = prefix_lines(lines, indent.into(), indent.into());
+        lines.push(Line::default());
+        lines.push(Line::default());
+        lines
     }
 
     fn raw_lines(&self) -> Vec<Line<'static>> {
         vec![Line::from(format!("Tip: {}", self.tip))]
+    }
+
+    fn suppress_display_separator_before(&self) -> bool {
+        true
     }
 }
 

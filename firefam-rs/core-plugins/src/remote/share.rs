@@ -2,6 +2,8 @@ use super::*;
 use firefam_login::FirefamAuth;
 use firefam_login::default_client::build_reqwest_client;
 use firefam_utils_absolute_path::AbsolutePathBuf;
+use firefam_utils_plugins::CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH;
+use firefam_utils_plugins::find_plugin_manifest_path;
 use flate2::Compression;
 use flate2::write::GzEncoder;
 use reqwest::RequestBuilder;
@@ -483,10 +485,10 @@ fn archive_plugin_for_upload_with_limit(
             reason: "expected a plugin directory".to_string(),
         });
     }
-    if !plugin_path.join(".firefam-plugin/plugin.json").is_file() {
+    if find_plugin_manifest_path(plugin_path).is_none() {
         return Err(RemotePluginCatalogError::InvalidPluginPath {
             path: plugin_path.to_path_buf(),
-            reason: "missing .firefam-plugin/plugin.json".to_string(),
+            reason: format!("missing {CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH}"),
         });
     }
 

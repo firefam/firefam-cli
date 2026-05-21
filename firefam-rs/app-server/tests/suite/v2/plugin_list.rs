@@ -253,7 +253,7 @@ async fn plugin_list_keeps_valid_marketplaces_when_another_marketplace_fails_to_
     std::fs::create_dir_all(
         valid_repo_root
             .path()
-            .join("plugins/valid-plugin/.firefam-plugin"),
+            .join("plugins/valid-plugin/.agents-plugin"),
     )?;
     std::fs::create_dir_all(invalid_repo_root.path().join(".git"))?;
     std::fs::create_dir_all(invalid_repo_root.path().join(".agents/plugins"))?;
@@ -290,7 +290,7 @@ async fn plugin_list_keeps_valid_marketplaces_when_another_marketplace_fails_to_
     std::fs::write(
         valid_repo_root
             .path()
-            .join("plugins/valid-plugin/.firefam-plugin/plugin.json"),
+            .join("plugins/valid-plugin/.agents-plugin/plugin.json"),
         r#"{"name":"valid-plugin","keywords":["api-key","developer tools"]}"#,
     )?;
     std::fs::write(invalid_marketplace_path.as_path(), "{not json")?;
@@ -455,7 +455,7 @@ async fn plugin_list_reuses_cached_workspace_firefam_plugins_setting() -> Result
     let server = MockServer::start().await;
     std::fs::create_dir_all(repo_root.path().join(".git"))?;
     std::fs::create_dir_all(repo_root.path().join(".agents/plugins"))?;
-    std::fs::create_dir_all(repo_root.path().join("demo-plugin/.firefam-plugin"))?;
+    std::fs::create_dir_all(repo_root.path().join("demo-plugin/.agents-plugin"))?;
     write_plugins_enabled_config_with_base_url(
         firefam_home.path(),
         &format!("{}/backend-api/", server.uri()),
@@ -488,7 +488,7 @@ async fn plugin_list_reuses_cached_workspace_firefam_plugins_setting() -> Result
     std::fs::write(
         repo_root
             .path()
-            .join("demo-plugin/.firefam-plugin/plugin.json"),
+            .join("demo-plugin/.agents-plugin/plugin.json"),
         r#"{"name":"demo-plugin"}"#,
     )?;
 
@@ -735,7 +735,7 @@ async fn plugin_list_returns_share_context_for_shared_local_plugin() -> Result<(
     let plugin_root = repo_root.path().join("plugins/demo-plugin");
     std::fs::create_dir_all(repo_root.path().join(".git"))?;
     std::fs::create_dir_all(repo_root.path().join(".agents/plugins"))?;
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     write_plugins_enabled_config(firefam_home.path())?;
     std::fs::write(
         repo_root.path().join(".agents/plugins/marketplace.json"),
@@ -753,7 +753,7 @@ async fn plugin_list_returns_share_context_for_shared_local_plugin() -> Result<(
 }"#,
     )?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"demo-plugin","version":"1.2.3"}"#,
     )?;
     write_plugin_share_local_path_mapping(
@@ -1047,7 +1047,7 @@ async fn plugin_list_returns_plugin_interface_with_absolute_asset_paths() -> Res
     let plugin_root = repo_root.path().join("plugins/demo-plugin");
     std::fs::create_dir_all(repo_root.path().join(".git"))?;
     std::fs::create_dir_all(repo_root.path().join(".agents/plugins"))?;
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     write_plugins_enabled_config(firefam_home.path())?;
     std::fs::write(
         repo_root.path().join(".agents/plugins/marketplace.json"),
@@ -1070,7 +1070,7 @@ async fn plugin_list_returns_plugin_interface_with_absolute_asset_paths() -> Res
 }"#,
     )?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r##"{
   "name": "demo-plugin",
   "interface": {
@@ -1181,7 +1181,7 @@ async fn plugin_list_accepts_legacy_string_default_prompt() -> Result<()> {
     let plugin_root = repo_root.path().join("plugins/demo-plugin");
     std::fs::create_dir_all(repo_root.path().join(".git"))?;
     std::fs::create_dir_all(repo_root.path().join(".agents/plugins"))?;
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     write_plugins_enabled_config(firefam_home.path())?;
     std::fs::write(
         repo_root.path().join(".agents/plugins/marketplace.json"),
@@ -1199,7 +1199,7 @@ async fn plugin_list_accepts_legacy_string_default_prompt() -> Result<()> {
 }"#,
     )?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r##"{
   "name": "demo-plugin",
   "interface": {
@@ -1273,9 +1273,9 @@ async fn plugin_list_returns_installed_git_source_interface_from_cache() -> Resu
     let cached_plugin_root = firefam_home
         .path()
         .join("plugins/cache/debug/toolkit/local");
-    std::fs::create_dir_all(cached_plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(cached_plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        cached_plugin_root.join(".firefam-plugin/plugin.json"),
+        cached_plugin_root.join(".agents-plugin/plugin.json"),
         r##"{
   "name": "toolkit",
   "interface": {
@@ -1502,9 +1502,9 @@ async fn app_server_startup_sync_downloads_remote_installed_plugin_bundles() -> 
     .await?;
     timeout(DEFAULT_TIMEOUT, mcp.initialize()).await??;
 
-    wait_for_path_exists(&installed_path.join(".firefam-plugin/plugin.json")).await?;
+    wait_for_path_exists(&installed_path.join(".agents-plugin/plugin.json")).await?;
     let installed_plugin_manifest: serde_json::Value = serde_json::from_str(
-        &std::fs::read_to_string(installed_path.join(".firefam-plugin/plugin.json"))?,
+        &std::fs::read_to_string(installed_path.join(".agents-plugin/plugin.json"))?,
     )?;
     assert_eq!(
         installed_plugin_manifest["version"],
@@ -1616,9 +1616,9 @@ async fn plugin_list_sync_upgrades_and_removes_remote_installed_plugin_bundles()
         vec![("linear@firefamai-curated-remote".to_string(), true, true)]
     );
 
-    wait_for_path_exists(&new_path.join(".firefam-plugin/plugin.json")).await?;
+    wait_for_path_exists(&new_path.join(".agents-plugin/plugin.json")).await?;
     let installed_plugin_manifest: serde_json::Value = serde_json::from_str(
-        &std::fs::read_to_string(new_path.join(".firefam-plugin/plugin.json"))?,
+        &std::fs::read_to_string(new_path.join(".agents-plugin/plugin.json"))?,
     )?;
     assert_eq!(
         installed_plugin_manifest["version"],
@@ -2312,7 +2312,7 @@ plugin_sharing = false
     );
     let installed_path = firefam_home
         .path()
-        .join("plugins/cache/firefamai-curated-remote/linear/1.2.3/.firefam-plugin/plugin.json");
+        .join("plugins/cache/firefamai-curated-remote/linear/1.2.3/.agents-plugin/plugin.json");
     wait_for_path_exists(&installed_path).await?;
     wait_for_remote_installed_scope_request(&server, "GLOBAL").await?;
     wait_for_remote_installed_scope_request(&server, "WORKSPACE").await?;
@@ -3228,7 +3228,7 @@ fn remote_plugin_bundle_tar_gz_bytes(plugin_name: &str) -> Result<Vec<u8>> {
     let mut tar = tar::Builder::new(encoder);
     for (path, contents, mode) in [
         (
-            ".firefam-plugin/plugin.json",
+            ".agents-plugin/plugin.json",
             manifest.as_bytes(),
             /*mode*/ 0o644,
         ),
@@ -3267,7 +3267,7 @@ fn write_installed_plugin_with_version(
         .join(marketplace_name)
         .join(plugin_name)
         .join(plugin_version)
-        .join(".firefam-plugin");
+        .join(".agents-plugin");
     std::fs::create_dir_all(&plugin_root)?;
     std::fs::write(
         plugin_root.join("plugin.json"),
@@ -3352,7 +3352,7 @@ fn write_firefamai_curated_marketplace(
     )?;
 
     for plugin_name in plugin_names {
-        let plugin_root = curated_root.join(format!("plugins/{plugin_name}/.firefam-plugin"));
+        let plugin_root = curated_root.join(format!("plugins/{plugin_name}/.agents-plugin"));
         std::fs::create_dir_all(&plugin_root)?;
         std::fs::write(
             plugin_root.join("plugin.json"),

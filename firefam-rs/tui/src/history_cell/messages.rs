@@ -81,6 +81,20 @@ fn remote_image_display_line(style: Style, index: usize) -> Line<'static> {
     Line::from(local_image_label_text(index)).style(style)
 }
 
+const USER_MESSAGE_PREFIX: &str = "⌑ ";
+
+fn user_message_prefix_width() -> u16 {
+    UnicodeWidthStr::width(USER_MESSAGE_PREFIX) as u16
+}
+
+fn user_message_prefix() -> Span<'static> {
+    USER_MESSAGE_PREFIX.bold().dim()
+}
+
+fn assistant_message_prefix() -> Span<'static> {
+    "● ".dim()
+}
+
 fn user_message_rounded_content_line(
     line: Line<'static>,
     content_width: usize,
@@ -100,30 +114,19 @@ fn user_message_rounded_content_line(
     Line::from(spans)
 }
 
-fn user_message_rounded_cap_line(content_width: usize, style: Style) -> Line<'static> {
-    let body_width = content_width.saturating_add(1);
-    if body_width < 2 {
-        return Line::from(Span::styled(" ".repeat(body_width), style));
-    }
-
-    Line::from(vec![
-        Span::from(" "),
-        Span::styled(" ".repeat(body_width.saturating_sub(2)), style),
-        Span::from(" "),
-    ])
+fn user_message_block_lines(lines: Vec<Line<'static>>, style: Style) -> Vec<Line<'static>> {
+    let content_width = lines.iter().map(Line::width).max().unwrap_or(0);
+    lines
+        .into_iter()
+        .map(|line| user_message_rounded_content_line(line, content_width, style))
+        .collect()
 }
 
-fn user_message_rounded_lines(lines: Vec<Line<'static>>, style: Style) -> Vec<Line<'static>> {
-    let content_width = lines.iter().map(Line::width).max().unwrap_or(0);
-    let mut bubble = Vec::with_capacity(lines.len() + 2);
-    bubble.push(user_message_rounded_cap_line(content_width, style));
-    bubble.extend(
-        lines
-            .into_iter()
-            .map(|line| user_message_rounded_content_line(line, content_width, style)),
-    );
-    bubble.push(user_message_rounded_cap_line(content_width, style));
-    bubble
+fn append_assistant_turn_spacing(lines: &mut Vec<Line<'static>>) {
+    if !lines.is_empty() {
+        lines.push(Line::default());
+        lines.push(Line::default());
+    }
 }
 
 fn trim_trailing_blank_lines(mut lines: Vec<Line<'static>>) -> Vec<Line<'static>> {
@@ -140,7 +143,7 @@ impl HistoryCell for UserHistoryCell {
     fn display_lines(&self, width: u16) -> Vec<Line<'static>> {
         let wrap_width = width
             .saturating_sub(
-                LIVE_PREFIX_COLS + 1, /* message prefix plus right padding */
+                user_message_prefix_width() + 1, /* message prefix plus right padding */
             )
             .max(1);
 
@@ -166,7 +169,7 @@ impl HistoryCell for UserHistoryCell {
             None
         } else if self.text_elements.is_empty() {
             let message_without_trailing_newlines = self.message.trim_end_matches(['\r', '\n']);
-            let wrapped = adaptive_wrap_lines(
+            let wrapped = word_wrap_lines(
                 message_without_trailing_newlines
                     .split('\n')
                     .map(|line| Line::from(line).style(style)),
@@ -183,7 +186,7 @@ impl HistoryCell for UserHistoryCell {
                 style,
                 element_style,
             );
-            let wrapped = adaptive_wrap_lines(
+            let wrapped = word_wrap_lines(
                 raw_lines,
                 RtOptions::new(usize::from(wrap_width))
                     .wrap_algorithm(textwrap::WrapAlgorithm::FirstFit),
@@ -212,12 +215,23 @@ impl HistoryCell for UserHistoryCell {
         if let Some(wrapped_message) = wrapped_message {
             lines.extend(prefix_lines(
                 wrapped_message,
-                "› ".bold().dim(),
-                "  ".into(),
+                user_message_prefix(),
+                " ".repeat(usize::from(user_message_prefix_width())).into(),
             ));
         }
 
-        user_message_rounded_lines(lines, style)
+        user_message_block_lines(lines, style)
+    }
+
+    fn desired_height(&self, width: u16) -> u16 {
+        self.display_lines(width)
+            .len()
+            .try_into()
+            .unwrap_or(u16::MAX)
+    }
+
+    fn desired_transcript_height(&self, width: u16) -> u16 {
+        self.desired_height(width)
     }
 
     fn raw_lines(&self) -> Vec<Line<'static>> {
@@ -335,7 +349,7 @@ impl HistoryCell for AgentMessageCell {
             &self.lines,
             RtOptions::new(width as usize)
                 .initial_indent(if self.is_first_line {
-                    "• ".dim().into()
+                    assistant_message_prefix().into()
                 } else {
                     "  ".into()
                 })
@@ -395,11 +409,17 @@ impl HistoryCell for AgentMarkdownCell {
         let Some(wrap_width) =
             crate::width::usable_content_width_u16(width, /*reserved_cols*/ 2)
         else {
-            return prefix_lines(vec![Line::default()], "• ".dim(), "  ".into());
+            let mut lines = prefix_lines(
+                vec![Line::default()],
+                assistant_message_prefix(),
+                "  ".into(),
+            );
+            append_assistant_turn_spacing(&mut lines);
+            return lines;
         };
 
         let mut lines: Vec<Line<'static>> = Vec::new();
-        // Re-render markdown from source at the current width. Reserve 2 columns for the "• " /
+        // Re-render markdown from source at the current width. Reserve 2 columns for the "● " /
         // " " prefix prepended below.
         crate::markdown::append_markdown_agent_with_cwd(
             &self.markdown_source,
@@ -407,7 +427,9 @@ impl HistoryCell for AgentMarkdownCell {
             Some(self.cwd.as_path()),
             &mut lines,
         );
-        prefix_lines(lines, "• ".dim(), "  ".into())
+        let mut lines = prefix_lines(lines, assistant_message_prefix(), "  ".into());
+        append_assistant_turn_spacing(&mut lines);
+        lines
     }
 
     fn raw_lines(&self) -> Vec<Line<'static>> {
@@ -446,7 +468,7 @@ impl HistoryCell for StreamingAgentTailCell {
         prefix_lines(
             self.lines.clone(),
             if self.is_first_line {
-                "• ".dim()
+                assistant_message_prefix()
             } else {
                 "  ".into()
             },

@@ -2,8 +2,7 @@
 source: tui/src/chatwidget/tests/status_and_layout.rs
 expression: normalize_snapshot_paths(term.backend().vt100().screen().contents())
 ---
-
-• Working (0s • esc to interrupt)
+● Working (0s • esc to interrupt)
 
 • Queued follow-up inputs
   ↳ Hello, world! 0
@@ -22,7 +21,8 @@ expression: normalize_snapshot_paths(term.backend().vt100().screen().contents())
   ↳ Hello, world! 13
   ↳ Hello, world! 14
   ↳ Hello, world! 15
-
+────────────────────────────────────────────────────────────────────────────────
+  /tmp/project
 › Ask Firefam to do anything
-
-  gpt-5.5 default · /tmp/project
+────────────────────────────────────────────────────────────────────────────────
+  ? help · / commands and skills                   Read Only · gpt-5.5 default

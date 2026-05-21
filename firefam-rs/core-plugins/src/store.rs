@@ -3,6 +3,7 @@ use crate::manifest::load_plugin_manifest;
 use firefam_plugin::PluginId;
 use firefam_plugin::validate_plugin_segment;
 use firefam_utils_absolute_path::AbsolutePathBuf;
+use firefam_utils_plugins::canonical_plugin_manifest_path;
 use firefam_utils_plugins::find_plugin_manifest_path;
 use semver::Version;
 use serde::Deserialize;
@@ -288,6 +289,7 @@ fn replace_plugin_root_atomically(
     let staged_root = staged_dir.path().join(plugin_dir_name);
     let staged_version_root = staged_root.join(plugin_version);
     copy_dir_recursive(source, &staged_version_root)?;
+    normalize_plugin_manifest(&staged_version_root)?;
 
     let target_version_root = target_root.join(plugin_version);
     if target_root.exists() && !target_version_root.exists() {
@@ -331,6 +333,30 @@ fn replace_plugin_root_atomically(
             .map_err(|err| PluginStoreError::io("failed to activate plugin cache entry", err))?;
     }
 
+    Ok(())
+}
+
+fn normalize_plugin_manifest(plugin_root: &Path) -> Result<(), PluginStoreError> {
+    let manifest_path = find_plugin_manifest_path(plugin_root)
+        .ok_or_else(|| PluginStoreError::Invalid("missing plugin.json".to_string()))?;
+    let canonical_manifest_path = canonical_plugin_manifest_path(plugin_root);
+    if manifest_path == canonical_manifest_path {
+        return Ok(());
+    }
+
+    let Some(parent) = canonical_manifest_path.parent() else {
+        return Err(PluginStoreError::Invalid(format!(
+            "canonical plugin manifest path has no parent: {}",
+            canonical_manifest_path.display()
+        )));
+    };
+    fs::create_dir_all(parent)
+        .map_err(|err| PluginStoreError::io("failed to create plugin manifest directory", err))?;
+    fs::rename(&manifest_path, &canonical_manifest_path)
+        .map_err(|err| PluginStoreError::io("failed to write canonical plugin manifest", err))?;
+    if let Some(old_parent) = manifest_path.parent() {
+        let _ = fs::remove_dir(old_parent);
+    }
     Ok(())
 }
 

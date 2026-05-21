@@ -43,7 +43,7 @@ plugins = true
 
 fn write_marketplace_source(source: &Path) -> Result<()> {
     std::fs::create_dir_all(source.join(".agents/plugins"))?;
-    std::fs::create_dir_all(source.join("plugins/sample/.firefam-plugin"))?;
+    std::fs::create_dir_all(source.join("plugins/sample/.agents-plugin"))?;
     std::fs::write(
         source.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -60,7 +60,7 @@ fn write_marketplace_source(source: &Path) -> Result<()> {
 }"#,
     )?;
     std::fs::write(
-        source.join("plugins/sample/.firefam-plugin/plugin.json"),
+        source.join("plugins/sample/.agents-plugin/plugin.json"),
         r#"{"name":"sample","description":"Sample plugin"}"#,
     )?;
     Ok(())
@@ -245,7 +245,7 @@ async fn plugin_add_reinstalls_from_configured_marketplace_snapshot() -> Result<
     assert!(
         firefam_home
             .path()
-            .join("plugins/cache/debug/sample/local/.firefam-plugin/plugin.json")
+            .join("plugins/cache/debug/sample/local/.agents-plugin/plugin.json")
             .is_file()
     );
 
@@ -292,7 +292,7 @@ async fn plugin_add_rejects_cached_plugins_without_authorizing_marketplace_snaps
     assert!(
         firefam_home
             .path()
-            .join("plugins/cache/debug/sample/local/.firefam-plugin/plugin.json")
+            .join("plugins/cache/debug/sample/local/.agents-plugin/plugin.json")
             .is_file()
     );
 

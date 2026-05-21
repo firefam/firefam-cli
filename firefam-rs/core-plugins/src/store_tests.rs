@@ -10,13 +10,13 @@ fn write_plugin_with_version(
     manifest_version: Option<&str>,
 ) {
     let plugin_root = root.join(dir_name);
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::create_dir_all(plugin_root.join("skills")).unwrap();
     let version = manifest_version
         .map(|manifest_version| format!(r#","version":"{manifest_version}""#))
         .unwrap_or_default();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         format!(r#"{{"name":"{manifest_name}"{version}}}"#),
     )
     .unwrap();
@@ -67,8 +67,48 @@ fn install_copies_plugin_into_default_marketplace() {
             installed_path: AbsolutePathBuf::try_from(installed_path.clone()).unwrap(),
         }
     );
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
     assert!(installed_path.join("skills/SKILL.md").is_file());
+}
+
+#[test]
+fn install_normalizes_supported_manifest_paths() {
+    let tmp = tempdir().unwrap();
+
+    for (source_manifest_dir, plugin_name) in [
+        (".claude-plugin", "claude-plugin"),
+        (".codex-plugin", "codex-plugin"),
+    ] {
+        let plugin_root = tmp.path().join(plugin_name);
+        fs::create_dir_all(plugin_root.join(source_manifest_dir)).unwrap();
+        fs::create_dir_all(plugin_root.join("skills")).unwrap();
+        fs::write(
+            plugin_root.join(source_manifest_dir).join("plugin.json"),
+            format!(r#"{{"name":"{plugin_name}"}}"#),
+        )
+        .unwrap();
+        fs::write(plugin_root.join("skills/SKILL.md"), "skill").unwrap();
+
+        let plugin_id = PluginId::new(plugin_name.to_string(), "debug".to_string()).unwrap();
+        let result = PluginStore::new(tmp.path().to_path_buf())
+            .install(
+                AbsolutePathBuf::try_from(plugin_root).unwrap(),
+                plugin_id.clone(),
+            )
+            .unwrap();
+        let installed_path = result.installed_path.as_path();
+
+        assert_eq!(
+            fs::read_to_string(installed_path.join(".agents-plugin/plugin.json")).unwrap(),
+            format!(r#"{{"name":"{plugin_name}"}}"#),
+        );
+        assert!(
+            !installed_path
+                .join(source_manifest_dir)
+                .join("plugin.json")
+                .exists()
+        );
+    }
 }
 
 #[test]
@@ -148,7 +188,7 @@ fn install_with_version_uses_requested_cache_version() {
             installed_path: AbsolutePathBuf::try_from(installed_path.clone()).unwrap(),
         }
     );
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
 }
 
 #[test]
@@ -180,7 +220,7 @@ fn install_uses_manifest_version_when_present() {
             installed_path: AbsolutePathBuf::try_from(installed_path.clone()).unwrap(),
         }
     );
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
 }
 
 #[test]

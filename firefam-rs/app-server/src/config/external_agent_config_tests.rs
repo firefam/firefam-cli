@@ -802,7 +802,7 @@ async fn import_local_plugins_returns_completed_status() {
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -837,7 +837,7 @@ async fn import_local_plugins_returns_completed_status() {
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");
@@ -1766,14 +1766,14 @@ async fn detect_repo_filters_plugins_against_installed_marketplace() {
         marketplace_root
             .join("plugins")
             .join("sample")
-            .join(".firefam-plugin"),
+            .join(".agents-plugin"),
     )
     .expect("create sample plugin");
     fs::create_dir_all(
         marketplace_root
             .join("plugins")
             .join("available")
-            .join(".firefam-plugin"),
+            .join(".agents-plugin"),
     )
     .expect("create available plugin");
     fs::write(
@@ -1834,7 +1834,7 @@ source = "owner/debug-marketplace"
         marketplace_root
             .join("plugins")
             .join("sample")
-            .join(".firefam-plugin")
+            .join(".agents-plugin")
             .join("plugin.json"),
         r#"{"name":"sample"}"#,
     )
@@ -1843,7 +1843,7 @@ source = "owner/debug-marketplace"
         marketplace_root
             .join("plugins")
             .join("available")
-            .join(".firefam-plugin")
+            .join(".agents-plugin")
             .join("plugin.json"),
         r#"{"name":"available"}"#,
     )
@@ -1968,7 +1968,7 @@ async fn import_plugins_supports_external_agent_plugin_marketplace_layout() {
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -2003,7 +2003,7 @@ async fn import_plugins_supports_external_agent_plugin_marketplace_layout() {
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");
@@ -2043,7 +2043,7 @@ async fn detect_home_supports_relative_external_agent_plugin_marketplace_path() 
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -2077,7 +2077,7 @@ async fn detect_home_supports_relative_external_agent_plugin_marketplace_path() 
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");
@@ -2163,7 +2163,7 @@ async fn import_plugins_supports_relative_external_agent_plugin_marketplace_path
     let plugin_root = marketplace_root.join("plugins").join("cloudflare");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -2197,7 +2197,7 @@ async fn import_plugins_supports_relative_external_agent_plugin_marketplace_path
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");
@@ -2285,7 +2285,7 @@ async fn detect_repo_supports_project_relative_external_agent_plugin_marketplace
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -2319,7 +2319,7 @@ async fn detect_repo_supports_project_relative_external_agent_plugin_marketplace
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");
@@ -2367,7 +2367,7 @@ async fn import_plugins_supports_project_relative_external_agent_plugin_marketpl
     fs::create_dir_all(repo_root.join(EXTERNAL_AGENT_DIR)).expect("create repo external agent dir");
     fs::create_dir_all(marketplace_root.join(EXTERNAL_AGENT_PLUGIN_MANIFEST_DIR))
         .expect("create marketplace manifest dir");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create plugin manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create plugin manifest dir");
     fs::create_dir_all(&firefam_home).expect("create firefam home");
 
     fs::write(
@@ -2401,7 +2401,7 @@ async fn import_plugins_supports_project_relative_external_agent_plugin_marketpl
     )
     .expect("write marketplace manifest");
     fs::write(
-        plugin_root.join(".firefam-plugin").join("plugin.json"),
+        plugin_root.join(".agents-plugin").join("plugin.json"),
         r#"{"name":"cloudflare","version":"0.1.0"}"#,
     )
     .expect("write plugin manifest");

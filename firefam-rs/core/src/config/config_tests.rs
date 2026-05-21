@@ -3797,9 +3797,9 @@ async fn rebuild_preserving_session_layers_refreshes_plugin_derived_mcp_config()
         .path()
         .join("plugins/cache")
         .join("test/sample/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )?;
     std::fs::write(
@@ -3899,9 +3899,9 @@ async fn to_mcp_config_omits_plugin_id_when_user_server_shadows_plugin_mcp() -> 
         .path()
         .join("plugins/cache")
         .join("test/sample/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )?;
     std::fs::write(
@@ -3952,9 +3952,9 @@ async fn to_mcp_config_applies_plugin_mcp_cloud_requirements() -> anyhow::Result
         .path()
         .join("plugins/cache")
         .join("test/sample/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )?;
     std::fs::write(
@@ -4038,9 +4038,9 @@ async fn to_mcp_config_empty_mcp_requirements_disable_plugin_mcps() -> anyhow::R
         .path()
         .join("plugins/cache")
         .join("test/sample/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )?;
     std::fs::write(

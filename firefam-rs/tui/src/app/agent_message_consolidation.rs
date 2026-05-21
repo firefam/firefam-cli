@@ -11,6 +11,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use color_eyre::eyre::Result;
+use ratatui::text::Line;
 
 use super::App;
 use super::resize_reflow::trailing_run_start;
@@ -70,6 +71,11 @@ impl App {
                 scrollback_reflow
             };
             self.finish_agent_message_consolidation(tui, reflow)?;
+            let scrollback_was_rebuilt = reflow == ConsolidationScrollbackReflow::Required
+                && self.terminal_resize_reflow_enabled();
+            if !work_log && !tui.is_full_screen_active() && !scrollback_was_rebuilt {
+                tui.insert_history_lines(vec![Line::default(), Line::default()]);
+            }
         } else {
             tracing::debug!(
                 "ConsolidateAgentMessage: no cells to consolidate(start={start}, end={end})",

@@ -99,9 +99,9 @@ fn write_plugin_with_skill(
     )?;
 
     let plugin_root = repo_root.join(plugin_name);
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         format!(r#"{{"name":"{plugin_name}"}}"#),
     )?;
 
@@ -118,9 +118,9 @@ fn write_cached_remote_plugin_with_skill(
     firefam_home: &std::path::Path,
 ) -> Result<std::path::PathBuf> {
     let plugin_root = firefam_home.join("plugins/cache/firefamai-curated-remote/linear/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"linear"}"#,
     )?;
 

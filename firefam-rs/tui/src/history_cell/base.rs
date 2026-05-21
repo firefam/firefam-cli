@@ -76,7 +76,7 @@ impl HistoryCell for CompositeHistoryCell {
         for part in &self.parts {
             let mut lines = part.display_lines(width);
             if !lines.is_empty() {
-                if !first {
+                if !first && !part.suppress_display_separator_before() {
                     out.push(Line::from(""));
                 }
                 out.append(&mut lines);

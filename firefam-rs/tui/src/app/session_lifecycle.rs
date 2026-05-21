@@ -396,11 +396,12 @@ impl App {
             tui.terminal.clear_visible_screen()?;
             if tui.is_full_screen_active() {
                 let size = tui.terminal.size()?;
-                let mut area = tui.terminal.viewport_area;
-                area.width = size.width;
-                area.height = area.height.min(size.height);
-                area.y = size.height.saturating_sub(area.height);
-                tui.terminal.set_viewport_area(area);
+                tui.terminal.set_viewport_area(ratatui::layout::Rect::new(
+                    0,
+                    0,
+                    size.width,
+                    size.height,
+                ));
             }
         } else {
             tui.terminal.clear_inline_owned_visible_region()?;

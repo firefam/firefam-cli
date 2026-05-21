@@ -223,7 +223,7 @@ async fn plugin_install_writes_remote_plugin_to_cloud_and_cache() -> Result<()> 
     mount_remote_plugin_install_after_cache_write(
         &server,
         REMOTE_PLUGIN_ID,
-        installed_path.join(".firefam-plugin/plugin.json"),
+        installed_path.join(".agents-plugin/plugin.json"),
     )
     .await;
 
@@ -263,9 +263,9 @@ async fn plugin_install_writes_remote_plugin_to_cloud_and_cache() -> Result<()> 
         /*expected_count*/ 1,
     )
     .await?;
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
     let installed_plugin_manifest: serde_json::Value = serde_json::from_str(
-        &std::fs::read_to_string(installed_path.join(".firefam-plugin/plugin.json"))?,
+        &std::fs::read_to_string(installed_path.join(".agents-plugin/plugin.json"))?,
     )?;
     assert_eq!(installed_plugin_manifest["name"], json!("linear"));
     assert_eq!(installed_plugin_manifest["version"], json!("1.2.3"));
@@ -1626,9 +1626,9 @@ fn write_plugin_source(
     app_ids: &[&str],
 ) -> Result<()> {
     let plugin_root = repo_root.join(plugin_name);
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         format!(r#"{{"name":"{plugin_name}"}}"#),
     )?;
 
@@ -1657,7 +1657,7 @@ fn remote_plugin_bundle_tar_gz_bytes_with_contents(
     let mut tar = tar::Builder::new(encoder);
     let mut entries = vec![
         (
-            ".firefam-plugin/plugin.json",
+            ".agents-plugin/plugin.json",
             plugin_manifest.as_bytes(),
             /*mode*/ 0o644,
         ),

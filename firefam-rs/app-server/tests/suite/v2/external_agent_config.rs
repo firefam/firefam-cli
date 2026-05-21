@@ -78,7 +78,7 @@ async fn external_agent_config_import_sends_completion_notification_for_local_pl
     let marketplace_root = firefam_home.path().join("marketplace");
     let plugin_root = marketplace_root.join("plugins").join("sample");
     std::fs::create_dir_all(marketplace_root.join(".agents/plugins"))?;
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::write(
         marketplace_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -95,7 +95,7 @@ async fn external_agent_config_import_sends_completion_notification_for_local_pl
 }"#,
     )?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample","version":"0.1.0"}"#,
     )?;
     std::fs::create_dir_all(firefam_home.path().join(".claude"))?;

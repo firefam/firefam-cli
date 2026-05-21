@@ -1,6 +1,6 @@
 ---
 name: plugin-creator
-description: Create and scaffold plugin directories for Firefam with a required `.firefam-plugin/plugin.json`, optional plugin folders/files, valid manifest defaults, and personal-marketplace entries by default. Use when Firefam needs to create a new personal plugin, add optional plugin structure, or generate or update marketplace entries for plugin ordering and availability metadata.
+description: Create and scaffold plugin directories for Firefam with a required `.agents-plugin/plugin.json`, optional plugin folders/files, valid manifest defaults, and personal-marketplace entries by default. Use when Firefam needs to create a new personal plugin, add optional plugin structure, or generate or update marketplace entries for plugin ordering and availability metadata.
 ---
 
 # Plugin Creator
@@ -17,7 +17,7 @@ description: Create and scaffold plugin directories for Firefam with a required 
 python3 .agents/skills/plugin-creator/scripts/create_basic_plugin.py <plugin-name>
 ```
 
-2. Edit `<plugin-path>/.firefam-plugin/plugin.json` when the request gives specific metadata.
+2. Edit `<plugin-path>/.agents-plugin/plugin.json` when the request gives specific metadata.
    The scaffold starts with valid defaults and must not contain `[TODO: ...]` placeholders.
 
 3. Generate or update the personal marketplace entry when the plugin should appear in Firefam UI ordering:
@@ -58,7 +58,7 @@ python3 .agents/skills/plugin-creator/scripts/validate_plugin.py <plugin-path>
 - Default marketplace-backed scaffolds are personal: `~/plugins/<plugin-name>/` plus
   `~/.agents/plugins/marketplace.json`.
 - Creates plugin root at `/<parent-plugin-directory>/<plugin-name>/`.
-- Always creates `/<parent-plugin-directory>/<plugin-name>/.firefam-plugin/plugin.json`.
+- Always creates `/<parent-plugin-directory>/<plugin-name>/.agents-plugin/plugin.json`.
 - Fills the manifest with the validated schema shape that the ingestion path accepts.
 - Creates or updates `~/.agents/plugins/marketplace.json` when `--with-marketplace` is set.
   - If the marketplace file does not exist yet, seed a personal marketplace root before adding the first plugin entry.
@@ -148,7 +148,7 @@ python3 .agents/skills/plugin-creator/scripts/validate_plugin.py <plugin-path>
 ## Required behavior
 
 - Outer folder name and `plugin.json` `"name"` are always the same normalized plugin name.
-- Do not remove required structure; keep `.firefam-plugin/plugin.json` present.
+- Do not remove required structure; keep `.agents-plugin/plugin.json` present.
 - Do not leave `[TODO: ...]` placeholders in plugin manifests.
 - Keep `apps` and `mcpServers` out of `plugin.json` unless their companion files are actually created.
 - Omit unsupported plugin manifest fields that validation rejects, including `hooks`.

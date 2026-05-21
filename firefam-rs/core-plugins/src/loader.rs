@@ -31,6 +31,7 @@ use firefam_plugin::PluginTelemetryMetadata;
 use firefam_protocol::protocol::Product;
 use firefam_protocol::protocol::SkillScope;
 use firefam_utils_absolute_path::AbsolutePathBuf;
+use firefam_utils_plugins::CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH;
 use firefam_utils_plugins::find_plugin_manifest_path;
 use serde::Deserialize;
 use serde_json::Map as JsonMap;
@@ -784,7 +785,7 @@ pub fn load_plugin_hooks(
         Some(PluginManifestHooks::Inline(hooks_files)) => {
             let manifest_path = find_plugin_manifest_path(plugin_root.as_path())
                 .and_then(|path| AbsolutePathBuf::try_from(path).ok())
-                .unwrap_or_else(|| plugin_root.join(".firefam-plugin/plugin.json"));
+                .unwrap_or_else(|| plugin_root.join(CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH));
             for (index, hooks_file) in hooks_files.iter().enumerate() {
                 if hooks_file.hooks.is_empty() {
                     continue;

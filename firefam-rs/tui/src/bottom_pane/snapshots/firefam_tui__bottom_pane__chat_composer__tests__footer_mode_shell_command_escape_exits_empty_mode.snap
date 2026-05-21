@@ -2,12 +2,12 @@
 source: tui/src/bottom_pane/chat_composer.rs
 expression: terminal.backend()
 ---
-"                                                                                                    "
+"────────────────────────────────────────────────────────────────────────────────────────────────────"
 "› Ask Firefam to do anything                                                                        "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                                                                                                    "
-"  gpt-5.4 high fast · ~/code/firefam-1 · Context 0% used                                              "
+"────────────────────────────────────────────────────────────────────────────────────────────────────"
+"  ? help · / commands and skills            gpt-5.4 high fast · ~/code/firefam-1 · Context 0% used  "

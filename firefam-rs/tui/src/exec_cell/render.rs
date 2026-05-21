@@ -987,7 +987,7 @@ mod tests {
             .collect();
 
         assert_eq!(first, second);
-        assert_eq!(first, vec!["• Running echo done".to_string()]);
+        assert_eq!(first, vec!["● Running echo done".to_string()]);
     }
 
     #[test]

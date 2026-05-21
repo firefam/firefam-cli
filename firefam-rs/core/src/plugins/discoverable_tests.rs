@@ -222,7 +222,7 @@ async fn list_tool_suggest_discoverable_plugins_normalizes_description() {
     write_firefamai_curated_marketplace(&curated_root, &["slack"]);
     write_plugins_feature_config(firefam_home.path());
     write_file(
-        &curated_root.join("plugins/slack/.firefam-plugin/plugin.json"),
+        &curated_root.join("plugins/slack/.agents-plugin/plugin.json"),
         r#"{
   "name": "slack",
   "description": "  Plugin\n   with   extra   spacing  "
@@ -347,7 +347,7 @@ async fn list_tool_suggest_discoverable_plugins_does_not_reload_marketplace_per_
     let too_long_prompt = "x".repeat(129);
     for plugin_name in ["build-ios-apps", "life-science-research"] {
         write_file(
-            &curated_root.join(format!("plugins/{plugin_name}/.firefam-plugin/plugin.json")),
+            &curated_root.join(format!("plugins/{plugin_name}/.agents-plugin/plugin.json")),
             &format!(
                 r#"{{
   "name": "{plugin_name}",
@@ -386,13 +386,13 @@ async fn list_tool_suggest_discoverable_plugins_does_not_reload_marketplace_per_
     let normalized_logs = logs.replace('\\', "/");
     assert_eq!(
         normalized_logs
-            .matches("build-ios-apps/.firefam-plugin/plugin.json")
+            .matches("build-ios-apps/.agents-plugin/plugin.json")
             .count(),
         1
     );
     assert_eq!(
         normalized_logs
-            .matches("life-science-research/.firefam-plugin/plugin.json")
+            .matches("life-science-research/.agents-plugin/plugin.json")
             .count(),
         1
     );

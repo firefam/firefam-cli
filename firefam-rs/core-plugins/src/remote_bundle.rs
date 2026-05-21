@@ -877,7 +877,7 @@ mod tests {
             bundle,
             tar_gz_bytes(&[
                 (
-                    ".firefam-plugin/plugin.json",
+                    ".agents-plugin/plugin.json",
                     br#"{"name":"linear","version":"bundle-version"}"#,
                     /*mode*/ 0o644,
                 ),
@@ -895,7 +895,7 @@ mod tests {
             &std::fs::read_to_string(
                 result
                     .installed_path
-                    .join(".firefam-plugin/plugin.json")
+                    .join(".agents-plugin/plugin.json")
                     .as_path(),
             )
             .expect("read installed plugin manifest"),
@@ -928,10 +928,10 @@ mod tests {
     #[test]
     fn find_extracted_plugin_root_uses_local_manifest_discovery() {
         let extraction_root = tempdir().expect("tempdir");
-        std::fs::create_dir_all(extraction_root.path().join(".firefam-plugin"))
+        std::fs::create_dir_all(extraction_root.path().join(".agents-plugin"))
             .expect("create manifest dir");
         std::fs::write(
-            extraction_root.path().join(".firefam-plugin/plugin.json"),
+            extraction_root.path().join(".agents-plugin/plugin.json"),
             r#"{"name":"linear"}"#,
         )
         .expect("write manifest");
@@ -946,9 +946,9 @@ mod tests {
     fn find_extracted_plugin_root_rejects_nested_plugin_root() {
         let extraction_root = tempdir().expect("tempdir");
         let plugin_root = extraction_root.path().join("linear");
-        std::fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create manifest dir");
+        std::fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create manifest dir");
         std::fs::write(
-            plugin_root.join(".firefam-plugin/plugin.json"),
+            plugin_root.join(".agents-plugin/plugin.json"),
             r#"{"name":"linear"}"#,
         )
         .expect("write manifest");
@@ -1015,7 +1015,7 @@ mod tests {
         extract_plugin_bundle_tar_gz(
             &tar_gz_bytes(&[
                 (
-                    ".firefam-plugin/plugin.json",
+                    ".agents-plugin/plugin.json",
                     b"{\"name\":\"linear\"}",
                     /*mode*/ 0o644,
                 ),

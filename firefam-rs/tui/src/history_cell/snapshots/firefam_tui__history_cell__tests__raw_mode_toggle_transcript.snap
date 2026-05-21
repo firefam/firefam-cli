@@ -1,13 +1,11 @@
 ---
-source: tui/src/history_cell.rs
+source: tui/src/history_cell/tests.rs
 expression: rendered
 ---
 rich before:
-
-› Please format this
-  for copying
-
-• - first item
+⌑ Please format this 
+  for copying        
+● - first item
   - second item
   
   ┌──────┬───────┐
@@ -17,6 +15,8 @@ rich before:
   └──────┴───────┘
   
   copy me
+
+
 • Called
   └ workspace.inspect({"path":"README.md
         "})
@@ -41,11 +41,9 @@ structured output
 second line
 
 rich after:
-
-› Please format this
-  for copying
-
-• - first item
+⌑ Please format this 
+  for copying        
+● - first item
   - second item
   
   ┌──────┬───────┐
@@ -55,6 +53,8 @@ rich after:
   └──────┴───────┘
   
   copy me
+
+
 • Called
   └ workspace.inspect({"path":"README.md
         "})

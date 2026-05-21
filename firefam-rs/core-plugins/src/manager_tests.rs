@@ -52,13 +52,13 @@ fn write_plugin_with_version(
     manifest_version: Option<&str>,
 ) {
     let plugin_root = root.join(dir_name);
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::create_dir_all(plugin_root.join("skills")).unwrap();
     let version = manifest_version
         .map(|manifest_version| format!(r#","version":"{manifest_version}""#))
         .unwrap_or_default();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         format!(r#"{{"name":"{manifest_name}"{version}}}"#),
     )
     .unwrap();
@@ -171,7 +171,7 @@ async fn load_plugins_loads_default_skills_and_mcp_servers() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample",
   "description": "Plugin that includes the sample MCP server and Skills"
@@ -290,7 +290,7 @@ async fn load_plugins_applies_plugin_mcp_server_policy() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample"
 }"#,
@@ -451,7 +451,7 @@ async fn load_plugins_resolves_disabled_skill_names_against_loaded_plugin_skills
     let skill_path = plugin_root.join("skills/sample-search/SKILL.md");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(
@@ -491,7 +491,7 @@ async fn load_plugins_ignores_unknown_disabled_skill_names() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(
@@ -535,7 +535,7 @@ async fn plugin_telemetry_metadata_uses_default_mcp_config_path() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample"
 }"#,
@@ -580,7 +580,7 @@ async fn capability_summary_sanitizes_plugin_descriptions_to_one_line() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample",
   "description": "Plugin that\n includes   the sample\tserver"
@@ -617,7 +617,7 @@ async fn capability_summary_truncates_overlong_plugin_descriptions() {
     let too_long = "x".repeat(MAX_CAPABILITY_SUMMARY_DESCRIPTION_LEN + 1);
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         &format!(
             r#"{{
   "name": "sample",
@@ -655,7 +655,7 @@ async fn load_plugins_uses_manifest_configured_component_paths() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample",
   "skills": "./custom-skills/",
@@ -770,7 +770,7 @@ async fn load_plugins_ignores_manifest_component_paths_without_dot_slash() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "sample",
   "skills": "custom-skills",
@@ -882,7 +882,7 @@ async fn load_plugins_preserves_disabled_plugins_without_effective_contributions
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(
@@ -940,7 +940,7 @@ async fn effective_apps_dedupes_connector_ids_across_plugins() {
         .join("test/plugin-b/local");
 
     write_file(
-        &plugin_a_root.join(".firefam-plugin/plugin.json"),
+        &plugin_a_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"plugin-a"}"#,
     );
     write_file(
@@ -954,7 +954,7 @@ async fn effective_apps_dedupes_connector_ids_across_plugins() {
 }"#,
     );
     write_file(
-        &plugin_b_root.join(".firefam-plugin/plugin.json"),
+        &plugin_b_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"plugin-b"}"#,
     );
     write_file(
@@ -1111,7 +1111,7 @@ async fn load_plugins_returns_empty_when_feature_disabled() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(
@@ -1142,7 +1142,7 @@ async fn plugins_for_config_reloads_when_plugin_hooks_enablement_changes() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(
@@ -1197,7 +1197,7 @@ async fn load_plugins_rejects_invalid_plugin_keys() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
 
@@ -1425,7 +1425,7 @@ async fn install_plugin_supports_git_subdir_marketplace_sources() {
             auth_policy: MarketplacePluginAuthPolicy::OnInstall,
         }
     );
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
 }
 
 #[tokio::test]
@@ -1476,7 +1476,7 @@ async fn install_plugin_supports_relative_git_subdir_marketplace_sources() {
             auth_policy: MarketplacePluginAuthPolicy::OnInstall,
         }
     );
-    assert!(installed_path.join(".firefam-plugin/plugin.json").is_file());
+    assert!(installed_path.join(".agents-plugin/plugin.json").is_file());
 }
 
 #[tokio::test]
@@ -1826,7 +1826,7 @@ async fn read_plugin_for_config_uses_user_layer_skill_settings_only() {
 }"#,
     );
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"enabled-plugin"}"#,
     );
     write_file(
@@ -1973,7 +1973,7 @@ async fn read_plugin_for_config_installed_git_source_reads_from_cache_without_cl
     );
     let cached_plugin_root = tmp.path().join("plugins/cache/debug/toolkit/local");
     write_file(
-        &cached_plugin_root.join(".firefam-plugin/plugin.json"),
+        &cached_plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "toolkit",
   "description": "Cached toolkit plugin",
@@ -2129,7 +2129,7 @@ async fn list_marketplaces_installed_git_source_reads_metadata_from_cache_withou
     );
     let cached_plugin_root = tmp.path().join("plugins/cache/debug/toolkit/local");
     write_file(
-        &cached_plugin_root.join(".firefam-plugin/plugin.json"),
+        &cached_plugin_root.join(".agents-plugin/plugin.json"),
         r##"{
   "name": "toolkit",
   "interface": {
@@ -2242,7 +2242,7 @@ plugins = true
 "#,
     );
     fs::create_dir_all(curated_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         curated_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -2260,7 +2260,7 @@ plugins = true
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"linear"}"#,
     )
     .unwrap();
@@ -2322,7 +2322,7 @@ source = "/tmp/debug"
 "#,
     );
     fs::create_dir_all(marketplace_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         marketplace_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -2340,7 +2340,7 @@ source = "/tmp/debug"
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )
     .unwrap();
@@ -2395,7 +2395,7 @@ source = "/tmp/debug"
 "#,
     );
     fs::create_dir_all(marketplace_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         marketplace_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -2413,7 +2413,7 @@ source = "/tmp/debug"
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )
     .unwrap();
@@ -2453,7 +2453,7 @@ plugins = true
 "#,
     );
     fs::create_dir_all(marketplace_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         marketplace_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -2471,7 +2471,7 @@ plugins = true
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )
     .unwrap();
@@ -3705,7 +3705,7 @@ async fn load_plugins_ignores_project_config_files() {
         .join("test/sample/local");
 
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     );
     write_file(

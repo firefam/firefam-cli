@@ -8,5 +8,4 @@ expression: rendered
 │ model:     gpt-5   /model to change │
 │ directory: /tmp/project             │
 ╰─────────────────────────────────────╯
-
   Tip: Model just became available

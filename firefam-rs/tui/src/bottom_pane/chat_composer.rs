@@ -136,7 +136,6 @@ use crate::key_hint;
 use crate::key_hint::KeyBinding;
 use crate::key_hint::has_ctrl_or_alt;
 use crate::line_truncation::truncate_line_with_ellipsis_if_overflow;
-use crate::ui_consts::FOOTER_INDENT_COLS;
 use crossterm::event::KeyCode;
 use crossterm::event::KeyEvent;
 use crossterm::event::KeyEventKind;
@@ -171,26 +170,17 @@ use super::footer::FooterKeyHints;
 use super::footer::FooterMode;
 use super::footer::FooterProps;
 use super::footer::GoalStatusIndicator;
-use super::footer::SummaryLeft;
-use super::footer::can_show_left_with_context;
 use super::footer::context_window_line;
 use super::footer::esc_hint_mode;
 use super::footer::footer_height;
-use super::footer::footer_hint_items_width;
-use super::footer::footer_line_width;
-use super::footer::inset_footer_hint_area;
 use super::footer::max_left_width_for_right;
-use super::footer::passive_footer_status_line;
 use super::footer::render_context_right;
 use super::footer::render_footer_from_props;
 use super::footer::render_footer_hint_items;
 use super::footer::render_footer_line;
 use super::footer::reset_mode_after_activity;
 use super::footer::side_conversation_context_line;
-use super::footer::single_line_footer_layout;
-use super::footer::status_line_right_indicator_line;
 use super::footer::toggle_shortcut_mode;
-use super::footer::uses_passive_footer_status_layout;
 use super::mentions_v2::MentionV2Popup;
 use super::mentions_v2::MentionV2Selection;
 use super::paste_burst::CharDecision;
@@ -215,6 +205,8 @@ use crate::render::Insets;
 use crate::render::RectExt;
 use crate::render::renderable::Renderable;
 use crate::slash_command::SlashCommand;
+use crate::style::accent_style;
+use crate::style::user_message_style;
 use firefam_protocol::ThreadId;
 use firefam_protocol::user_input::ByteRange;
 use firefam_protocol::user_input::MAX_USER_INPUT_TEXT_CHARS;
@@ -421,6 +413,16 @@ enum SlashValidation {
 
 const FOOTER_SPACING_HEIGHT: u16 = 0;
 const COMPOSER_TEXTAREA_LEFT_INSET: u16 = LIVE_PREFIX_COLS;
+const POPUP_SURFACE_LEFT_BORDER: &str = "▌";
+
+struct ComposerLayout {
+    composer_rect: Rect,
+    directory_rect: Rect,
+    remote_images_rect: Rect,
+    textarea_rect: Rect,
+    panel_rect: Rect,
+    footer_rect: Rect,
+}
 
 /// Builds the one-line nudge that replaces the ambient footer without adding layout height.
 fn plan_mode_nudge_line() -> Line<'static> {
@@ -505,6 +507,9 @@ impl ChatComposer {
                 goal_status_indicator: None,
                 ide_context_active: false,
                 status_line_value: None,
+                composer_permissions_line: None,
+                composer_model_line: None,
+                composer_directory_line: None,
                 status_line_hyperlink_url: None,
                 status_line_enabled: false,
                 side_conversation_context_label: None,
@@ -723,7 +728,7 @@ impl ChatComposer {
     pub fn set_windows_degraded_sandbox_active(&mut self, enabled: bool) {
         self.windows_degraded_sandbox_active = enabled;
     }
-    fn layout_areas(&self, area: Rect) -> [Rect; 4] {
+    fn layout_areas(&self, area: Rect) -> ComposerLayout {
         self.layout_areas_with_textarea_right_reserve(area, /*textarea_right_reserve*/ 0)
     }
 
@@ -731,30 +736,30 @@ impl ChatComposer {
         &self,
         area: Rect,
         textarea_right_reserve: u16,
-    ) -> [Rect; 4] {
+    ) -> ComposerLayout {
         let footer_props = self.footer_props();
-        let footer_hint_height = self
-            .custom_footer_height()
-            .unwrap_or_else(|| footer_height(&footer_props));
-        let footer_spacing = Self::footer_spacing(footer_hint_height);
-        let footer_total_height = footer_hint_height + footer_spacing;
-        let popup_constraint = match &self.popups.active {
-            ActivePopup::Command(popup) => {
-                Constraint::Max(popup.calculate_required_height(area.width))
-            }
-            ActivePopup::File(popup) => Constraint::Max(popup.calculate_required_height()),
-            ActivePopup::Skill(popup) => {
-                Constraint::Max(popup.calculate_required_height(area.width))
-            }
-            ActivePopup::MentionV2(popup) => {
-                Constraint::Max(popup.calculate_required_height(area.width))
-            }
-            ActivePopup::None => Constraint::Max(footer_total_height),
+        let panel_height = self.active_panel_height(area.width, &footer_props);
+        let directory_height = self.composer_directory_height();
+        let min_composer_height = 3u16.saturating_add(directory_height);
+        let [panel_rect, composer_rect, footer_rect] = Layout::vertical([
+            Constraint::Length(panel_height),
+            Constraint::Min(min_composer_height),
+            Constraint::Length(Self::bottom_footer_height()),
+        ])
+        .areas(area);
+        let directory_height = directory_height.min(composer_rect.height.saturating_sub(2));
+        let directory_rect = Rect {
+            x: composer_rect.x.saturating_add(COMPOSER_TEXTAREA_LEFT_INSET),
+            y: composer_rect.y.saturating_add(1),
+            width: composer_rect.width.saturating_sub(
+                COMPOSER_TEXTAREA_LEFT_INSET
+                    .saturating_add(1)
+                    .saturating_add(textarea_right_reserve),
+            ),
+            height: directory_height,
         };
-        let [composer_rect, popup_rect] =
-            Layout::vertical([Constraint::Min(3), popup_constraint]).areas(area);
         let mut textarea_rect = composer_rect.inset(Insets::tlbr(
-            /*top*/ 1,
+            /*top*/ 1u16.saturating_add(directory_height),
             COMPOSER_TEXTAREA_LEFT_INSET,
             /*bottom*/ 1,
             /*right*/ 1u16.saturating_add(textarea_right_reserve),
@@ -776,7 +781,38 @@ impl ChatComposer {
         };
         textarea_rect.y = textarea_rect.y.saturating_add(consumed);
         textarea_rect.height = textarea_rect.height.saturating_sub(consumed);
-        [composer_rect, remote_images_rect, textarea_rect, popup_rect]
+        ComposerLayout {
+            composer_rect,
+            directory_rect,
+            remote_images_rect,
+            textarea_rect,
+            panel_rect,
+            footer_rect,
+        }
+    }
+
+    fn active_panel_height(&self, width: u16, footer_props: &FooterProps) -> u16 {
+        match &self.popups.active {
+            ActivePopup::Command(popup) => popup.calculate_required_height(width),
+            ActivePopup::File(popup) => popup.calculate_required_height(),
+            ActivePopup::Skill(popup) => popup.calculate_required_height(width),
+            ActivePopup::MentionV2(popup) => popup.calculate_required_height(width),
+            ActivePopup::None
+                if footer_props.mode == FooterMode::ShortcutOverlay
+                    && self.custom_footer_height().is_none() =>
+            {
+                footer_height(footer_props)
+            }
+            ActivePopup::None => 0,
+        }
+    }
+
+    fn composer_directory_height(&self) -> u16 {
+        u16::from(self.footer.composer_directory_line.is_some())
+    }
+
+    fn bottom_footer_height() -> u16 {
+        1
     }
 
     fn footer_spacing(footer_hint_height: u16) -> u16 {
@@ -784,6 +820,37 @@ impl ChatComposer {
             0
         } else {
             FOOTER_SPACING_HEIGHT
+        }
+    }
+
+    fn render_popup_surface(area: Rect, buf: &mut Buffer) {
+        if area.is_empty() {
+            return;
+        }
+
+        Clear.render_ref(area, buf);
+        Block::default()
+            .style(user_message_style())
+            .render_ref(area, buf);
+    }
+
+    fn finish_popup_surface(area: Rect, buf: &mut Buffer) {
+        if area.is_empty() {
+            return;
+        }
+
+        let surface_style = user_message_style();
+        for y in area.y..area.bottom() {
+            for x in area.x..area.right() {
+                let style = buf[(x, y)].style().patch(surface_style);
+                buf[(x, y)].set_style(style);
+            }
+        }
+        let border_style = accent_style();
+        for y in area.y..area.bottom() {
+            buf[(area.x, y)]
+                .set_symbol(POPUP_SURFACE_LEFT_BORDER)
+                .set_style(border_style.patch(surface_style));
         }
     }
 
@@ -804,12 +871,11 @@ impl ChatComposer {
             return Some(pos);
         }
 
-        let [_, _, textarea_rect, _] =
-            self.layout_areas_with_textarea_right_reserve(area, textarea_right_reserve);
+        let layout = self.layout_areas_with_textarea_right_reserve(area, textarea_right_reserve);
         let state = *self.draft.textarea_state.borrow();
         self.draft
             .textarea
-            .cursor_pos_with_state(textarea_rect, state)
+            .cursor_pos_with_state(layout.textarea_rect, state)
     }
     /// Returns true if the composer currently contains no user-entered input.
     pub(crate) fn is_empty(&self) -> bool {
@@ -1078,29 +1144,6 @@ impl ChatComposer {
                 "Insert" => "Vim: Insert".green(),
                 _ => unreachable!(),
             })
-    }
-
-    fn mode_indicator_line(&self, show_cycle_hint: bool) -> Option<Line<'static>> {
-        let mut spans: Vec<Span<'static>> = Vec::new();
-        if let Some(vim_mode) = self.vim_mode_indicator_span() {
-            spans.push(vim_mode);
-        }
-        if let Some(indicators) = status_line_right_indicator_line(
-            self.footer.collaboration_mode_indicator,
-            self.footer.goal_status_indicator.as_ref(),
-            self.footer.ide_context_active,
-            show_cycle_hint,
-        ) {
-            if !spans.is_empty() {
-                spans.push(" | ".dim());
-            }
-            spans.extend(indicators.spans);
-        }
-        if spans.is_empty() {
-            None
-        } else {
-            Some(Line::from(spans))
-        }
     }
 
     fn right_footer_line_with_context(&self) -> Line<'static> {
@@ -1660,13 +1703,7 @@ impl ChatComposer {
         if self.handle_shortcut_overlay_key(&key_event) {
             return (InputResult::None, true);
         }
-        if key_event.code == KeyCode::Esc {
-            let next_mode = esc_hint_mode(self.footer.mode, self.is_task_running);
-            if next_mode != self.footer.mode {
-                self.footer.mode = next_mode;
-                return (InputResult::None, true);
-            }
-        } else {
+        if key_event.code != KeyCode::Esc {
             self.footer.mode = reset_mode_after_activity(self.footer.mode);
         }
         let ActivePopup::Command(popup) = &mut self.popups.active else {
@@ -1701,6 +1738,8 @@ impl ChatComposer {
                 code: KeyCode::Esc, ..
             } => {
                 // Dismiss the slash popup; keep the current input untouched.
+                let first_line = self.draft.textarea.text().lines().next().unwrap_or("");
+                self.popups.dismissed_command_line = Some(first_line.to_string());
                 self.popups.active = ActivePopup::None;
                 (InputResult::None, true)
             }
@@ -1929,13 +1968,7 @@ impl ChatComposer {
         if self.handle_shortcut_overlay_key(&key_event) {
             return (InputResult::None, true);
         }
-        if key_event.code == KeyCode::Esc {
-            let next_mode = esc_hint_mode(self.footer.mode, self.is_task_running);
-            if next_mode != self.footer.mode {
-                self.footer.mode = next_mode;
-                return (InputResult::None, true);
-            }
-        } else {
+        if key_event.code != KeyCode::Esc {
             self.footer.mode = reset_mode_after_activity(self.footer.mode);
         }
         let ActivePopup::File(popup) = &mut self.popups.active else {
@@ -3668,12 +3701,14 @@ impl ChatComposer {
                 self.popups.current_file_query = None;
             }
             self.popups.active = ActivePopup::None;
+            self.popups.dismissed_command_line = None;
             self.popups.dismissed_file_token = None;
             self.popups.dismissed_mention_token = None;
             return;
         }
         if !self.popups_enabled() {
             self.popups.active = ActivePopup::None;
+            self.popups.dismissed_command_line = None;
             return;
         }
         let mentions_v2_token = self.current_mentions_v2_token();
@@ -3885,6 +3920,20 @@ impl ChatComposer {
         let text = self.draft.textarea.text();
         let first_line_end = text.find('\n').unwrap_or(text.len());
         let first_line = &text[..first_line_end];
+        if self
+            .popups
+            .dismissed_command_line
+            .as_deref()
+            .is_some_and(|dismissed| dismissed != first_line)
+        {
+            self.popups.dismissed_command_line = None;
+        }
+        if self.popups.dismissed_command_line.as_deref() == Some(first_line) {
+            if matches!(self.popups.active, ActivePopup::Command(_)) {
+                self.popups.active = ActivePopup::None;
+            }
+            return;
+        }
         let cursor = self.draft.textarea.cursor();
         let caret_on_first_line = cursor <= first_line_end;
 
@@ -3905,6 +3954,7 @@ impl ChatComposer {
         match &mut self.popups.active {
             ActivePopup::Command(popup) => {
                 if is_editing_slash_command_name {
+                    self.popups.dismissed_command_line = None;
                     popup.set_skills(skill_mentions);
                     popup.on_composer_text_change(first_line.to_string());
                 } else {
@@ -3913,6 +3963,7 @@ impl ChatComposer {
             }
             _ => {
                 if is_editing_slash_command_name {
+                    self.popups.dismissed_command_line = None;
                     let collaboration_modes_enabled = self.collaboration_modes_enabled;
                     let connectors_enabled = self.connectors_enabled;
                     let plugins_command_enabled = self.plugins_command_enabled;
@@ -4222,6 +4273,24 @@ impl ChatComposer {
         true
     }
 
+    pub(crate) fn set_composer_status_context(
+        &mut self,
+        permissions_line: Option<Line<'static>>,
+        model_line: Option<Line<'static>>,
+        directory_line: Option<Line<'static>>,
+    ) -> bool {
+        if self.footer.composer_permissions_line == permissions_line
+            && self.footer.composer_model_line == model_line
+            && self.footer.composer_directory_line == directory_line
+        {
+            return false;
+        }
+        self.footer.composer_permissions_line = permissions_line;
+        self.footer.composer_model_line = model_line;
+        self.footer.composer_directory_line = directory_line;
+        true
+    }
+
     pub(crate) fn set_status_line_hyperlink(&mut self, url: Option<String>) -> bool {
         if self.footer.status_line_hyperlink_url == url {
             return false;
@@ -4374,11 +4443,6 @@ impl ChatComposer {
         textarea_right_reserve: u16,
     ) -> u16 {
         let footer_props = self.footer_props();
-        let footer_hint_height = self
-            .custom_footer_height()
-            .unwrap_or_else(|| footer_height(&footer_props));
-        let footer_spacing = Self::footer_spacing(footer_hint_height);
-        let footer_total_height = footer_hint_height + footer_spacing;
         const COLS_WITH_MARGIN: u16 = COMPOSER_TEXTAREA_LEFT_INSET + 1;
         let inner_width =
             width.saturating_sub(COLS_WITH_MARGIN.saturating_add(textarea_right_reserve));
@@ -4393,17 +4457,181 @@ impl ChatComposer {
             + remote_images_height
             + remote_images_separator
             + 2
-            + match &self.popups.active {
-                ActivePopup::None => footer_total_height,
-                ActivePopup::Command(c) => c.calculate_required_height(width),
-                ActivePopup::File(c) => c.calculate_required_height(),
-                ActivePopup::Skill(c) => c.calculate_required_height(width),
-                ActivePopup::MentionV2(c) => c.calculate_required_height(width),
-            }
+            + self.composer_directory_height()
+            + self.active_panel_height(width, &footer_props)
+            + Self::bottom_footer_height()
     }
 }
 
 impl ChatComposer {
+    fn normal_footer_help_line(&self) -> Line<'static> {
+        Line::from(vec![
+            key_hint::plain(KeyCode::Char('?')).into(),
+            " help".dim(),
+            " · ".dim(),
+            key_hint::plain(KeyCode::Char('/')).into(),
+            " commands and skills".dim(),
+        ])
+    }
+
+    fn selection_footer_help_line() -> Line<'static> {
+        Line::from(vec![
+            "↑/↓".bold(),
+            " Navigate".dim(),
+            " · ".dim(),
+            key_hint::plain(KeyCode::Enter).into(),
+            " Select".dim(),
+            " · ".dim(),
+            key_hint::plain(KeyCode::Tab).into(),
+            " Complete".dim(),
+            " · ".dim(),
+            key_hint::plain(KeyCode::Esc).into(),
+            " to cancel".dim(),
+        ])
+    }
+
+    fn footer_right_line(&self) -> Option<Line<'static>> {
+        let mut line = if let Some(label) = self.footer.side_conversation_context_label.as_ref() {
+            Some(side_conversation_context_line(label))
+        } else {
+            self.shell_mode_footer_line()
+        };
+
+        if let Some(permissions_line) = self.footer.composer_permissions_line.as_ref() {
+            if let Some(existing) = line.as_mut() {
+                existing.spans.push(" · ".dim());
+                existing.spans.extend(permissions_line.spans.clone());
+            } else {
+                line = Some(permissions_line.clone());
+            }
+        }
+
+        if let Some(model_line) = self.footer.composer_model_line.as_ref() {
+            if let Some(existing) = line.as_mut() {
+                existing.spans.push(" · ".dim());
+                existing.spans.extend(model_line.spans.clone());
+            } else {
+                line = Some(model_line.clone());
+            }
+        }
+
+        if line.is_some() {
+            line
+        } else if self.footer.status_line_enabled {
+            Some(
+                self.footer
+                    .status_line_value
+                    .clone()
+                    .unwrap_or_else(|| self.right_footer_line_with_context()),
+            )
+        } else {
+            Some(self.right_footer_line_with_context())
+        }
+    }
+
+    fn panel_open(&self, footer_props: &FooterProps) -> bool {
+        self.popups.active() || footer_props.mode == FooterMode::ShortcutOverlay
+    }
+
+    fn render_footer_line_with_right(
+        &self,
+        area: Rect,
+        buf: &mut Buffer,
+        line: Line<'static>,
+        right_line: Option<&Line<'static>>,
+    ) {
+        let line = if let Some(right_line) = right_line {
+            max_left_width_for_right(area, right_line.width() as u16)
+                .map(|max_width| {
+                    truncate_line_with_ellipsis_if_overflow(line.clone(), max_width as usize)
+                })
+                .unwrap_or(line)
+        } else {
+            line
+        };
+        render_footer_line(area, buf, line);
+    }
+
+    fn render_bottom_footer(&self, area: Rect, buf: &mut Buffer, footer_props: &FooterProps) {
+        if area.is_empty() {
+            return;
+        }
+
+        Clear.render_ref(area, buf);
+        let right_line = if self.panel_open(footer_props) {
+            None
+        } else {
+            self.footer_right_line()
+        };
+        if let Some(line) = self.history_search_footer_line() {
+            self.render_footer_line_with_right(area, buf, line, right_line.as_ref());
+        } else if self.footer.plan_mode_nudge_visible {
+            self.render_footer_line_with_right(
+                area,
+                buf,
+                plan_mode_nudge_line(),
+                right_line.as_ref(),
+            );
+        } else if self.footer.flash_visible() {
+            if let Some(flash) = self.footer.flash.as_ref() {
+                self.render_footer_line_with_right(
+                    area,
+                    buf,
+                    flash.line.clone(),
+                    right_line.as_ref(),
+                );
+            }
+        } else if let Some(items) = self.footer.hint_override.as_ref() {
+            render_footer_hint_items(area, buf, items);
+        } else if self.popups.active() {
+            self.render_footer_line_with_right(
+                area,
+                buf,
+                Self::selection_footer_help_line(),
+                right_line.as_ref(),
+            );
+        } else if footer_props.mode == FooterMode::ComposerHasDraft && footer_props.is_task_running
+        {
+            render_footer_from_props(
+                area,
+                buf,
+                footer_props,
+                self.footer.collaboration_mode_indicator,
+                /*show_cycle_hint*/ false,
+                /*show_shortcuts_hint*/ false,
+                /*show_queue_hint*/ true,
+            );
+        } else if matches!(
+            footer_props.mode,
+            FooterMode::QuitShortcutReminder | FooterMode::EscHint
+        ) {
+            render_footer_from_props(
+                area,
+                buf,
+                footer_props,
+                self.footer.collaboration_mode_indicator,
+                /*show_cycle_hint*/ false,
+                /*show_shortcuts_hint*/ false,
+                /*show_queue_hint*/ false,
+            );
+        } else {
+            self.render_footer_line_with_right(
+                area,
+                buf,
+                self.normal_footer_help_line(),
+                right_line.as_ref(),
+            );
+        }
+
+        if let Some(line) = &right_line {
+            render_context_right(area, buf, line);
+        }
+
+        if let Some(url) = self.footer.status_line_hyperlink_url.as_deref() {
+            mark_underlined_hyperlink(buf, area, url);
+        }
+    }
+
     pub(crate) fn render_with_mask(&self, area: Rect, buf: &mut Buffer, mask_char: Option<char>) {
         self.render_with_mask_and_textarea_right_reserve(
             area, buf, mask_char, /*textarea_right_reserve*/ 0,
@@ -4417,261 +4645,63 @@ impl ChatComposer {
         mask_char: Option<char>,
         textarea_right_reserve: u16,
     ) {
-        let [composer_rect, remote_images_rect, textarea_rect, popup_rect] =
-            self.layout_areas_with_textarea_right_reserve(area, textarea_right_reserve);
+        let layout = self.layout_areas_with_textarea_right_reserve(area, textarea_right_reserve);
+        let footer_props = self.footer_props();
         match &self.popups.active {
             ActivePopup::Command(popup) => {
-                popup.render_ref(popup_rect, buf);
+                Self::render_popup_surface(layout.panel_rect, buf);
+                popup.render_ref(layout.panel_rect, buf);
+                Self::finish_popup_surface(layout.panel_rect, buf);
             }
             ActivePopup::File(popup) => {
-                popup.render_ref(popup_rect, buf);
+                Self::render_popup_surface(layout.panel_rect, buf);
+                popup.render_ref(layout.panel_rect, buf);
+                Self::finish_popup_surface(layout.panel_rect, buf);
             }
             ActivePopup::Skill(popup) => {
-                popup.render_ref(popup_rect, buf);
+                Self::render_popup_surface(layout.panel_rect, buf);
+                popup.render_ref(layout.panel_rect, buf);
+                Self::finish_popup_surface(layout.panel_rect, buf);
             }
             ActivePopup::MentionV2(popup) => {
-                popup.render_ref(popup_rect, buf);
+                Self::render_popup_surface(layout.panel_rect, buf);
+                popup.render_ref(layout.panel_rect, buf);
+                Self::finish_popup_surface(layout.panel_rect, buf);
             }
             ActivePopup::None => {
-                let footer_props = self.footer_props();
-                let show_cycle_hint = !footer_props.is_task_running
-                    && self.footer.collaboration_mode_indicator.is_some();
-                let show_shortcuts_hint = match footer_props.mode {
-                    FooterMode::ComposerEmpty => !self.is_in_paste_burst(),
-                    FooterMode::ComposerHasDraft => false,
-                    FooterMode::HistorySearch
-                    | FooterMode::QuitShortcutReminder
-                    | FooterMode::ShortcutOverlay
-                    | FooterMode::EscHint => false,
-                };
-                let show_queue_hint = match footer_props.mode {
-                    FooterMode::ComposerHasDraft => footer_props.is_task_running,
-                    FooterMode::HistorySearch
-                    | FooterMode::QuitShortcutReminder
-                    | FooterMode::ComposerEmpty
-                    | FooterMode::ShortcutOverlay
-                    | FooterMode::EscHint => false,
-                };
-                let custom_height = self.custom_footer_height();
-                let footer_hint_height =
-                    custom_height.unwrap_or_else(|| footer_height(&footer_props));
-                let footer_spacing = Self::footer_spacing(footer_hint_height);
-                let hint_rect = if footer_spacing > 0 && footer_hint_height > 0 {
-                    let [_, hint_rect] = Layout::vertical([
-                        Constraint::Length(footer_spacing),
-                        Constraint::Length(footer_hint_height),
-                    ])
-                    .areas(popup_rect);
-                    hint_rect
-                } else {
-                    popup_rect
-                };
-                if let Some(line) = self.history_search_footer_line() {
-                    render_footer_line(hint_rect, buf, line);
-                } else if self.footer.plan_mode_nudge_visible {
-                    let available_width =
-                        hint_rect.width.saturating_sub(FOOTER_INDENT_COLS as u16) as usize;
-                    render_footer_line(
-                        hint_rect,
+                if footer_props.mode == FooterMode::ShortcutOverlay
+                    && self.custom_footer_height().is_none()
+                {
+                    Self::render_popup_surface(layout.panel_rect, buf);
+                    render_footer_from_props(
+                        layout.panel_rect,
                         buf,
-                        truncate_line_with_ellipsis_if_overflow(
-                            plan_mode_nudge_line(),
-                            available_width,
-                        ),
+                        &footer_props,
+                        /*collaboration_mode_indicator*/ None,
+                        /*show_cycle_hint*/ false,
+                        /*show_shortcuts_hint*/ false,
+                        /*show_queue_hint*/ false,
                     );
-                } else {
-                    let available_width =
-                        hint_rect.width.saturating_sub(FOOTER_INDENT_COLS as u16) as usize;
-                    let status_line_active = uses_passive_footer_status_layout(&footer_props);
-                    let combined_status_line = if status_line_active {
-                        passive_footer_status_line(&footer_props)
-                    } else {
-                        None
-                    };
-                    let mut truncated_status_line = if status_line_active {
-                        combined_status_line.as_ref().map(|line| {
-                            truncate_line_with_ellipsis_if_overflow(line.clone(), available_width)
-                        })
-                    } else {
-                        None
-                    };
-                    let left_mode_indicator = if status_line_active {
-                        None
-                    } else {
-                        self.footer.collaboration_mode_indicator
-                    };
-                    let active_footer_hint_override = self.footer.hint_override.as_ref();
-                    let mut left_width = if self.footer.flash_visible() {
-                        self.footer
-                            .flash
-                            .as_ref()
-                            .map(|flash| flash.line.width() as u16)
-                            .unwrap_or(0)
-                    } else if let Some(items) = active_footer_hint_override {
-                        footer_hint_items_width(items)
-                    } else if status_line_active {
-                        truncated_status_line
-                            .as_ref()
-                            .map(|line| line.width() as u16)
-                            .unwrap_or(0)
-                    } else {
-                        footer_line_width(
-                            &footer_props,
-                            left_mode_indicator,
-                            show_cycle_hint,
-                            show_shortcuts_hint,
-                            show_queue_hint,
-                        )
-                    };
-                    let right_line =
-                        if let Some(label) = self.footer.side_conversation_context_label.as_ref() {
-                            Some(side_conversation_context_line(label))
-                        } else if let Some(line) = self.shell_mode_footer_line() {
-                            Some(line)
-                        } else if status_line_active {
-                            let full = self.mode_indicator_line(show_cycle_hint);
-                            let compact = self.mode_indicator_line(/*show_cycle_hint*/ false);
-                            let full_width = full.as_ref().map(|l| l.width() as u16).unwrap_or(0);
-                            if can_show_left_with_context(hint_rect, left_width, full_width) {
-                                full
-                            } else {
-                                compact
-                            }
-                        } else {
-                            Some(self.right_footer_line_with_context())
-                        };
-                    let right_width = right_line.as_ref().map(|l| l.width() as u16).unwrap_or(0);
-                    if status_line_active
-                        && let Some(max_left) = max_left_width_for_right(hint_rect, right_width)
-                        && left_width > max_left
-                        && let Some(line) = combined_status_line.as_ref().map(|line| {
-                            truncate_line_with_ellipsis_if_overflow(line.clone(), max_left as usize)
-                        })
-                    {
-                        left_width = line.width() as u16;
-                        truncated_status_line = Some(line);
-                    }
-                    let can_show_left_and_context =
-                        can_show_left_with_context(hint_rect, left_width, right_width);
-                    let has_override =
-                        self.footer.flash_visible() || active_footer_hint_override.is_some();
-                    let single_line_layout = if has_override || status_line_active {
-                        None
-                    } else {
-                        match footer_props.mode {
-                            FooterMode::ComposerEmpty | FooterMode::ComposerHasDraft => {
-                                // Both of these modes render the single-line footer style (with
-                                // either the shortcuts hint or the optional queue hint). We still
-                                // want the single-line collapse rules so the mode label can win over
-                                // the context indicator on narrow widths.
-                                Some(single_line_footer_layout(
-                                    hint_rect,
-                                    right_width,
-                                    left_mode_indicator,
-                                    show_cycle_hint,
-                                    show_shortcuts_hint,
-                                    show_queue_hint,
-                                    footer_props.key_hints,
-                                ))
-                            }
-                            FooterMode::EscHint
-                            | FooterMode::HistorySearch
-                            | FooterMode::QuitShortcutReminder
-                            | FooterMode::ShortcutOverlay => None,
-                        }
-                    };
-                    let show_right = if matches!(
-                        footer_props.mode,
-                        FooterMode::EscHint
-                            | FooterMode::HistorySearch
-                            | FooterMode::QuitShortcutReminder
-                            | FooterMode::ShortcutOverlay
-                    ) {
-                        false
-                    } else {
-                        single_line_layout
-                            .as_ref()
-                            .map(|(_, show_context)| *show_context)
-                            .unwrap_or(can_show_left_and_context)
-                    };
-
-                    if let Some((summary_left, _)) = single_line_layout {
-                        match summary_left {
-                            SummaryLeft::Default => {
-                                if status_line_active {
-                                    if let Some(line) = truncated_status_line.clone() {
-                                        render_footer_line(hint_rect, buf, line);
-                                    } else {
-                                        render_footer_from_props(
-                                            hint_rect,
-                                            buf,
-                                            &footer_props,
-                                            left_mode_indicator,
-                                            show_cycle_hint,
-                                            show_shortcuts_hint,
-                                            show_queue_hint,
-                                        );
-                                    }
-                                } else {
-                                    render_footer_from_props(
-                                        hint_rect,
-                                        buf,
-                                        &footer_props,
-                                        left_mode_indicator,
-                                        show_cycle_hint,
-                                        show_shortcuts_hint,
-                                        show_queue_hint,
-                                    );
-                                }
-                            }
-                            SummaryLeft::Custom(line) => {
-                                render_footer_line(hint_rect, buf, line);
-                            }
-                            SummaryLeft::None => {}
-                        }
-                    } else if self.footer.flash_visible() {
-                        if let Some(flash) = self.footer.flash.as_ref() {
-                            flash.line.render(inset_footer_hint_area(hint_rect), buf);
-                        }
-                    } else if let Some(items) = active_footer_hint_override {
-                        render_footer_hint_items(hint_rect, buf, items);
-                    } else if status_line_active {
-                        if let Some(line) = truncated_status_line {
-                            render_footer_line(hint_rect, buf, line);
-                        }
-                    } else {
-                        render_footer_from_props(
-                            hint_rect,
-                            buf,
-                            &footer_props,
-                            self.footer.collaboration_mode_indicator,
-                            show_cycle_hint,
-                            show_shortcuts_hint,
-                            show_queue_hint,
-                        );
-                    }
-                    if show_right && let Some(line) = &right_line {
-                        render_context_right(hint_rect, buf, line);
-                    }
-                    if status_line_active
-                        && let Some(url) = self.footer.status_line_hyperlink_url.as_deref()
-                    {
-                        mark_underlined_hyperlink(buf, hint_rect, url);
-                    }
+                    Self::finish_popup_surface(layout.panel_rect, buf);
                 }
             }
         }
-        Clear.render_ref(composer_rect, buf);
+        Clear.render_ref(layout.composer_rect, buf);
         Block::default()
             .borders(Borders::TOP | Borders::BOTTOM)
             .border_type(BorderType::Rounded)
             .border_style(Style::default().dim())
-            .render_ref(composer_rect, buf);
-        if !remote_images_rect.is_empty() {
-            Paragraph::new(self.attachments.remote_image_lines())
-                .render_ref(remote_images_rect, buf);
+            .render_ref(layout.composer_rect, buf);
+        if !layout.directory_rect.is_empty()
+            && let Some(line) = self.footer.composer_directory_line.as_ref()
+        {
+            line.clone().render_ref(layout.directory_rect, buf);
         }
-        if !textarea_rect.is_empty() {
+        if !layout.remote_images_rect.is_empty() {
+            Paragraph::new(self.attachments.remote_image_lines())
+                .render_ref(layout.remote_images_rect, buf);
+        }
+        if !layout.textarea_rect.is_empty() {
             let prompt = if self.draft.input_enabled {
                 if self.draft.is_bash_mode {
                     Span::from("!").light_red().bold()
@@ -4682,10 +4712,10 @@ impl ChatComposer {
                 "›".dim()
             };
             buf.set_span(
-                textarea_rect.x - LIVE_PREFIX_COLS,
-                textarea_rect.y,
+                layout.textarea_rect.x - LIVE_PREFIX_COLS,
+                layout.textarea_rect.y,
                 &prompt,
-                textarea_rect.width,
+                layout.textarea_rect.width,
             );
         }
 
@@ -4693,15 +4723,18 @@ impl ChatComposer {
         let textarea_is_empty = self.draft.textarea.text().is_empty() && !self.draft.is_bash_mode;
         if self.draft.input_enabled {
             if let Some(mask_char) = mask_char {
-                self.draft
-                    .textarea
-                    .render_ref_masked(textarea_rect, buf, &mut state, mask_char);
+                self.draft.textarea.render_ref_masked(
+                    layout.textarea_rect,
+                    buf,
+                    &mut state,
+                    mask_char,
+                );
             } else {
                 let highlight_ranges = self.history_search_highlight_ranges();
                 if highlight_ranges.is_empty() {
                     StatefulWidgetRef::render_ref(
                         &(&self.draft.textarea),
-                        textarea_rect,
+                        layout.textarea_rect,
                         buf,
                         &mut state,
                     );
@@ -4713,7 +4746,7 @@ impl ChatComposer {
                         .map(|range| (range, highlight_style))
                         .collect::<Vec<_>>();
                     self.draft.textarea.render_ref_styled_with_highlights(
-                        textarea_rect,
+                        layout.textarea_rect,
                         buf,
                         &mut state,
                         Style::default(),
@@ -4732,12 +4765,13 @@ impl ChatComposer {
                     .unwrap_or("Input disabled.")
                     .to_string()
             };
-            if !textarea_rect.is_empty() {
+            if !layout.textarea_rect.is_empty() {
                 let placeholder = Span::from(text).dim();
                 Line::from(vec![placeholder])
-                    .render_ref(textarea_rect.inner(Margin::new(0, 0)), buf);
+                    .render_ref(layout.textarea_rect.inner(Margin::new(0, 0)), buf);
             }
         }
+        self.render_bottom_footer(layout.footer_rect, buf, &footer_props);
     }
 }
 
@@ -4790,7 +4824,7 @@ mod tests {
         let mut hint_row: Option<(u16, String)> = None;
         for y in 0..area.height {
             let row = row_to_string(y);
-            if row.contains("? for shortcuts") {
+            if row.contains("? help") {
                 hint_row = Some((y, row));
                 break;
             }
@@ -4809,11 +4843,11 @@ mod tests {
             "expected a spacing row above the footer hints",
         );
 
-        let spacing_row = row_to_string(hint_row_idx - 1);
+        let separator_row = row_to_string(hint_row_idx - 1);
         assert_eq!(
-            spacing_row.trim(),
+            separator_row.trim_matches('─').trim(),
             "",
-            "expected blank spacing row above hints but saw: {spacing_row:?}",
+            "expected composer border above hints but saw: {separator_row:?}",
         );
     }
 
@@ -10340,6 +10374,34 @@ mod tests {
         assert!(
             matches!(composer.popups.active, ActivePopup::None),
             "'/zzz' should not activate slash popup because it is not a prefix of any built-in command"
+        );
+    }
+
+    #[test]
+    fn esc_dismisses_file_popup_on_first_press() {
+        let (tx, _rx) = unbounded_channel::<AppEvent>();
+        let sender = AppEventSender::new(tx);
+        let mut composer = ChatComposer::new(
+            /*has_input_focus*/ true,
+            sender,
+            /*enhanced_keys_supported*/ false,
+            "Ask Firefam to do anything".to_string(),
+            /*disable_paste_burst*/ false,
+        );
+
+        type_chars_humanlike(&mut composer, &['@']);
+        assert!(
+            composer.popup_active(),
+            "expected file popup after typing @"
+        );
+
+        let (_result, handled) =
+            composer.handle_key_event(KeyEvent::new(KeyCode::Esc, KeyModifiers::NONE));
+
+        assert!(handled);
+        assert!(
+            !composer.popup_active(),
+            "expected Esc to dismiss file popup"
         );
     }
 

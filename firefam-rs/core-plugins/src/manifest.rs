@@ -450,12 +450,12 @@ mod tests {
     const ALTERNATE_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".claude-plugin/plugin.json";
 
     fn write_manifest(plugin_root: &Path, version: Option<&str>, interface: &str) {
-        fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create manifest dir");
+        fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create manifest dir");
         let version = version
             .map(|version| format!("  \"version\": \"{version}\",\n"))
             .unwrap_or_default();
         fs::write(
-            plugin_root.join(".firefam-plugin/plugin.json"),
+            plugin_root.join(".agents-plugin/plugin.json"),
             format!(
                 r#"{{
   "name": "demo-plugin",
@@ -577,9 +577,9 @@ mod tests {
     fn plugin_manifest_reads_keywords() {
         let tmp = tempdir().expect("tempdir");
         let plugin_root = tmp.path().join("demo-plugin");
-        fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create manifest dir");
+        fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create manifest dir");
         fs::write(
-            plugin_root.join(".firefam-plugin/plugin.json"),
+            plugin_root.join(".agents-plugin/plugin.json"),
             r#"{
   "name": "demo-plugin",
   "keywords": ["api-key", "developer tools"]

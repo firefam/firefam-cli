@@ -42,6 +42,52 @@ impl ChatWidget {
         );
         RenderableItem::Owned(Box::new(flex))
     }
+
+    pub(crate) fn bottom_pane_desired_height(&self, width: u16) -> u16 {
+        self.bottom_pane.desired_height_with_composer_right_reserve(
+            width,
+            self.ambient_pet_wrap_reserved_cols(),
+        )
+    }
+
+    pub(crate) fn render_bottom_pane(&self, area: Rect, buf: &mut Buffer) {
+        self.bottom_pane.render_with_composer_right_reserve(
+            area,
+            buf,
+            self.ambient_pet_wrap_reserved_cols(),
+        );
+        self.last_rendered_width.set(Some(area.width as usize));
+    }
+
+    pub(crate) fn bottom_pane_cursor_pos(&self, area: Rect) -> Option<(u16, u16)> {
+        self.bottom_pane
+            .cursor_pos_with_composer_right_reserve(area, self.ambient_pet_wrap_reserved_cols())
+    }
+
+    pub(crate) fn bottom_pane_cursor_style(&self, area: Rect) -> crossterm::cursor::SetCursorStyle {
+        self.bottom_pane
+            .cursor_style_with_composer_right_reserve(area, self.ambient_pet_wrap_reserved_cols())
+    }
+
+    pub(crate) fn visible_active_cell_transcript_lines(&self, width: u16) -> Vec<Line<'static>> {
+        let mut lines = Vec::new();
+        if let Some(cell) = self.transcript.active_cell.as_ref()
+            && (self.work_log_visible || !cell.is_work_log())
+        {
+            lines.extend(cell.transcript_lines(width));
+        }
+        if let Some(hook_cell) = self.active_hook_cell.as_ref()
+            && hook_cell.should_render()
+            && (self.work_log_visible || !hook_cell.is_work_log())
+        {
+            let hook_lines = hook_cell.transcript_lines(width);
+            if !hook_lines.is_empty() && !lines.is_empty() {
+                lines.push("".into());
+            }
+            lines.extend(hook_lines);
+        }
+        lines
+    }
 }
 
 struct BottomPaneComposerReserveRenderable<'a> {

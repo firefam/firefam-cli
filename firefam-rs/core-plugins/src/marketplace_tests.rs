@@ -150,7 +150,7 @@ fn find_marketplace_plugin_supports_git_subdir_sources() {
             plugin_id: PluginId::new("remote-plugin".to_string(), "firefam-curated".to_string())
                 .unwrap(),
             source: MarketplacePluginSource::Git {
-                url: "https://github.com/openai/joey_marketplace3.git".to_string(),
+                url: "https://github.com/firefamai/joey_marketplace3.git".to_string(),
                 path: Some("plugins/toolkit".to_string()),
                 ref_name: Some("main".to_string()),
                 sha: Some("abc123".to_string()),
@@ -199,7 +199,7 @@ fn find_marketplace_plugin_normalizes_github_shorthand_with_dot_git_suffix() {
     assert_eq!(
         resolved.source,
         MarketplacePluginSource::Git {
-            url: "https://github.com/openai/toolkit.git".to_string(),
+            url: "https://github.com/firefamai/toolkit.git".to_string(),
             path: Some("plugins/toolkit".to_string()),
             ref_name: None,
             sha: None,
@@ -1161,7 +1161,7 @@ fn list_marketplaces_resolves_plugin_interface_paths_to_absolute() {
     let plugin_root = repo_root.join("plugins/demo-plugin");
     fs::create_dir_all(repo_root.join(".git")).unwrap();
     fs::create_dir_all(repo_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         repo_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -1185,7 +1185,7 @@ fn list_marketplaces_resolves_plugin_interface_paths_to_absolute() {
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "demo-plugin",
   "interface": {
@@ -1296,7 +1296,7 @@ fn list_marketplaces_ignores_plugin_interface_assets_without_dot_slash() {
 
     fs::create_dir_all(repo_root.join(".git")).unwrap();
     fs::create_dir_all(repo_root.join(".agents/plugins")).unwrap();
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
         repo_root.join(".agents/plugins/marketplace.json"),
         r#"{
@@ -1314,7 +1314,7 @@ fn list_marketplaces_ignores_plugin_interface_assets_without_dot_slash() {
     )
     .unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{
   "name": "demo-plugin",
   "interface": {

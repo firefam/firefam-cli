@@ -1139,7 +1139,7 @@ fn mcp_inventory_loading_without_animations_is_stable() {
     let second = render_lines(&cell.display_lines(/*width*/ 80));
 
     assert_eq!(first, second);
-    assert_eq!(first, vec!["• Loading MCP inventory…".to_string()]);
+    assert_eq!(first, vec!["● Loading MCP inventory…".to_string()]);
 }
 
 #[test]
@@ -1973,7 +1973,7 @@ fn user_history_cell_trims_trailing_blank_message_lines() {
         .rev()
         .take_while(|line| line.trim().is_empty())
         .count();
-    assert_eq!(trailing_blank_count, 1);
+    assert_eq!(trailing_blank_count, 0);
     assert!(rendered.iter().any(|line| line.contains("line one")));
 }
 
@@ -1996,7 +1996,7 @@ fn user_history_cell_trims_trailing_blank_message_lines_with_text_elements() {
         .rev()
         .take_while(|line| line.trim().is_empty())
         .count();
-    assert_eq!(trailing_blank_count, 1);
+    assert_eq!(trailing_blank_count, 0);
     assert!(rendered.iter().any(|line| line.contains("tokenized")));
 }
 
@@ -2288,7 +2288,7 @@ fn agent_markdown_cell_renders_source_at_different_widths() {
 
     let lines_80 = render_lines(&cell.display_lines(/*width*/ 80));
     assert!(
-        lines_80.first().is_some_and(|line| line.starts_with("• ")),
+        lines_80.first().is_some_and(|line| line.starts_with("● ")),
         "first line should start with bullet prefix: {:?}",
         lines_80[0]
     );
@@ -2322,7 +2322,10 @@ fn agent_markdown_cell_narrow_width_shows_prefix_only() {
     let cell = AgentMarkdownCell::new(source.to_string(), &test_cwd());
 
     let lines = render_lines(&cell.display_lines(/*width*/ 2));
-    assert_eq!(lines, vec!["• ".to_string()]);
+    assert_eq!(
+        lines,
+        vec!["● ".to_string(), "".to_string(), "".to_string()]
+    );
 }
 
 #[test]

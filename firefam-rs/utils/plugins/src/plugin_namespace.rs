@@ -5,8 +5,17 @@ use firefam_utils_absolute_path::AbsolutePathBuf;
 use std::path::Path;
 use std::path::PathBuf;
 
-const DISCOVERABLE_PLUGIN_MANIFEST_PATHS: &[&str] =
-    &[".firefam-plugin/plugin.json", ".claude-plugin/plugin.json"];
+pub const CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".agents-plugin/plugin.json";
+
+const DISCOVERABLE_PLUGIN_MANIFEST_PATHS: &[&str] = &[
+    CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH,
+    ".claude-plugin/plugin.json",
+    ".codex-plugin/plugin.json",
+];
+
+pub fn canonical_plugin_manifest_path(plugin_root: &Path) -> PathBuf {
+    plugin_root.join(CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH)
+}
 
 pub fn find_plugin_manifest_path(plugin_root: &Path) -> Option<PathBuf> {
     DISCOVERABLE_PLUGIN_MANIFEST_PATHS
@@ -69,6 +78,7 @@ pub async fn plugin_namespace_for_skill_path(
 
 #[cfg(test)]
 mod tests {
+    use super::CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH;
     use super::find_plugin_manifest_path;
     use super::plugin_namespace_for_skill_path;
     use firefam_exec_server::LOCAL_FS;
@@ -76,7 +86,8 @@ mod tests {
     use std::fs;
     use tempfile::tempdir;
 
-    const ALTERNATE_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".claude-plugin/plugin.json";
+    const CLAUDE_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".claude-plugin/plugin.json";
+    const CODEX_PLUGIN_MANIFEST_RELATIVE_PATH: &str = ".codex-plugin/plugin.json";
 
     #[tokio::test]
     async fn uses_manifest_name() {
@@ -85,12 +96,11 @@ mod tests {
         let skill_path = plugin_root.join("skills/search/SKILL.md");
 
         fs::create_dir_all(skill_path.parent().expect("parent")).expect("mkdir");
-        fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("mkdir manifest");
-        fs::write(
-            plugin_root.join(".firefam-plugin/plugin.json"),
-            r#"{"name":"sample"}"#,
-        )
-        .expect("write manifest");
+        let manifest_path = plugin_root.join(CANONICAL_PLUGIN_MANIFEST_RELATIVE_PATH);
+
+        fs::create_dir_all(manifest_path.parent().expect("manifest parent"))
+            .expect("mkdir manifest");
+        fs::write(&manifest_path, r#"{"name":"sample"}"#).expect("write manifest");
         fs::write(&skill_path, "---\ndescription: search\n---\n").expect("write skill");
 
         assert_eq!(
@@ -104,7 +114,27 @@ mod tests {
         let tmp = tempdir().expect("tempdir");
         let plugin_root = tmp.path().join("plugins/sample");
         let skill_path = plugin_root.join("skills/search/SKILL.md");
-        let manifest_path = plugin_root.join(ALTERNATE_PLUGIN_MANIFEST_RELATIVE_PATH);
+        let manifest_path = plugin_root.join(CLAUDE_PLUGIN_MANIFEST_RELATIVE_PATH);
+
+        fs::create_dir_all(skill_path.parent().expect("parent")).expect("mkdir");
+        fs::create_dir_all(manifest_path.parent().expect("manifest parent"))
+            .expect("mkdir manifest");
+        fs::write(&manifest_path, r#"{"name":"sample"}"#).expect("write manifest");
+        fs::write(&skill_path, "---\ndescription: search\n---\n").expect("write skill");
+
+        assert_eq!(
+            plugin_namespace_for_skill_path(LOCAL_FS.as_ref(), &skill_path.abs()).await,
+            Some("sample".to_string())
+        );
+        assert_eq!(find_plugin_manifest_path(&plugin_root), Some(manifest_path));
+    }
+
+    #[tokio::test]
+    async fn uses_name_from_codex_plugin_manifest_path() {
+        let tmp = tempdir().expect("tempdir");
+        let plugin_root = tmp.path().join("plugins/sample");
+        let skill_path = plugin_root.join("skills/search/SKILL.md");
+        let manifest_path = plugin_root.join(CODEX_PLUGIN_MANIFEST_RELATIVE_PATH);
 
         fs::create_dir_all(skill_path.parent().expect("parent")).expect("mkdir");
         fs::create_dir_all(manifest_path.parent().expect("manifest parent"))

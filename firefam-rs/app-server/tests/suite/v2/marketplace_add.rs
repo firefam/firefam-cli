@@ -18,13 +18,13 @@ async fn marketplace_add_local_directory_source() -> Result<()> {
     let firefam_home = TempDir::new()?;
     let source = firefam_home.path().join("marketplace");
     std::fs::create_dir_all(source.join(".agents/plugins"))?;
-    std::fs::create_dir_all(source.join("plugins/sample/.firefam-plugin"))?;
+    std::fs::create_dir_all(source.join("plugins/sample/.agents-plugin"))?;
     std::fs::write(
         source.join(".agents/plugins/marketplace.json"),
         r#"{"name":"debug","plugins":[]}"#,
     )?;
     std::fs::write(
-        source.join("plugins/sample/.firefam-plugin/plugin.json"),
+        source.join("plugins/sample/.agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )?;
     std::fs::write(source.join("plugins/sample/marker.txt"), "local ref")?;

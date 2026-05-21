@@ -40,12 +40,12 @@ use crate::test_support::test_path_buf;
 use crate::text_formatting::format_and_truncate_tool_result;
 use crate::text_formatting::truncate_text;
 use crate::tooltips;
-use crate::ui_consts::LIVE_PREFIX_COLS;
 use crate::update_action::UpdateAction;
 use crate::version::FIREFAM_CLI_VERSION;
 use crate::wrapping::RtOptions;
 use crate::wrapping::adaptive_wrap_line;
 use crate::wrapping::adaptive_wrap_lines;
+use crate::wrapping::word_wrap_lines;
 use base64::Engine;
 use firefam_app_server_protocol::AskForApproval;
 use firefam_app_server_protocol::McpAuthStatus;
@@ -192,6 +192,10 @@ pub(crate) trait HistoryCell: std::fmt::Debug + Send + Sync + Any {
             HistoryRenderMode::Rich => self.display_lines(width),
             HistoryRenderMode::Raw => self.raw_lines(),
         }
+    }
+
+    fn suppress_display_separator_before(&self) -> bool {
+        false
     }
 
     /// Returns the number of viewport rows needed to render this cell.

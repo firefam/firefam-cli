@@ -29,16 +29,16 @@ expression: normalize_snapshot_paths(term.backend().vt100().screen().contents())
 
 
 
-• I’m going to search the repo for where “Change Approved” is rendered to update
+
+
+
+
+● I’m going to search the repo for where “Change Approved” is rendered to update
   that view.
+● Investigating rendering code (0s • esc to interrupt)
 
-• Explored
-  └ Search Change Approved
-    Read diff_render.rs
-
-• Investigating rendering code (0s • esc to interrupt)
-
-
+────────────────────────────────────────────────────────────────────────────────
+  /tmp/project
 › Summarize recent commits
-
-  tab to queue message                                       100% context left
+────────────────────────────────────────────────────────────────────────────────
+  tab to queue message                             Read Only · gpt-5.5 default

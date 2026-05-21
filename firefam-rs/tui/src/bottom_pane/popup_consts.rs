@@ -15,21 +15,30 @@ pub(crate) const MAX_POPUP_ROWS: usize = 8;
 /// Standard footer hint text used by popups.
 pub(crate) fn standard_popup_hint_line() -> Line<'static> {
     Line::from(vec![
-        "Press ".into(),
+        "↑/↓ Navigate · ".into(),
         key_hint::plain(KeyCode::Enter).into(),
-        " to confirm or ".into(),
+        " Select · ".into(),
+        key_hint::plain(KeyCode::Tab).into(),
+        " Complete · ".into(),
         key_hint::plain(KeyCode::Esc).into(),
-        " to go back".into(),
+        " to cancel".into(),
     ])
 }
 
 pub(crate) fn standard_popup_hint_line_for_keymap(list_keymap: &ListKeymap) -> Line<'static> {
-    accept_cancel_hint_line(
-        primary_binding(&list_keymap.accept),
-        "to confirm",
-        primary_binding(&list_keymap.cancel),
-        "to go back",
-    )
+    let accept =
+        primary_binding(&list_keymap.accept).unwrap_or_else(|| key_hint::plain(KeyCode::Enter));
+    let cancel =
+        primary_binding(&list_keymap.cancel).unwrap_or_else(|| key_hint::plain(KeyCode::Esc));
+    Line::from(vec![
+        "↑/↓ Navigate · ".into(),
+        accept.into(),
+        " Select · ".into(),
+        key_hint::plain(KeyCode::Tab).into(),
+        " Complete · ".into(),
+        cancel.into(),
+        " to cancel".into(),
+    ])
 }
 
 pub(crate) fn accept_cancel_hint_line(

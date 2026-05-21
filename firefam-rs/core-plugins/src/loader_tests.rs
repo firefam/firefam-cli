@@ -166,13 +166,13 @@ fn plugin_root() -> (tempfile::TempDir, AbsolutePathBuf) {
     let tmp = tempfile::tempdir().expect("tempdir");
     let plugin_root =
         AbsolutePathBuf::try_from(tmp.path().join("demo-plugin")).expect("plugin root");
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).expect("create manifest dir");
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).expect("create manifest dir");
     fs::create_dir_all(plugin_root.join("hooks")).expect("create hooks dir");
     (tmp, plugin_root)
 }
 
 fn write_manifest(plugin_root: &AbsolutePathBuf, manifest: &str) {
-    fs::write(plugin_root.join(".firefam-plugin/plugin.json"), manifest).expect("write manifest");
+    fs::write(plugin_root.join(".agents-plugin/plugin.json"), manifest).expect("write manifest");
 }
 
 fn write_hook_file(plugin_root: &AbsolutePathBuf, relative_path: &str, event: &str, command: &str) {

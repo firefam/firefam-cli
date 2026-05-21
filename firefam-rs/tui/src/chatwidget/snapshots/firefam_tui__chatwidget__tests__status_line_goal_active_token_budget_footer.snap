@@ -2,8 +2,8 @@
 source: tui/src/chatwidget/tests/status_and_layout.rs
 expression: normalized_backend_snapshot(terminal.backend())
 ---
-"                                                                                "
-"                                                                                "
+"────────────────────────────────────────────────────────────────────────────────"
+"  /tmp/project                                                                  "
 "› Ask Firefam to do anything                                                    "
-"                                                                                "
-"  gpt-5.4                                            Pursuing goal (40K / 50K)  "
+"────────────────────────────────────────────────────────────────────────────────"
+"  ? help · / commands and skills                   Read Only · gpt-5.4 default  "

@@ -41,10 +41,10 @@ fn write_plugin_skill(
         .join(plugin_name)
         .join("local");
     let skill_dir = plugin_root.join("skills").join(dir);
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::create_dir_all(&skill_dir).unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         format!(r#"{{"name":"{plugin_name}"}}"#),
     )
     .unwrap();

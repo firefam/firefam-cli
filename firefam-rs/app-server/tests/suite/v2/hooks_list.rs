@@ -86,10 +86,10 @@ statusMessage = "running listed hook"
 
 fn write_plugin_hook_config(firefam_home: &std::path::Path, hooks_json: &str) -> Result<()> {
     let plugin_root = firefam_home.join("plugins/cache/test/demo/local");
-    std::fs::create_dir_all(plugin_root.join(".firefam-plugin"))?;
+    std::fs::create_dir_all(plugin_root.join(".agents-plugin"))?;
     std::fs::create_dir_all(plugin_root.join("hooks"))?;
     std::fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"demo"}"#,
     )?;
     std::fs::write(plugin_root.join("hooks/hooks.json"), hooks_json)?;

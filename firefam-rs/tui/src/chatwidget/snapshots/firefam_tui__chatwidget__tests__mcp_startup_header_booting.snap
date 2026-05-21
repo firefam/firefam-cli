@@ -2,10 +2,10 @@
 source: tui/src/chatwidget/tests/mcp_startup.rs
 expression: normalized_backend_snapshot(terminal.backend())
 ---
+"● Booting MCP server: alpha (0s • esc to interrupt)                             "
 "                                                                                "
-"• Booting MCP server: alpha (0s • esc to interrupt)                             "
-"                                                                                "
-"                                                                                "
+"────────────────────────────────────────────────────────────────────────────────"
+"  /tmp/project                                                                  "
 "› Ask Firefam to do anything                                                    "
-"                                                                                "
-"  gpt-5.5 default · /tmp/project                                                "
+"────────────────────────────────────────────────────────────────────────────────"
+"  ? help · / commands and skills                   Read Only · gpt-5.5 default  "

@@ -365,7 +365,7 @@ mod tests {
 
     fn write_marketplace_source(source: &Path, marker: &str) -> std::io::Result<()> {
         fs::create_dir_all(source.join(".agents/plugins"))?;
-        fs::create_dir_all(source.join("plugins/sample/.firefam-plugin"))?;
+        fs::create_dir_all(source.join("plugins/sample/.agents-plugin"))?;
         fs::write(
             source.join(".agents/plugins/marketplace.json"),
             r#"{
@@ -382,7 +382,7 @@ mod tests {
 }"#,
         )?;
         fs::write(
-            source.join("plugins/sample/.firefam-plugin/plugin.json"),
+            source.join("plugins/sample/.agents-plugin/plugin.json"),
             r#"{"name":"sample"}"#,
         )?;
         fs::write(source.join("plugins/sample/marker.txt"), marker)?;

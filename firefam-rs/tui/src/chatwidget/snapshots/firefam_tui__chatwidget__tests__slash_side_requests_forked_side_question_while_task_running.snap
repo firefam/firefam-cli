@@ -2,10 +2,10 @@
 source: tui/src/chatwidget/tests/side.rs
 expression: normalized_backend_snapshot(terminal.backend())
 ---
+"● Working (0s • esc to interrupt)                                               "
 "                                                                                "
-"• Working (0s • esc to interrupt)                                               "
-"                                                                                "
-"                                                                                "
+"────────────────────────────────────────────────────────────────────────────────"
+"  /tmp/project                                                                  "
 "› Ask Firefam to do anything                                                    "
-"                                                                                "
-"  gpt-5.5 default                                             Side starting...  "
+"────────────────────────────────────────────────────────────────────────────────"
+"  ? help · / commands and skil… Side starting... · Read Only · gpt-5.5 default  "

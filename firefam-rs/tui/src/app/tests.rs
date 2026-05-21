@@ -1366,8 +1366,10 @@ fn attach_live_thread_for_selection_rejects_unmaterialized_fallback_threads() ->
 
     runtime.block_on(async {
         let mut app = make_test_app().await;
-        let mut app_server =
-            crate::start_embedded_app_server_for_picker(app.chat_widget.config_ref()).await?;
+        let mut app_server = Box::pin(crate::start_embedded_app_server_for_picker(
+            app.chat_widget.config_ref(),
+        ))
+        .await?;
         let mut ephemeral_config = app.chat_widget.config_ref().clone();
         ephemeral_config.ephemeral = true;
         let started = app_server.start_thread(&ephemeral_config).await?;
@@ -3489,12 +3491,23 @@ async fn side_discard_selection_keeps_current_side_thread() {
     );
 }
 
-#[tokio::test]
-async fn discard_side_thread_removes_agent_navigation_entry() -> Result<()> {
-    Box::pin(async {
-        let mut app = make_test_app().await;
-        let mut app_server =
-            crate::start_embedded_app_server_for_picker(app.chat_widget.config_ref()).await?;
+#[test]
+fn discard_side_thread_removes_agent_navigation_entry() -> Result<()> {
+    const WORKER_THREADS: usize = 1;
+    const TEST_STACK_SIZE_BYTES: usize = 8 * 1024 * 1024;
+
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(WORKER_THREADS)
+        .thread_stack_size(TEST_STACK_SIZE_BYTES)
+        .enable_all()
+        .build()?;
+
+    runtime.block_on(async {
+        let mut app = Box::pin(make_test_app()).await;
+        let mut app_server = Box::pin(crate::start_embedded_app_server_for_picker(
+            app.chat_widget.config_ref(),
+        ))
+        .await?;
         let mut side_config = app.chat_widget.config_ref().clone();
         side_config.ephemeral = true;
         let started = app_server.start_thread(&side_config).await?;
@@ -3508,24 +3521,31 @@ async fn discard_side_thread_removes_agent_navigation_entry() -> Result<()> {
             /*is_closed*/ false,
         );
 
-        assert!(
-            app.discard_side_thread(&mut app_server, side_thread_id)
-                .await
-        );
+        assert!(Box::pin(app.discard_side_thread(&mut app_server, side_thread_id)).await);
 
         assert_eq!(app.agent_navigation.get(&side_thread_id), None);
         assert!(!app.side_threads.contains_key(&side_thread_id));
         Ok(())
     })
-    .await
 }
 
-#[tokio::test]
-async fn discard_side_thread_keeps_local_state_when_server_close_fails() -> Result<()> {
-    Box::pin(async {
-        let mut app = make_test_app().await;
-        let mut app_server =
-            crate::start_embedded_app_server_for_picker(app.chat_widget.config_ref()).await?;
+#[test]
+fn discard_side_thread_keeps_local_state_when_server_close_fails() -> Result<()> {
+    const WORKER_THREADS: usize = 1;
+    const TEST_STACK_SIZE_BYTES: usize = 8 * 1024 * 1024;
+
+    let runtime = tokio::runtime::Builder::new_multi_thread()
+        .worker_threads(WORKER_THREADS)
+        .thread_stack_size(TEST_STACK_SIZE_BYTES)
+        .enable_all()
+        .build()?;
+
+    runtime.block_on(async {
+        let mut app = Box::pin(make_test_app()).await;
+        let mut app_server = Box::pin(crate::start_embedded_app_server_for_picker(
+            app.chat_widget.config_ref(),
+        ))
+        .await?;
         let parent_thread_id = ThreadId::new();
         let side_thread_id = ThreadId::new();
         app.active_thread_id = Some(side_thread_id);
@@ -3538,10 +3558,7 @@ async fn discard_side_thread_keeps_local_state_when_server_close_fails() -> Resu
             /*is_closed*/ false,
         );
 
-        assert!(
-            !app.discard_side_thread(&mut app_server, side_thread_id)
-                .await
-        );
+        assert!(!Box::pin(app.discard_side_thread(&mut app_server, side_thread_id)).await);
 
         assert_eq!(app.active_thread_id, Some(side_thread_id));
         assert_eq!(
@@ -3553,7 +3570,6 @@ async fn discard_side_thread_keeps_local_state_when_server_close_fails() -> Resu
         assert!(app.agent_navigation.get(&side_thread_id).is_some());
         Ok(())
     })
-    .await
 }
 
 #[tokio::test]
@@ -3829,6 +3845,55 @@ async fn clear_ui_header_shows_fast_status_for_fast_capable_models() {
     assert_app_snapshot!("clear_ui_header_fast_status_fast_capable_models", rendered);
 }
 
+#[tokio::test]
+async fn full_screen_chat_surface_starts_transcript_at_top_and_pins_footer() {
+    let mut app = make_test_app().await;
+    app.transcript_cells = vec![
+        Arc::new(UserHistoryCell {
+            message: "hi".to_string(),
+            text_elements: Vec::new(),
+            local_image_paths: Vec::new(),
+            remote_image_urls: Vec::new(),
+        }) as Arc<dyn HistoryCell>,
+        Arc::new(AgentMarkdownCell::new(
+            "Hi.".to_string(),
+            Path::new("/tmp/project"),
+        )) as Arc<dyn HistoryCell>,
+        Arc::new(UserHistoryCell {
+            message: "hello".to_string(),
+            text_elements: Vec::new(),
+            local_image_paths: Vec::new(),
+            remote_image_urls: Vec::new(),
+        }) as Arc<dyn HistoryCell>,
+        Arc::new(AgentMarkdownCell::new(
+            "Hello.".to_string(),
+            Path::new("/tmp/project"),
+        )) as Arc<dyn HistoryCell>,
+    ];
+
+    let mut terminal = ratatui::Terminal::new(ratatui::backend::TestBackend::new(
+        /*width*/ 60, /*height*/ 16,
+    ))
+    .expect("create terminal");
+    let mut bottom_pane_area = Rect::default();
+    terminal
+        .draw(|frame| {
+            bottom_pane_area =
+                app.render_full_screen_chat_surface(frame.area(), frame.buffer_mut());
+        })
+        .expect("draw full screen chat");
+
+    assert_eq!(bottom_pane_area.bottom(), 16);
+    assert!(
+        bottom_pane_area.y > 0,
+        "footer should be pinned below the transcript instead of shifting content down"
+    );
+    assert_app_snapshot!(
+        "full_screen_chat_surface_starts_transcript_at_top_and_pins_footer",
+        format!("{}", terminal.backend())
+    );
+}
+
 async fn make_test_app() -> App {
     let (chat_widget, app_event_tx, _rx, _op_rx) = make_chatwidget_manual_with_sender().await;
     let config = chat_widget.config_ref().clone();
@@ -4012,10 +4077,10 @@ async fn capped_resize_reflow_renders_recent_suffix_only() {
             .map(rendered_line_text)
             .collect::<Vec<_>>(),
         vec![
+            "cell 15".to_string(),
+            "cell 16".to_string(),
             "cell 17".to_string(),
-            String::new(),
             "cell 18".to_string(),
-            String::new(),
             "cell 19".to_string(),
         ]
     );
@@ -4031,9 +4096,9 @@ async fn uncapped_resize_reflow_renders_all_cells_when_row_cap_absent() {
 
     let rendered = app.render_transcript_lines_for_reflow(/*width*/ 80);
 
-    assert_eq!(rendered.lines.len(), 39);
+    assert_eq!(rendered.lines.len(), 20);
     assert_eq!(rendered_line_text(&rendered.lines[0]), "cell 0");
-    assert_eq!(rendered_line_text(&rendered.lines[38]), "cell 19");
+    assert_eq!(rendered_line_text(&rendered.lines[19]), "cell 19");
 }
 
 #[tokio::test]
@@ -4080,9 +4145,7 @@ async fn uncapped_resize_reflow_renders_all_cells_under_row_limit() {
             .collect::<Vec<_>>(),
         vec![
             "cell 0".to_string(),
-            String::new(),
             "cell 1".to_string(),
-            String::new(),
             "cell 2".to_string(),
         ]
     );

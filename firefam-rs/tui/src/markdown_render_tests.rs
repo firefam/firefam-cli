@@ -919,7 +919,8 @@ fn consecutive_unordered_list_local_file_links_do_not_detach_paths() {
         rendered,
         vec![
             "- firefam-rs/README.md:93: cli is the top-level multitool binary.",
-            "- firefam-rs/core/README.md:1: firefam-core owns the real runtime behavior.",
+            "- firefam-rs/core/README.md:1: firefam-core owns the real runtime",
+            "  behavior.",
         ]
     );
 }

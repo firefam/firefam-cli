@@ -1,0 +1,20 @@
+---
+source: tui/src/app/tests.rs
+expression: "format!(\"{}\", terminal.backend())"
+---
+"⌑ hi                                                        "
+"● Hi.                                                       "
+"                                                            "
+"                                                            "
+"⌑ hello                                                     "
+"● Hello.                                                    "
+"                                                            "
+"                                                            "
+"                                                            "
+"                                                            "
+"                                                            "
+"────────────────────────────────────────────────────────────"
+"  /tmp/project                                              "
+"› Ask Firefam to do anything                                "
+"────────────────────────────────────────────────────────────"
+"  ? help · / commands and ski… Read Only · gpt-5.5 default  "

@@ -20,8 +20,9 @@ const GITHUB_API_ACCEPT_HEADER: &str = "application/vnd.github+json";
 const GITHUB_API_VERSION_HEADER: &str = "2022-11-28";
 const CURATED_PLUGINS_BACKUP_ARCHIVE_API_URL: &str =
     "https://chatgpt.com/backend-api/plugins/export/curated";
-const FIREFAMAI_PLUGINS_OWNER: &str = "openai";
+const FIREFAMAI_PLUGINS_OWNER: &str = "firefamai";
 const FIREFAMAI_PLUGINS_REPO: &str = "plugins";
+const FIREFAMAI_PLUGINS_GIT_URL: &str = "https://github.com/firefamai/plugins.git";
 const CURATED_PLUGINS_RELATIVE_DIR: &str = ".tmp/plugins";
 const CURATED_PLUGINS_SHA_FILE: &str = ".tmp/plugins.sha";
 const CURATED_PLUGINS_BACKUP_ARCHIVE_FALLBACK_VERSION: &str = "export-backup";
@@ -155,7 +156,7 @@ fn sync_firefamai_plugins_repo_via_git(
             .arg("clone")
             .arg("--depth")
             .arg("1")
-            .arg("https://github.com/openai/plugins.git")
+            .arg(FIREFAMAI_PLUGINS_GIT_URL)
             .arg(staged_repo_dir.path()),
         "git clone curated plugins repo",
         CURATED_PLUGINS_GIT_TIMEOUT,
@@ -473,7 +474,7 @@ fn git_ls_remote_head_sha(git_binary: &str) -> Result<String, String> {
         Command::new(git_binary)
             .env("GIT_OPTIONAL_LOCKS", "0")
             .arg("ls-remote")
-            .arg("https://github.com/openai/plugins.git")
+            .arg(FIREFAMAI_PLUGINS_GIT_URL)
             .arg("HEAD"),
         "git ls-remote curated plugins repo",
         CURATED_PLUGINS_GIT_TIMEOUT,

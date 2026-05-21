@@ -22,7 +22,7 @@ pub(crate) fn write_file(path: &Path, contents: &str) {
 pub(crate) fn write_curated_plugin(root: &Path, plugin_name: &str) {
     let plugin_root = root.join("plugins").join(plugin_name);
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         &format!(
             r#"{{
   "name": "{plugin_name}",

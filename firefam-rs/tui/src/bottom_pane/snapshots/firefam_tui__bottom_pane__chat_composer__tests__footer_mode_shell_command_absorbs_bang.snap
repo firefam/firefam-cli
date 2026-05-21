@@ -2,12 +2,12 @@
 source: tui/src/bottom_pane/chat_composer.rs
 expression: terminal.backend()
 ---
-"                                                                                                    "
+"────────────────────────────────────────────────────────────────────────────────────────────────────"
 "! git status                                                                                        "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
 "                                                                                                    "
-"                                                                                                    "
-"  gpt-5.4 high fast · ~/code/firefam-1 · Context 0% used                                  Shell mode  "
+"────────────────────────────────────────────────────────────────────────────────────────────────────"
+"  ? help · / commands and skills                                                        Shell mode  "

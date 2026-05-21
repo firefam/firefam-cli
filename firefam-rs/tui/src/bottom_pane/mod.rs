@@ -1662,6 +1662,20 @@ impl BottomPane {
         }
     }
 
+    pub(crate) fn set_composer_status_context(
+        &mut self,
+        permissions_line: Option<Line<'static>>,
+        model_line: Option<Line<'static>>,
+        directory_line: Option<Line<'static>>,
+    ) {
+        if self
+            .composer
+            .set_composer_status_context(permissions_line, model_line, directory_line)
+        {
+            self.request_redraw();
+        }
+    }
+
     pub(crate) fn set_status_line_hyperlink(&mut self, url: Option<String>) {
         if self.composer.set_status_line_hyperlink(url) {
             self.request_redraw();
@@ -2297,7 +2311,7 @@ mod tests {
         pane.render(area, &mut buf);
 
         let bufs = snapshot_buffer(&buf);
-        assert!(bufs.contains("• Working"), "expected Working header");
+        assert!(bufs.contains("● Working"), "expected Working header");
     }
 
     #[test]
@@ -2616,6 +2630,10 @@ mod tests {
             );
         }
         assert_eq!(pane.composer_text(), "/");
+        assert!(
+            !pane.composer.popup_active(),
+            "expected Esc to dismiss command popup"
+        );
     }
 
     #[test]

@@ -459,7 +459,7 @@ mod tests {
             .join(REMOTE_GLOBAL_MARKETPLACE_NAME)
             .join("linear")
             .join("1.2.3")
-            .join(".firefam-plugin")
+            .join(".agents-plugin")
             .join("plugin.json");
         std::fs::create_dir_all(cached_manifest.parent().expect("manifest parent"))
             .expect("create cached plugin manifest parent");
@@ -528,7 +528,7 @@ mod tests {
             .join(REMOTE_WORKSPACE_SHARED_WITH_ME_PRIVATE_MARKETPLACE_NAME)
             .join("private-plugin")
             .join("1.2.3")
-            .join(".firefam-plugin")
+            .join(".agents-plugin")
             .join("plugin.json");
         std::fs::create_dir_all(cached_manifest.parent().expect("manifest parent"))
             .expect("create cached plugin manifest parent");
@@ -540,7 +540,7 @@ mod tests {
             .join(REMOTE_WORKSPACE_SHARED_WITH_ME_MARKETPLACE_NAME)
             .join("shared-plugin")
             .join("1.2.3")
-            .join(".firefam-plugin")
+            .join(".agents-plugin")
             .join("plugin.json");
         std::fs::create_dir_all(canonical_cached_manifest.parent().expect("manifest parent"))
             .expect("create canonical cached plugin manifest parent");

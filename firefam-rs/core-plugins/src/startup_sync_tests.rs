@@ -22,7 +22,7 @@ fn write_file(path: &Path, contents: &str) {
 fn write_curated_plugin(root: &Path, plugin_name: &str) {
     let plugin_root = root.join("plugins").join(plugin_name);
     write_file(
-        &plugin_root.join(".firefam-plugin/plugin.json"),
+        &plugin_root.join(".agents-plugin/plugin.json"),
         &format!(r#"{{"name":"{plugin_name}"}}"#),
     );
 }
@@ -182,7 +182,7 @@ fn assert_curated_gmail_repo(repo_path: &Path) {
     assert!(repo_path.join(".agents/plugins/marketplace.json").is_file());
     assert!(
         repo_path
-            .join("plugins/gmail/.firefam-plugin/plugin.json")
+            .join("plugins/gmail/.agents-plugin/plugin.json")
             .is_file()
     );
 }
@@ -272,11 +272,11 @@ if [ "$1" = "ls-remote" ]; then
 fi
 if [ "$1" = "clone" ]; then
   dest="$5"
-  mkdir -p "$dest/.git" "$dest/.agents/plugins" "$dest/plugins/gmail/.firefam-plugin"
+  mkdir -p "$dest/.git" "$dest/.agents/plugins" "$dest/plugins/gmail/.agents-plugin"
   cat > "$dest/.agents/plugins/marketplace.json" <<'EOF'
 {{"name":"firefamai-curated","plugins":[{{"name":"gmail","source":{{"source":"local","path":"./plugins/gmail"}}}}]}}
 EOF
-  printf '%s\n' '{{"name":"gmail"}}' > "$dest/plugins/gmail/.firefam-plugin/plugin.json"
+  printf '%s\n' '{{"name":"gmail"}}' > "$dest/plugins/gmail/.agents-plugin/plugin.json"
   exit 0
 fi
 if [ "$1" = "-C" ] && [ "$3" = "rev-parse" ] && [ "$4" = "HEAD" ]; then
@@ -315,7 +315,7 @@ fn sync_firefamai_plugins_repo_via_git_succeeds_with_local_rewritten_remote() {
     let work_repo = repo_root.path().join("work/plugins");
     let remote_repo = repo_root.path().join("remotes/firefamai/plugins.git");
     std::fs::create_dir_all(work_repo.join(".agents/plugins")).expect("create marketplace dir");
-    std::fs::create_dir_all(work_repo.join("plugins/gmail/.firefam-plugin"))
+    std::fs::create_dir_all(work_repo.join("plugins/gmail/.agents-plugin"))
         .expect("create plugin dir");
     std::fs::write(
         work_repo.join(".agents/plugins/marketplace.json"),
@@ -323,7 +323,7 @@ fn sync_firefamai_plugins_repo_via_git_succeeds_with_local_rewritten_remote() {
     )
     .expect("write marketplace");
     std::fs::write(
-        work_repo.join("plugins/gmail/.firefam-plugin/plugin.json"),
+        work_repo.join("plugins/gmail/.agents-plugin/plugin.json"),
         r#"{"name":"gmail"}"#,
     )
     .expect("write plugin manifest");
@@ -605,7 +605,7 @@ async fn sync_firefamai_plugins_repo_skips_export_archive_when_snapshot_exists()
     write_firefamai_curated_marketplace(&curated_root, &["linear"]);
     write_curated_plugin_sha(tmp.path());
 
-    let plugin_manifest_path = curated_root.join("plugins/linear/.firefam-plugin/plugin.json");
+    let plugin_manifest_path = curated_root.join("plugins/linear/.agents-plugin/plugin.json");
     let original_manifest =
         std::fs::read_to_string(&plugin_manifest_path).expect("read existing plugin manifest");
 
@@ -712,7 +712,7 @@ fn curated_repo_zipball_bytes(sha: &str) -> Vec<u8> {
         .expect("write marketplace");
     writer
         .start_file(
-            format!("{root}/plugins/gmail/.firefam-plugin/plugin.json"),
+            format!("{root}/plugins/gmail/.agents-plugin/plugin.json"),
             options,
         )
         .expect("start plugin manifest entry");
@@ -760,7 +760,7 @@ fn curated_repo_backup_archive_zip_bytes(sha: &str) -> Vec<u8> {
         )
         .expect("write marketplace");
     writer
-        .start_file("plugins/plugins/gmail/.firefam-plugin/plugin.json", options)
+        .start_file("plugins/plugins/gmail/.agents-plugin/plugin.json", options)
         .expect("start plugin manifest entry");
     writer
         .write_all(br#"{"name":"gmail"}"#)

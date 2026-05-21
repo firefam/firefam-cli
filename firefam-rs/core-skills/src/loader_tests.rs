@@ -1156,9 +1156,9 @@ async fn namespaces_plugin_skills_using_plugin_name() {
         "sample-search",
         "description: search sample data",
     );
-    fs::create_dir_all(plugin_root.join(".firefam-plugin")).unwrap();
+    fs::create_dir_all(plugin_root.join(".agents-plugin")).unwrap();
     fs::write(
-        plugin_root.join(".firefam-plugin/plugin.json"),
+        plugin_root.join(".agents-plugin/plugin.json"),
         r#"{"name":"sample"}"#,
     )
     .unwrap();

@@ -735,14 +735,12 @@ impl Tui {
     }
 
     /// Enter alternate screen for the main chat UI.
-    ///
-    /// The chat viewport itself is still bottom-aligned during draw so finalized history can be
-    /// inserted above it while the footer stays pinned to the bottom row.
     pub fn enter_full_screen(&mut self) -> Result<()> {
         if self.full_screen_active || !self.alt_screen_enabled {
             return Ok(());
         }
         self.enter_alt_screen()?;
+        self.pending_history_lines.clear();
         self.full_screen_active = true;
         Ok(())
     }
@@ -797,6 +795,10 @@ impl Tui {
         if lines.is_empty() {
             return;
         }
+        if self.full_screen_active {
+            self.frame_requester().schedule_frame();
+            return;
+        }
         if let Some(last) = self.pending_history_lines.last_mut()
             && last.wrap_policy == wrap_policy
         {
@@ -820,7 +822,7 @@ impl Tui {
     fn update_inline_viewport_for_resize_reflow(
         terminal: &mut Terminal,
         height: u16,
-        bottom_align: bool,
+        full_screen: bool,
     ) -> Result<bool> {
         let size = terminal.size()?;
         let terminal_height_shrank = size.height < terminal.last_known_screen_size.height;
@@ -834,8 +836,8 @@ impl Tui {
         area.width = size.width;
         let mut needs_full_repaint = false;
 
-        if bottom_align {
-            area.y = size.height.saturating_sub(area.height);
+        if full_screen {
+            area = Rect::new(/*x*/ 0, /*y*/ 0, size.width, size.height);
         } else if area.bottom() > size.height {
             let scroll_by = area.bottom() - size.height;
             if !terminal_height_shrank {
@@ -917,7 +919,7 @@ impl Tui {
             area.width = size.width;
             // If the viewport has expanded, scroll everything else up to make room.
             if self.full_screen_active && self.overlay_saved_viewport.is_none() {
-                area.y = size.height.saturating_sub(area.height);
+                area = Rect::new(/*x*/ 0, /*y*/ 0, size.width, size.height);
             } else if area.bottom() > size.height {
                 terminal
                     .backend_mut()
@@ -931,7 +933,11 @@ impl Tui {
                 terminal.set_viewport_area(area);
             }
 
-            Self::flush_pending_history_lines(terminal, &mut self.pending_history_lines)?;
+            if self.full_screen_active {
+                self.pending_history_lines.clear();
+            } else {
+                Self::flush_pending_history_lines(terminal, &mut self.pending_history_lines)?;
+            }
 
             // Update the y position for suspending so Ctrl-Z can place the cursor correctly.
             #[cfg(unix)]
@@ -1026,7 +1032,11 @@ impl Tui {
                 height,
                 self.full_screen_active && self.overlay_saved_viewport.is_none(),
             )?;
-            Self::flush_pending_history_lines(terminal, &mut self.pending_history_lines)?;
+            if self.full_screen_active {
+                self.pending_history_lines.clear();
+            } else {
+                Self::flush_pending_history_lines(terminal, &mut self.pending_history_lines)?;
+            }
 
             if needs_full_repaint {
                 terminal.invalidate_viewport();

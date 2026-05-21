@@ -2,12 +2,12 @@
 source: tui/src/bottom_pane/chat_composer.rs
 expression: terminal.backend()
 ---
+"▌ $Firefam Debugger  Debug this Firefam checkout  [Skill]               "
 "────────────────────────────────────────────────────────────────────────"
 "› /fir                                                                  "
 "                                                                        "
 "                                                                        "
 "                                                                        "
 "                                                                        "
-"                                                                        "
 "────────────────────────────────────────────────────────────────────────"
-"  $Firefam Debugger  Debug this Firefam checkout  [Skill]               "
+"  ↑/↓ Navigate · enter Select · tab Complete · esc to cancel            "
