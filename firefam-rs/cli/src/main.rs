@@ -8,8 +8,6 @@ use firefam_app_server_daemon::LifecycleCommand as AppServerLifecycleCommand;
 use firefam_app_server_daemon::RemoteControlMode as AppServerRemoteControlMode;
 use firefam_arg0::Arg0DispatchPaths;
 use firefam_arg0::arg0_dispatch_or_else;
-use firefam_chatgpt::apply_command::ApplyCommand;
-use firefam_chatgpt::apply_command::run_apply_command;
 use firefam_cli::LandlockCommand;
 use firefam_cli::SeatbeltCommand;
 use firefam_cli::WindowsCommand;
@@ -167,10 +165,6 @@ enum Subcommand {
     /// Execpolicy tooling.
     #[clap(hide = true)]
     Execpolicy(ExecpolicyCommand),
-
-    /// Apply the latest diff produced by Firefam agent as a `git apply` to your local working tree.
-    #[clap(visible_alias = "a")]
-    Apply(ApplyCommand),
 
     /// Resume a previous interactive session (picker by default; use --last to continue the most recent).
     Resume(ResumeCommand),
@@ -1323,18 +1317,6 @@ async fn cli_main(arg0_paths: Arg0DispatchPaths) -> anyhow::Result<()> {
                 run_execpolicycheck(cmd)?
             }
         },
-        Some(Subcommand::Apply(mut apply_cli)) => {
-            reject_remote_mode_for_subcommand(
-                root_remote.as_deref(),
-                root_remote_auth_token_env.as_deref(),
-                "apply",
-            )?;
-            prepend_config_flags(
-                &mut apply_cli.config_overrides,
-                root_config_overrides.clone(),
-            );
-            run_apply_command(apply_cli, /*cwd*/ None).await?;
-        }
         Some(Subcommand::ResponsesApiProxy(args)) => {
             reject_remote_mode_for_subcommand(
                 root_remote.as_deref(),
@@ -1875,7 +1857,6 @@ fn unsupported_subcommand_name_for_strict_config(
         Some(Subcommand::Sandbox(_)) => Some("sandbox"),
         Some(Subcommand::Debug(_)) => Some("debug"),
         Some(Subcommand::Execpolicy(_)) => Some("execpolicy"),
-        Some(Subcommand::Apply(_)) => Some("apply"),
         Some(Subcommand::ResponsesApiProxy(_)) => Some("responses-api-proxy"),
         Some(Subcommand::StdioToUds(_)) => Some("stdio-to-uds"),
         Some(Subcommand::ExecServer(_)) => Some("exec-server"),
@@ -2507,9 +2488,6 @@ mod tests {
     fn cloud_no_longer_parses_at_top_level() {
         let cloud_result = MultitoolCli::try_parse_from(["firefam", "cloud", "list"]);
         assert!(cloud_result.is_err());
-
-        let cloud_tasks_result = MultitoolCli::try_parse_from(["firefam", "cloud-tasks", "list"]);
-        assert!(cloud_tasks_result.is_err());
     }
 
     #[test]

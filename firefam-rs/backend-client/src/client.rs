@@ -1,9 +1,6 @@
-use crate::types::CodeTaskDetailsResponse;
 use crate::types::ConfigFileResponse;
-use crate::types::PaginatedListTaskListItem;
 use crate::types::RateLimitReachedKind as BackendRateLimitReachedKind;
 use crate::types::RateLimitStatusPayload;
-use crate::types::TurnAttemptsSiblingTurnsResponse;
 use anyhow::Result;
 use firefam_api::SharedAuthProvider;
 use firefam_client::build_reqwest_client_with_custom_ca;
@@ -316,81 +313,6 @@ impl Client {
         Ok(())
     }
 
-    pub async fn list_tasks(
-        &self,
-        limit: Option<i32>,
-        task_filter: Option<&str>,
-        environment_id: Option<&str>,
-        cursor: Option<&str>,
-    ) -> Result<PaginatedListTaskListItem> {
-        let url = match self.path_style {
-            PathStyle::FirefamApi => format!("{}/api/firefam/tasks/list", self.base_url),
-            PathStyle::ChatGptApi => format!("{}/wham/tasks/list", self.base_url),
-        };
-        let req = self.http.get(&url).headers(self.headers());
-        let req = if let Some(lim) = limit {
-            req.query(&[("limit", lim)])
-        } else {
-            req
-        };
-        let req = if let Some(tf) = task_filter {
-            req.query(&[("task_filter", tf)])
-        } else {
-            req
-        };
-        let req = if let Some(c) = cursor {
-            req.query(&[("cursor", c)])
-        } else {
-            req
-        };
-        let req = if let Some(id) = environment_id {
-            req.query(&[("environment_id", id)])
-        } else {
-            req
-        };
-        let (body, ct) = self.exec_request(req, "GET", &url).await?;
-        self.decode_json::<PaginatedListTaskListItem>(&url, &ct, &body)
-    }
-
-    pub async fn get_task_details(&self, task_id: &str) -> Result<CodeTaskDetailsResponse> {
-        let (parsed, _body, _ct) = self.get_task_details_with_body(task_id).await?;
-        Ok(parsed)
-    }
-
-    pub async fn get_task_details_with_body(
-        &self,
-        task_id: &str,
-    ) -> Result<(CodeTaskDetailsResponse, String, String)> {
-        let url = match self.path_style {
-            PathStyle::FirefamApi => format!("{}/api/firefam/tasks/{}", self.base_url, task_id),
-            PathStyle::ChatGptApi => format!("{}/wham/tasks/{}", self.base_url, task_id),
-        };
-        let req = self.http.get(&url).headers(self.headers());
-        let (body, ct) = self.exec_request(req, "GET", &url).await?;
-        let parsed: CodeTaskDetailsResponse = self.decode_json(&url, &ct, &body)?;
-        Ok((parsed, body, ct))
-    }
-
-    pub async fn list_sibling_turns(
-        &self,
-        task_id: &str,
-        turn_id: &str,
-    ) -> Result<TurnAttemptsSiblingTurnsResponse> {
-        let url = match self.path_style {
-            PathStyle::FirefamApi => format!(
-                "{}/api/firefam/tasks/{}/turns/{}/sibling_turns",
-                self.base_url, task_id, turn_id
-            ),
-            PathStyle::ChatGptApi => format!(
-                "{}/wham/tasks/{}/turns/{}/sibling_turns",
-                self.base_url, task_id, turn_id
-            ),
-        };
-        let req = self.http.get(&url).headers(self.headers());
-        let (body, ct) = self.exec_request(req, "GET", &url).await?;
-        self.decode_json::<TurnAttemptsSiblingTurnsResponse>(&url, &ct, &body)
-    }
-
     /// Fetch the managed requirements file from firefam-backend.
     ///
     /// `GET /api/firefam/config/requirements` (Firefam API style) or
@@ -406,41 +328,6 @@ impl Client {
         let (body, ct) = self.exec_request_detailed(req, "GET", &url).await?;
         self.decode_json::<ConfigFileResponse>(&url, &ct, &body)
             .map_err(RequestError::from)
-    }
-
-    /// Create a new task (user turn) by POSTing to the appropriate backend path
-    /// based on `path_style`. Returns the created task id.
-    pub async fn create_task(&self, request_body: serde_json::Value) -> Result<String> {
-        let url = match self.path_style {
-            PathStyle::FirefamApi => format!("{}/api/firefam/tasks", self.base_url),
-            PathStyle::ChatGptApi => format!("{}/wham/tasks", self.base_url),
-        };
-        let req = self
-            .http
-            .post(&url)
-            .headers(self.headers())
-            .header(CONTENT_TYPE, HeaderValue::from_static("application/json"))
-            .json(&request_body);
-        let (body, ct) = self.exec_request(req, "POST", &url).await?;
-        // Extract id from JSON: prefer `task.id`; fallback to top-level `id` when present.
-        match serde_json::from_str::<serde_json::Value>(&body) {
-            Ok(v) => {
-                if let Some(id) = v
-                    .get("task")
-                    .and_then(|t| t.get("id"))
-                    .and_then(|s| s.as_str())
-                {
-                    Ok(id.to_string())
-                } else if let Some(id) = v.get("id").and_then(|s| s.as_str()) {
-                    Ok(id.to_string())
-                } else {
-                    anyhow::bail!(
-                        "POST {url} succeeded but no task id found; content-type={ct}; body={body}"
-                    );
-                }
-            }
-            Err(e) => anyhow::bail!("Decode error for {url}: {e}; content-type={ct}; body={body}"),
-        }
     }
 
     // rate limit helpers

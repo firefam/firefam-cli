@@ -3,5 +3,4 @@ load("//:defs.bzl", "firefam_rust_crate")
 firefam_rust_crate(
     name = "backend-client",
     crate_name = "firefam_backend_client",
-    compile_data = glob(["tests/fixtures/**"]),
 )
