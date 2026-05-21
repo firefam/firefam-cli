@@ -241,7 +241,9 @@ impl App {
 
     /// Close transcript overlay and restore normal UI.
     pub(crate) fn close_transcript_overlay(&mut self, tui: &mut tui::Tui) {
+        let was_alt_screen_active = tui.is_alt_screen_active();
         let _ = tui.leave_alt_screen();
+        let needs_transcript_restore = !was_alt_screen_active || tui.is_full_screen_active();
         let was_backtrack = self.backtrack.overlay_preview_active;
         if !self.deferred_history_lines.is_empty() {
             let lines = std::mem::take(&mut self.deferred_history_lines);
@@ -249,6 +251,11 @@ impl App {
         }
         self.overlay = None;
         self.backtrack.overlay_preview_active = false;
+        if needs_transcript_restore && let Err(err) = self.reflow_transcript_now(tui) {
+            tracing::warn!(error = %err, "failed to restore transcript after closing overlay");
+            self.chat_widget
+                .add_error_message(format!("Failed to restore transcript: {err}"));
+        }
         if was_backtrack {
             // Ensure backtrack state is fully reset when overlay closes (e.g. via 'q').
             self.reset_backtrack_state();

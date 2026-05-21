@@ -230,13 +230,16 @@ impl App {
     fn clear_terminal_for_resize_replay(&mut self, tui: &mut tui::Tui) -> Result<()> {
         if tui.is_alt_screen_active() {
             tui.terminal.clear_visible_screen()?;
+            if tui.is_full_screen_active() {
+                let size = tui.terminal.size()?;
+                let mut area = tui.terminal.viewport_area;
+                area.width = size.width;
+                area.height = area.height.min(size.height);
+                area.y = size.height.saturating_sub(area.height);
+                tui.terminal.set_viewport_area(area);
+            }
         } else {
-            tui.terminal.clear_scrollback_and_visible_screen_ansi()?;
-        }
-        let mut area = tui.terminal.viewport_area;
-        if area.y > 0 {
-            area.y = 0;
-            tui.terminal.set_viewport_area(area);
+            tui.terminal.clear_inline_owned_visible_region()?;
         }
         Ok(())
     }
@@ -417,7 +420,7 @@ impl App {
         Ok(())
     }
 
-    pub(super) fn reflow_transcript_now(&mut self, tui: &mut tui::Tui) -> Result<u16> {
+    pub(crate) fn reflow_transcript_now(&mut self, tui: &mut tui::Tui) -> Result<u16> {
         let terminal_width = tui.terminal.size()?.width;
         let width = self.chat_widget.history_wrap_width(terminal_width);
         if self.transcript_cells.is_empty() {

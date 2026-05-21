@@ -66,7 +66,6 @@ async fn tmux_split_preserves_fresh_session_composer_row_after_resize_reflow() -
             .arg("analytics.enabled=false")
             .arg("-c")
             .arg(&firefamai_base_url_config)
-            .arg("--no-alt-screen")
             .arg("-C")
             .arg(&repo_root)
             .arg(prompt),
@@ -238,7 +237,6 @@ async fn tmux_width_resize_restore_keeps_visible_content_anchored() -> Result<()
             .arg("analytics.enabled=false")
             .arg("-c")
             .arg(&firefamai_base_url_config)
-            .arg("--no-alt-screen")
             .arg("-C")
             .arg(&repo_root)
             .arg(prompt),
@@ -367,7 +365,6 @@ async fn run_repeated_resize_smoke(terminal_resize_reflow_enabled: bool) -> Resu
             .arg("analytics.enabled=false")
             .arg("-c")
             .arg(&firefamai_base_url_config)
-            .arg("--no-alt-screen")
             .arg("-C")
             .arg(&repo_root)
             .arg(prompt),

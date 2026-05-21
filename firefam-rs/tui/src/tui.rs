@@ -35,6 +35,7 @@ use ratatui::layout::Position;
 use ratatui::layout::Rect;
 use ratatui::text::Line;
 use tokio::sync::broadcast;
+use tokio::task::JoinHandle;
 use tokio_stream::Stream;
 
 pub use self::frame_requester::FrameRequester;
@@ -81,6 +82,12 @@ fn should_emit_notification(condition: NotificationCondition, terminal_focused: 
 
 impl Drop for Tui {
     fn drop(&mut self) {
+        self.resize_watcher.abort();
+        if self.full_screen_active {
+            let _ = self.leave_full_screen();
+        } else if self.is_alt_screen_active() {
+            let _ = self.leave_alt_screen();
+        }
         if let Err(err) = self.clear_ambient_pet_image() {
             tracing::debug!(error = %err, "failed to clear ambient pet image on TUI drop");
         }
@@ -425,6 +432,22 @@ pub(crate) fn init() -> Result<InitializedTerminal> {
     })
 }
 
+fn spawn_resize_watcher(draw_tx: broadcast::Sender<()>) -> JoinHandle<()> {
+    tokio::spawn(async move {
+        const RESIZE_POLL_INTERVAL: Duration = Duration::from_millis(100);
+        let mut last_size = crossterm::terminal::size().ok();
+        let mut interval = tokio::time::interval(RESIZE_POLL_INTERVAL);
+        loop {
+            interval.tick().await;
+            let size = crossterm::terminal::size().ok();
+            if size != last_size {
+                last_size = size;
+                let _ = draw_tx.send(());
+            }
+        }
+    })
+}
+
 #[cfg(not(unix))]
 fn cursor_position_with_crossterm(backend: &mut CrosstermBackend<Stdout>) -> Position {
     backend.get_cursor_position().unwrap_or_else(|err| {
@@ -472,10 +495,12 @@ pub struct Tui {
     ambient_pet_image_state: crate::pets::PetImageRenderState,
     pet_picker_preview_image_state: crate::pets::PetImageRenderState,
     alt_saved_viewport: Option<ratatui::layout::Rect>,
+    overlay_saved_viewport: Option<ratatui::layout::Rect>,
     #[cfg(unix)]
     suspend_context: SuspendContext,
     // True when overlay alt-screen UI is active
     alt_screen_active: Arc<AtomicBool>,
+    full_screen_active: bool,
     // True when terminal/tab is focused; updated internally from crossterm events
     terminal_focused: Arc<AtomicBool>,
     enhanced_keys_supported: bool,
@@ -483,6 +508,7 @@ pub struct Tui {
     notification_condition: NotificationCondition,
     // When false, enter_alt_screen() becomes a no-op.
     alt_screen_enabled: bool,
+    resize_watcher: JoinHandle<()>,
 }
 
 struct PendingHistoryLines {
@@ -506,6 +532,7 @@ impl Tui {
     pub fn new(terminal: Terminal, enhanced_keys_supported: bool) -> Self {
         let (draw_tx, _) = broadcast::channel(1);
         let frame_requester = FrameRequester::new(draw_tx.clone());
+        let resize_watcher = spawn_resize_watcher(draw_tx.clone());
 
         // Cache this to avoid contention with the event reader.
         supports_color::on_cached(supports_color::Stream::Stdout);
@@ -520,14 +547,17 @@ impl Tui {
             ambient_pet_image_state: crate::pets::PetImageRenderState::default(),
             pet_picker_preview_image_state: crate::pets::PetImageRenderState::default(),
             alt_saved_viewport: None,
+            overlay_saved_viewport: None,
             #[cfg(unix)]
             suspend_context: SuspendContext::new(),
             alt_screen_active: Arc::new(AtomicBool::new(false)),
+            full_screen_active: false,
             terminal_focused: Arc::new(AtomicBool::new(true)),
             enhanced_keys_supported,
             notification_backend: Some(detect_backend(NotificationMethod::default())),
             notification_condition: NotificationCondition::default(),
-            alt_screen_enabled: true,
+            alt_screen_enabled: false,
+            resize_watcher,
         }
     }
 
@@ -557,6 +587,10 @@ impl Tui {
         self.alt_screen_active.load(Ordering::Relaxed)
     }
 
+    pub fn is_full_screen_active(&self) -> bool {
+        self.full_screen_active
+    }
+
     // Drop crossterm EventStream to avoid stdin conflicts with other processes.
     pub fn pause_events(&mut self) {
         self.event_broker.pause_events();
@@ -583,8 +617,13 @@ impl Tui {
 
         // Leave alt screen if active to avoid conflicts with external program `f`.
         let was_alt_screen = self.is_alt_screen_active();
+        let was_full_screen = self.full_screen_active;
         if was_alt_screen {
-            let _ = self.leave_alt_screen();
+            if was_full_screen {
+                let _ = self.leave_full_screen();
+            } else {
+                let _ = self.leave_alt_screen();
+            }
         }
 
         if let Err(err) = mode.restore() {
@@ -600,7 +639,11 @@ impl Tui {
         flush_terminal_input_buffer();
 
         if was_alt_screen {
-            let _ = self.enter_alt_screen();
+            if was_full_screen {
+                let _ = self.enter_full_screen();
+            } else {
+                let _ = self.enter_alt_screen();
+            }
         }
 
         self.resume_events();
@@ -659,6 +702,21 @@ impl Tui {
         if !self.alt_screen_enabled {
             return Ok(());
         }
+        if self.is_alt_screen_active() {
+            if self.overlay_saved_viewport.is_none() {
+                self.overlay_saved_viewport = Some(self.terminal.viewport_area);
+            }
+            if let Ok(size) = self.terminal.size() {
+                self.terminal.set_viewport_area(ratatui::layout::Rect::new(
+                    0,
+                    0,
+                    size.width,
+                    size.height,
+                ));
+                let _ = self.terminal.clear_visible_screen();
+            }
+            return Ok(());
+        }
         let _ = execute!(self.terminal.backend_mut(), EnterAlternateScreen);
         // Enable "alternate scroll" so terminals may translate wheel to arrows
         let _ = execute!(self.terminal.backend_mut(), EnableAlternateScroll);
@@ -676,12 +734,48 @@ impl Tui {
         Ok(())
     }
 
+    /// Enter alternate screen for the main chat UI.
+    ///
+    /// The chat viewport itself is still bottom-aligned during draw so finalized history can be
+    /// inserted above it while the footer stays pinned to the bottom row.
+    pub fn enter_full_screen(&mut self) -> Result<()> {
+        if self.full_screen_active || !self.alt_screen_enabled {
+            return Ok(());
+        }
+        self.enter_alt_screen()?;
+        self.full_screen_active = true;
+        Ok(())
+    }
+
     /// Leave alternate screen and restore the previously saved inline viewport, if any.
     pub fn leave_alt_screen(&mut self) -> Result<()> {
         if !self.alt_screen_enabled {
             return Ok(());
         }
+        if let Some(saved) = self.overlay_saved_viewport.take() {
+            self.terminal.set_viewport_area(saved);
+            self.terminal.invalidate_viewport();
+            return Ok(());
+        }
+        if self.full_screen_active {
+            return Ok(());
+        }
         // Disable alternate scroll when leaving alt-screen
+        let _ = execute!(self.terminal.backend_mut(), DisableAlternateScroll);
+        let _ = execute!(self.terminal.backend_mut(), LeaveAlternateScreen);
+        if let Some(saved) = self.alt_saved_viewport.take() {
+            self.terminal.set_viewport_area(saved);
+        }
+        self.alt_screen_active.store(false, Ordering::Relaxed);
+        Ok(())
+    }
+
+    pub fn leave_full_screen(&mut self) -> Result<()> {
+        if !self.full_screen_active {
+            return Ok(());
+        }
+        self.overlay_saved_viewport = None;
+        self.full_screen_active = false;
         let _ = execute!(self.terminal.backend_mut(), DisableAlternateScroll);
         let _ = execute!(self.terminal.backend_mut(), LeaveAlternateScreen);
         if let Some(saved) = self.alt_saved_viewport.take() {
@@ -726,6 +820,7 @@ impl Tui {
     fn update_inline_viewport_for_resize_reflow(
         terminal: &mut Terminal,
         height: u16,
+        bottom_align: bool,
     ) -> Result<bool> {
         let size = terminal.size()?;
         let terminal_height_shrank = size.height < terminal.last_known_screen_size.height;
@@ -739,7 +834,9 @@ impl Tui {
         area.width = size.width;
         let mut needs_full_repaint = false;
 
-        if area.bottom() > size.height {
+        if bottom_align {
+            area.y = size.height.saturating_sub(area.height);
+        } else if area.bottom() > size.height {
             let scroll_by = area.bottom() - size.height;
             if !terminal_height_shrank {
                 terminal
@@ -795,7 +892,11 @@ impl Tui {
 
         // Precompute any viewport updates that need a cursor-position query before entering
         // the synchronized update, to avoid racing with the event reader.
-        let mut pending_viewport_area = self.pending_viewport_area()?;
+        let mut pending_viewport_area = if self.full_screen_active {
+            None
+        } else {
+            self.pending_viewport_area()?
+        };
 
         stdout().sync_update(|_| {
             #[cfg(unix)]
@@ -815,7 +916,9 @@ impl Tui {
             area.height = height.min(size.height);
             area.width = size.width;
             // If the viewport has expanded, scroll everything else up to make room.
-            if area.bottom() > size.height {
+            if self.full_screen_active && self.overlay_saved_viewport.is_none() {
+                area.y = size.height.saturating_sub(area.height);
+            } else if area.bottom() > size.height {
                 terminal
                     .backend_mut()
                     .scroll_region_up(0..area.top(), area.bottom() - size.height)?;
@@ -918,8 +1021,11 @@ impl Tui {
             }
 
             let terminal = &mut self.terminal;
-            let needs_full_repaint =
-                Self::update_inline_viewport_for_resize_reflow(terminal, height)?;
+            let needs_full_repaint = Self::update_inline_viewport_for_resize_reflow(
+                terminal,
+                height,
+                self.full_screen_active && self.overlay_saved_viewport.is_none(),
+            )?;
             Self::flush_pending_history_lines(terminal, &mut self.pending_history_lines)?;
 
             if needs_full_repaint {

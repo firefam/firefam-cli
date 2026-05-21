@@ -64,17 +64,7 @@ impl App {
         if is_alt_screen_active {
             tui.terminal.clear_visible_screen()?;
         } else {
-            // Some terminals (Terminal.app, Warp) do not reliably drop scrollback when purge and
-            // clear are emitted as separate backend commands. Prefer a single ANSI sequence.
-            tui.terminal.clear_scrollback_and_visible_screen_ansi()?;
-        }
-
-        let mut area = tui.terminal.viewport_area;
-        if area.y > 0 {
-            // After a full clear, anchor the inline viewport at the top and redraw a fresh header
-            // box. `insert_history_lines()` will shift the viewport down by the rendered height.
-            area.y = 0;
-            tui.terminal.set_viewport_area(area);
+            tui.terminal.clear_inline_owned_visible_region()?;
         }
         self.has_emitted_history_lines = false;
 

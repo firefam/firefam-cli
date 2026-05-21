@@ -508,6 +508,24 @@ where
         Ok(())
     }
 
+    /// Clear only the visible rows currently owned by Firefam's inline UI.
+    ///
+    /// This deliberately does not purge terminal scrollback. Inline redraws and transcript
+    /// reflows can repair Firefam-owned visible rows, but they must preserve shell output and other
+    /// terminal history that existed before the TUI started.
+    pub fn clear_inline_owned_visible_region(&mut self) -> io::Result<()> {
+        if self.viewport_area.is_empty() {
+            return Ok(());
+        }
+        let top = self
+            .viewport_area
+            .top()
+            .saturating_sub(self.visible_history_rows);
+        self.clear_after_position(Position { x: 0, y: top })?;
+        self.visible_history_rows = 0;
+        Ok(())
+    }
+
     /// Clear the entire visible screen (not just the viewport) and force a full redraw.
     pub fn clear_visible_screen(&mut self) -> io::Result<()> {
         let home = Position { x: 0, y: 0 };
@@ -960,5 +978,40 @@ mod tests {
             actual.contains(&expected),
             "expected terminal output to contain cursor style reset {expected:?}, got {actual:?}"
         );
+    }
+
+    #[test]
+    fn clear_inline_owned_visible_region_preserves_rows_above_owned_region() {
+        let width = 16;
+        let height = 5;
+        let backend = crate::test_backend::VT100Backend::new(width, height);
+        let mut terminal = Terminal::with_options(backend).expect("terminal");
+        write!(
+            terminal.backend_mut(),
+            "shell history\r\nowned one\r\nowned two\r\nfooter"
+        )
+        .expect("prefill terminal");
+        terminal.set_viewport_area(Rect::new(0, 3, width, 2));
+        terminal.note_history_rows_inserted(2);
+
+        terminal
+            .clear_inline_owned_visible_region()
+            .expect("clear owned region");
+
+        let rows: Vec<String> = terminal
+            .backend()
+            .vt100()
+            .screen()
+            .rows(/*start*/ 0, width)
+            .collect();
+        assert!(
+            rows[0].contains("shell history"),
+            "expected pre-TUI row to remain visible, rows: {rows:?}"
+        );
+        assert!(
+            !rows.iter().skip(1).any(|row| row.contains("owned")),
+            "expected owned rows to be cleared, rows: {rows:?}"
+        );
+        assert_eq!(0, terminal.visible_history_rows());
     }
 }

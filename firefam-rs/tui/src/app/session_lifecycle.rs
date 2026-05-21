@@ -387,21 +387,23 @@ impl App {
     pub(super) fn reset_for_thread_switch(&mut self, tui: &mut tui::Tui) -> Result<()> {
         self.reset_transcript_state_after_clear();
         tui.clear_pending_history_lines();
-        Self::clear_terminal_for_thread_switch(&mut tui.terminal)?;
+        self.clear_terminal_for_thread_switch(tui)?;
         Ok(())
     }
 
-    pub(super) fn clear_terminal_for_thread_switch<B>(
-        terminal: &mut crate::custom_terminal::Terminal<B>,
-    ) -> Result<()>
-    where
-        B: Backend + Write,
-    {
-        terminal.clear_scrollback_and_visible_screen_ansi()?;
-        let mut area = terminal.viewport_area;
-        if area.y > 0 {
-            area.y = 0;
-            terminal.set_viewport_area(area);
+    pub(super) fn clear_terminal_for_thread_switch(&mut self, tui: &mut tui::Tui) -> Result<()> {
+        if tui.is_alt_screen_active() {
+            tui.terminal.clear_visible_screen()?;
+            if tui.is_full_screen_active() {
+                let size = tui.terminal.size()?;
+                let mut area = tui.terminal.viewport_area;
+                area.width = size.width;
+                area.height = area.height.min(size.height);
+                area.y = size.height.saturating_sub(area.height);
+                tui.terminal.set_viewport_area(area);
+            }
+        } else {
+            tui.terminal.clear_inline_owned_visible_region()?;
         }
         Ok(())
     }

@@ -542,21 +542,21 @@ pub enum TrustLevel {
 
 /// Controls whether the TUI uses the terminal's alternate screen buffer.
 ///
-/// - `auto` (default): Use alternate screen mode.
-/// - `always`: Always use alternate screen mode.
+/// - `auto` (default): Run inline and preserve scrollback.
+/// - `always`: Always use alternate screen mode for the main TUI.
 /// - `never`: Never use alternate screen mode. Runs in inline mode, preserving scrollback.
 ///
-/// The CLI flag `--no-alt-screen` can override this setting at runtime.
+/// The CLI flag `--full-screen` can opt into alternate screen mode at runtime.
 #[derive(
     Debug, Serialize, Deserialize, Default, Clone, Copy, PartialEq, Eq, Display, JsonSchema, TS,
 )]
 #[serde(rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum AltScreenMode {
-    /// Use alternate screen mode.
+    /// Run inline and preserve scrollback.
     #[default]
     Auto,
-    /// Always use alternate screen mode.
+    /// Always use alternate screen mode for the main TUI.
     Always,
     /// Never use alternate screen (inline mode only).
     Never,

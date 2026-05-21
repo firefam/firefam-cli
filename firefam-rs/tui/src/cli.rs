@@ -65,11 +65,11 @@ pub struct Cli {
     #[arg(long = "search", default_value_t = false)]
     pub web_search: bool,
 
-    /// Disable alternate screen mode
+    /// Open the TUI in the terminal alternate screen buffer.
     ///
-    /// Runs the TUI in inline mode, preserving terminal scrollback history.
-    #[arg(long = "no-alt-screen", default_value_t = false)]
-    pub no_alt_screen: bool,
+    /// By default Firefam runs inline and preserves terminal scrollback history.
+    #[arg(long = "full-screen", default_value_t = false)]
+    pub full_screen: bool,
 
     #[clap(skip)]
     pub config_overrides: CliConfigOverrides,

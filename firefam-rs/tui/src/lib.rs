@@ -1308,6 +1308,10 @@ async fn run_ratatui_app(
         initialized_terminal.terminal,
         initialized_terminal.enhanced_keys_supported,
     );
+    tui.set_alt_screen_enabled(determine_full_screen_mode(
+        cli.full_screen,
+        initial_config.tui_alternate_screen,
+    ));
     let mut terminal_restore_guard = TerminalRestoreGuard::new();
 
     #[cfg(not(debug_assertions))]
@@ -1673,13 +1677,16 @@ async fn run_ratatui_app(
     let Cli {
         prompt,
         shared,
-        no_alt_screen,
+        full_screen,
         ..
     } = cli;
     let images = shared.into_inner().images;
 
-    let use_alt_screen = determine_alt_screen_mode(no_alt_screen, config.tui_alternate_screen);
-    tui.set_alt_screen_enabled(use_alt_screen);
+    let use_full_screen = determine_full_screen_mode(full_screen, config.tui_alternate_screen);
+    tui.set_alt_screen_enabled(use_full_screen);
+    if use_full_screen {
+        tui.enter_full_screen()?;
+    }
     let mut app_server = match app_server {
         Some(app_server) => app_server,
         None => match start_app_server(
@@ -1737,6 +1744,7 @@ async fn run_ratatui_app(
     )
     .await;
 
+    let _ = tui.leave_full_screen();
     terminal_restore_guard.restore_silently();
     // Mark the end of the recorded session.
     session_log::log_session_end();
@@ -1788,19 +1796,17 @@ impl Drop for TerminalRestoreGuard {
     }
 }
 
-/// Determine whether to use the terminal's alternate screen buffer.
+/// Determine whether to use the terminal's alternate screen buffer for the main chat UI.
 ///
-/// - If `--no-alt-screen` is explicitly passed, always disable alternate screen
-/// - Otherwise, respect the `tui.alternate_screen` config setting:
-///   - `always`: Use alternate screen
-///   - `never`: Inline mode only, preserves scrollback
-///   - `auto` (default): Use alternate screen
-fn determine_alt_screen_mode(no_alt_screen: bool, tui_alternate_screen: AltScreenMode) -> bool {
-    if no_alt_screen {
-        return false;
+/// - If `--full-screen` is explicitly passed, always use alternate screen.
+/// - Otherwise, `tui.alternate_screen = "always"` keeps the legacy config opt-in.
+/// - `auto` and `never` run inline by default, preserving terminal scrollback.
+fn determine_full_screen_mode(full_screen: bool, tui_alternate_screen: AltScreenMode) -> bool {
+    if full_screen {
+        return true;
     }
 
-    tui_alternate_screen != AltScreenMode::Never
+    tui_alternate_screen == AltScreenMode::Always
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1944,21 +1950,21 @@ mod tests {
     }
 
     #[test]
-    fn alternate_screen_auto_uses_alt_screen() {
-        assert!(determine_alt_screen_mode(
-            /*no_alt_screen*/ false,
+    fn full_screen_mode_is_opt_in() {
+        assert!(!determine_full_screen_mode(
+            /*full_screen*/ false,
             AltScreenMode::Auto,
         ));
-        assert!(determine_alt_screen_mode(
-            /*no_alt_screen*/ false,
+        assert!(determine_full_screen_mode(
+            /*full_screen*/ false,
             AltScreenMode::Always,
         ));
-        assert!(!determine_alt_screen_mode(
-            /*no_alt_screen*/ false,
+        assert!(!determine_full_screen_mode(
+            /*full_screen*/ false,
             AltScreenMode::Never,
         ));
-        assert!(!determine_alt_screen_mode(
-            /*no_alt_screen*/ true,
+        assert!(determine_full_screen_mode(
+            /*full_screen*/ true,
             AltScreenMode::Auto,
         ));
     }
