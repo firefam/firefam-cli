@@ -197,6 +197,7 @@ use super::paste_burst::CharDecision;
 use super::paste_burst::PasteBurst;
 use super::skill_popup::MentionItem;
 use super::skill_popup::SkillPopup;
+use super::skill_popup::match_mention_item;
 use super::slash_commands::BuiltinCommandFlags;
 use super::slash_commands::ServiceTierCommand;
 use super::slash_commands::SlashCommandItem;
@@ -1710,29 +1711,37 @@ impl ChatComposer {
                 // before applying completion.
                 let first_line = self.draft.textarea.text().lines().next().unwrap_or("");
                 popup.on_composer_text_change(first_line.to_string());
-                if let Some(selected_cmd) = popup.selected_item() {
-                    let selected_command_text = format!("/{}", selected_cmd.command());
-                    if let CommandItem::Builtin(cmd) = selected_cmd
-                        && cmd == SlashCommand::Skills
-                    {
-                        self.stage_selected_slash_command_history(&CommandItem::Builtin(cmd));
-                        self.draft.textarea.set_text_clearing_elements("");
-                        self.draft.is_bash_mode = false;
-                        return (InputResult::Command(cmd), true);
-                    }
-
-                    let starts_with_cmd =
-                        first_line.trim_start().starts_with(&selected_command_text);
-                    if !starts_with_cmd {
-                        self.draft
-                            .textarea
-                            .set_text_clearing_elements(&format!("{selected_command_text} "));
-                        if !self.draft.textarea.text().is_empty() {
-                            self.draft
-                                .textarea
-                                .set_cursor(self.draft.textarea.text().len());
+                if let Some(selected_item) = popup.selected_item() {
+                    match selected_item {
+                        CommandItem::Skill(mention) => {
+                            self.insert_selected_command_popup_skill(mention);
+                            self.popups.active = ActivePopup::None;
+                            return (InputResult::None, true);
                         }
-                        return (InputResult::None, true);
+                        CommandItem::Builtin(cmd) if cmd == SlashCommand::Skills => {
+                            self.stage_selected_slash_command_history(&CommandItem::Builtin(cmd));
+                            self.draft.textarea.set_text_clearing_elements("");
+                            self.draft.is_bash_mode = false;
+                            return (InputResult::Command(cmd), true);
+                        }
+                        CommandItem::Builtin(_) | CommandItem::ServiceTier(_) => {
+                            if let Some(slash_name) = selected_item.slash_command_name() {
+                                let selected_command_text = format!("/{slash_name}");
+                                let starts_with_cmd =
+                                    first_line.trim_start().starts_with(&selected_command_text);
+                                if !starts_with_cmd {
+                                    self.draft.textarea.set_text_clearing_elements(&format!(
+                                        "{selected_command_text} "
+                                    ));
+                                    if !self.draft.textarea.text().is_empty() {
+                                        self.draft
+                                            .textarea
+                                            .set_cursor(self.draft.textarea.text().len());
+                                    }
+                                    return (InputResult::None, true);
+                                }
+                            }
+                        }
                     }
                 }
                 if self.is_task_running {
@@ -1749,20 +1758,30 @@ impl ChatComposer {
                 // while the slash-command popup is active.
                 let first_line = self.draft.textarea.text().lines().next().unwrap_or("");
                 popup.on_composer_text_change(first_line.to_string());
-                if let Some(selected_cmd) = popup.selected_item() {
-                    let selected_command_text = format!("/{}", selected_cmd.command());
-                    let starts_with_cmd =
-                        first_line.trim_start().starts_with(&selected_command_text);
-                    if !starts_with_cmd {
-                        self.draft
-                            .textarea
-                            .set_text_clearing_elements(&format!("{selected_command_text} "));
-                        self.draft.is_bash_mode = false;
-                    }
-                    if !self.draft.textarea.text().is_empty() {
-                        self.draft
-                            .textarea
-                            .set_cursor(self.draft.textarea.text().len());
+                if let Some(selected_item) = popup.selected_item() {
+                    match selected_item {
+                        CommandItem::Skill(mention) => {
+                            self.insert_selected_command_popup_skill(mention);
+                            self.popups.active = ActivePopup::None;
+                        }
+                        CommandItem::Builtin(_) | CommandItem::ServiceTier(_) => {
+                            if let Some(slash_name) = selected_item.slash_command_name() {
+                                let selected_command_text = format!("/{slash_name}");
+                                let starts_with_cmd =
+                                    first_line.trim_start().starts_with(&selected_command_text);
+                                if !starts_with_cmd {
+                                    self.draft.textarea.set_text_clearing_elements(&format!(
+                                        "{selected_command_text} "
+                                    ));
+                                    self.draft.is_bash_mode = false;
+                                }
+                                if !self.draft.textarea.text().is_empty() {
+                                    self.draft
+                                        .textarea
+                                        .set_cursor(self.draft.textarea.text().len());
+                                }
+                            }
+                        }
                     }
                 }
                 (InputResult::None, true)
@@ -1773,18 +1792,27 @@ impl ChatComposer {
                 ..
             } => {
                 if let Some(sel) = popup.selected_item() {
-                    self.stage_selected_slash_command_history(&sel);
-                    self.draft.textarea.set_text_clearing_elements("");
-                    self.draft.is_bash_mode = false;
-                    return (
-                        match sel {
-                            CommandItem::Builtin(cmd) => InputResult::Command(cmd),
-                            CommandItem::ServiceTier(command) => {
-                                InputResult::ServiceTierCommand(command)
-                            }
-                        },
-                        true,
-                    );
+                    return match sel {
+                        CommandItem::Builtin(cmd) => {
+                            self.stage_selected_slash_command_history(&CommandItem::Builtin(cmd));
+                            self.draft.textarea.set_text_clearing_elements("");
+                            self.draft.is_bash_mode = false;
+                            (InputResult::Command(cmd), true)
+                        }
+                        CommandItem::ServiceTier(command) => {
+                            self.stage_selected_slash_command_history(&CommandItem::ServiceTier(
+                                command.clone(),
+                            ));
+                            self.draft.textarea.set_text_clearing_elements("");
+                            self.draft.is_bash_mode = false;
+                            (InputResult::ServiceTierCommand(command), true)
+                        }
+                        CommandItem::Skill(mention) => {
+                            self.insert_selected_command_popup_skill(mention);
+                            self.popups.active = ActivePopup::None;
+                            (InputResult::None, true)
+                        }
+                    };
                 }
                 // Fallback to default newline handling if no command selected.
                 self.handle_key_event_without_popup(key_event)
@@ -2599,6 +2627,14 @@ impl ChatComposer {
         self.draft.textarea.set_cursor(new_cursor);
     }
 
+    fn insert_selected_command_popup_skill(&mut self, mention: MentionItem) {
+        let MentionItem {
+            insert_text, path, ..
+        } = mention;
+        self.insert_selected_mention(&insert_text, path.as_deref());
+        self.draft.is_bash_mode = false;
+    }
+
     fn mention_name_from_insert_text(insert_text: &str) -> Option<String> {
         let name = insert_text.strip_prefix('$')?;
         if name.is_empty() {
@@ -3099,7 +3135,9 @@ impl ChatComposer {
         if matches!(command, CommandItem::Builtin(SlashCommand::Clear)) {
             return;
         }
-        self.stage_slash_command_history_text(format!("/{}", command.command()));
+        if let Some(slash_name) = command.slash_command_name() {
+            self.stage_slash_command_history_text(format!("/{slash_name}"));
+        }
     }
 
     /// Store the provided command text and the current composer adornments in the pending slot.
@@ -3827,7 +3865,10 @@ impl ChatComposer {
             name,
             self.builtin_command_flags(),
             &self.service_tier_commands,
-        )
+        ) || self
+            .skill_mention_items()
+            .iter()
+            .any(|skill| match_mention_item(skill, name).is_some())
     }
 
     /// Synchronize `self.command_popup` with the current text in the
@@ -3860,9 +3901,11 @@ impl ChatComposer {
             }
             return;
         }
+        let skill_mentions = self.skill_mention_items();
         match &mut self.popups.active {
             ActivePopup::Command(popup) => {
                 if is_editing_slash_command_name {
+                    popup.set_skills(skill_mentions);
                     popup.on_composer_text_change(first_line.to_string());
                 } else {
                     self.popups.active = ActivePopup::None;
@@ -3892,6 +3935,7 @@ impl ChatComposer {
                             side_conversation_active: self.side_conversation_active,
                         },
                         self.service_tier_commands.clone(),
+                        skill_mentions,
                     );
                     command_popup.on_composer_text_change(first_line.to_string());
                     self.popups.active = ActivePopup::Command(command_popup);
@@ -4003,28 +4047,7 @@ impl ChatComposer {
     }
 
     fn mention_items(&self) -> Vec<MentionItem> {
-        let mut mentions = Vec::new();
-        if let Some(skills) = self.skills.as_ref() {
-            for skill in skills {
-                let display_name = skill_display_name(skill);
-                let description = skill_description(skill);
-                let skill_name = skill.name.clone();
-                let search_terms = if display_name == skill.name {
-                    vec![skill_name.clone()]
-                } else {
-                    vec![skill_name.clone(), display_name.clone()]
-                };
-                mentions.push(MentionItem {
-                    display_name,
-                    description,
-                    insert_text: format!("${skill_name}"),
-                    search_terms,
-                    path: Some(skill.path_to_skills_md.to_string_lossy().into_owned()),
-                    category_tag: Some("[Skill]".to_string()),
-                    sort_rank: 1,
-                });
-            }
-        }
+        let mut mentions = self.skill_mention_items();
 
         if let Some(plugins) = self.plugins.as_ref() {
             for plugin in plugins {
@@ -4102,6 +4125,32 @@ impl ChatComposer {
             }
         }
 
+        mentions
+    }
+
+    fn skill_mention_items(&self) -> Vec<MentionItem> {
+        let mut mentions = Vec::new();
+        if let Some(skills) = self.skills.as_ref() {
+            for skill in skills {
+                let display_name = skill_display_name(skill);
+                let description = skill_description(skill);
+                let skill_name = skill.name.clone();
+                let search_terms = if display_name == skill.name {
+                    vec![skill_name.clone()]
+                } else {
+                    vec![skill_name.clone(), display_name.clone()]
+                };
+                mentions.push(MentionItem {
+                    display_name,
+                    description,
+                    insert_text: format!("${skill_name}"),
+                    search_terms,
+                    path: Some(skill.path_to_skills_md.to_string_lossy().into_owned()),
+                    category_tag: Some("[Skill]".to_string()),
+                    sort_rank: 1,
+                });
+            }
+        }
         mentions
     }
 
@@ -7589,6 +7638,9 @@ mod tests {
                 Some(CommandItem::ServiceTier(command)) => {
                     panic!("expected model command, got service tier {command:?}")
                 }
+                Some(CommandItem::Skill(skill)) => {
+                    panic!("expected model command, got skill {skill:?}")
+                }
                 None => panic!("no selected command for '/mo'"),
             },
             _ => panic!("slash popup not active after typing '/mo'"),
@@ -7645,6 +7697,9 @@ mod tests {
                 Some(CommandItem::ServiceTier(command)) => {
                     panic!("expected resume command, got service tier {command:?}")
                 }
+                Some(CommandItem::Skill(skill)) => {
+                    panic!("expected resume command, got skill {skill:?}")
+                }
                 None => panic!("no selected command for '/res'"),
             },
             _ => panic!("slash popup not active after typing '/res'"),
@@ -7677,6 +7732,96 @@ mod tests {
         insta::assert_snapshot!("slash_popup_pet", terminal.backend());
     }
 
+    fn skill_metadata_for_slash_popup(
+        name: &str,
+        display_name: &str,
+        description: &str,
+        path: PathBuf,
+    ) -> SkillMetadata {
+        SkillMetadata {
+            name: name.to_string(),
+            description: description.to_string(),
+            short_description: None,
+            interface: Some(SkillInterface {
+                display_name: Some(display_name.to_string()),
+                short_description: None,
+                icon_small: None,
+                icon_large: None,
+                brand_color: None,
+                default_prompt: None,
+            }),
+            dependencies: None,
+            policy: None,
+            path_to_skills_md: path.abs(),
+            scope: crate::test_support::skill_scope_user(),
+            plugin_id: None,
+        }
+    }
+
+    #[test]
+    fn slash_popup_skill_match_ui() {
+        snapshot_composer_state_with_width(
+            "slash_popup_skill_match",
+            /*width*/ 72,
+            /*enhanced_keys_supported*/ false,
+            |composer| {
+                composer.set_skill_mentions(Some(vec![skill_metadata_for_slash_popup(
+                    "firefam-debugger",
+                    "Firefam Debugger",
+                    "Debug this Firefam checkout",
+                    test_path_buf("/tmp/firefam-debugger/SKILL.md"),
+                )]));
+                type_chars_humanlike(composer, &['/', 'f', 'i', 'r']);
+            },
+        );
+    }
+
+    #[test]
+    fn slash_popup_skill_match_inserts_dollar_mention() {
+        use crate::bottom_pane::MentionBinding;
+
+        let skill_path = test_path_buf("/tmp/firefam-debugger/SKILL.md").abs();
+        let (tx, _rx) = unbounded_channel::<AppEvent>();
+        let sender = AppEventSender::new(tx);
+        let mut composer = ChatComposer::new(
+            /*has_input_focus*/ true,
+            sender,
+            /*enhanced_keys_supported*/ false,
+            "Ask Firefam to do anything".to_string(),
+            /*disable_paste_burst*/ false,
+        );
+        composer.set_skill_mentions(Some(vec![skill_metadata_for_slash_popup(
+            "firefam-debugger",
+            "Firefam Debugger",
+            "Debug this Firefam checkout",
+            skill_path.to_path_buf(),
+        )]));
+        type_chars_humanlike(&mut composer, &['/', 'f', 'i', 'r']);
+
+        match &composer.popups.active {
+            ActivePopup::Command(popup) => match popup.selected_item() {
+                Some(CommandItem::Skill(skill)) => {
+                    assert_eq!(skill.insert_text, "$firefam-debugger")
+                }
+                other => panic!("expected matching skill to be selected, got {other:?}"),
+            },
+            _ => panic!("slash popup not active after typing '/fir'"),
+        }
+
+        let (result, handled) =
+            composer.handle_key_event(KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE));
+        assert_eq!(result, InputResult::None);
+        assert!(handled);
+        assert_eq!(composer.draft.textarea.text(), "$firefam-debugger ");
+        assert_eq!(
+            composer.take_mention_bindings(),
+            vec![MentionBinding {
+                mention: "firefam-debugger".to_string(),
+                path: skill_path.display().to_string(),
+            }]
+        );
+    }
+
     #[test]
     fn slash_popup_pets_for_pet_logic() {
         use super::super::command_popup::CommandItem;
@@ -7698,6 +7843,9 @@ mod tests {
                 }
                 Some(CommandItem::ServiceTier(command)) => {
                     panic!("expected pets command, got service tier {command:?}")
+                }
+                Some(CommandItem::Skill(skill)) => {
+                    panic!("expected pets command, got skill {skill:?}")
                 }
                 None => panic!("no selected command for '/pet'"),
             },

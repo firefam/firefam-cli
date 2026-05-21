@@ -1,5 +1,6 @@
 use ratatui::buffer::Buffer;
 use ratatui::layout::Rect;
+use ratatui::style::Stylize;
 use ratatui::widgets::WidgetRef;
 
 use super::popup_consts::MAX_POPUP_ROWS;
@@ -9,6 +10,9 @@ use super::selection_popup_common::ColumnWidthMode;
 use super::selection_popup_common::GenericDisplayRow;
 use super::selection_popup_common::measure_rows_height_with_col_width_mode;
 use super::selection_popup_common::render_rows_with_col_width_mode;
+use super::skill_popup::MentionItem;
+use super::skill_popup::match_mention_item;
+use super::skill_popup::sort_mention_matches;
 use super::slash_commands::BuiltinCommandFlags;
 use super::slash_commands::ServiceTierCommand;
 use super::slash_commands::SlashCommandItem;
@@ -30,11 +34,13 @@ const COMMAND_COLUMN_WIDTH: ColumnWidthConfig = ColumnWidthConfig::new(
 pub(crate) enum CommandItem {
     Builtin(SlashCommand),
     ServiceTier(ServiceTierCommand),
+    Skill(MentionItem),
 }
 
 pub(crate) struct CommandPopup {
     command_filter: String,
     commands: Vec<CommandItem>,
+    skills: Vec<MentionItem>,
     state: ScrollState,
 }
 
@@ -73,6 +79,7 @@ impl CommandPopup {
     pub(crate) fn new(
         flags: CommandPopupFlags,
         service_tier_commands: Vec<ServiceTierCommand>,
+        skills: Vec<MentionItem>,
     ) -> Self {
         // Keep built-in availability in sync with the composer.
         let commands = commands_for_input(flags.into(), &service_tier_commands)
@@ -87,8 +94,17 @@ impl CommandPopup {
         Self {
             command_filter: String::new(),
             commands,
+            skills,
             state: ScrollState::new(),
         }
+    }
+
+    pub(crate) fn set_skills(&mut self, skills: Vec<MentionItem>) {
+        self.skills = skills;
+        let matches_len = self.filtered_items().len();
+        self.state.clamp_selection(matches_len);
+        self.state
+            .ensure_visible(matches_len, MAX_POPUP_ROWS.min(matches_len));
     }
 
     /// Update the filter string based on the current composer text. The text
@@ -149,6 +165,11 @@ impl CommandPopup {
                 }
                 out.push((command.clone(), None));
             }
+            out.extend(
+                self.filtered_skills(filter)
+                    .into_iter()
+                    .map(|(skill, indices, _score)| (CommandItem::Skill(skill), indices)),
+            );
             return out;
         }
 
@@ -186,7 +207,26 @@ impl CommandPopup {
 
         out.extend(exact);
         out.extend(prefix);
+        out.extend(
+            self.filtered_skills(filter)
+                .into_iter()
+                .map(|(skill, indices, _score)| (CommandItem::Skill(skill), indices)),
+        );
         out
+    }
+
+    fn filtered_skills(&self, filter: &str) -> Vec<(MentionItem, Option<Vec<usize>>, i32)> {
+        let mut matches = Vec::new();
+        for (idx, skill) in self.skills.iter().enumerate() {
+            if let Some((indices, score)) = match_mention_item(skill, filter) {
+                matches.push((idx, indices, score));
+            }
+        }
+        sort_mention_matches(&mut matches, &self.skills, filter);
+        matches
+            .into_iter()
+            .map(|(idx, indices, score)| (self.skills[idx].clone(), indices, score))
+            .collect()
     }
 
     fn filtered_items(&self) -> Vec<CommandItem> {
@@ -199,20 +239,16 @@ impl CommandPopup {
     ) -> Vec<GenericDisplayRow> {
         matches
             .into_iter()
-            .map(|(item, indices)| {
-                let name = format!("/{}", item.command());
-                let description = item.description().to_string();
-                GenericDisplayRow {
-                    name,
-                    name_prefix_spans: Vec::new(),
-                    match_indices: indices.map(|v| v.into_iter().map(|i| i + 1).collect()),
-                    display_shortcut: None,
-                    description: Some(description),
-                    category_tag: None,
-                    wrap_indent: None,
-                    is_disabled: false,
-                    disabled_reason: None,
-                }
+            .map(|(item, indices)| GenericDisplayRow {
+                name: item.display_name(),
+                name_prefix_spans: item.name_prefix_spans(),
+                match_indices: item.match_indices(indices),
+                display_shortcut: None,
+                description: item.description(),
+                category_tag: item.category_tag(),
+                wrap_indent: None,
+                is_disabled: false,
+                disabled_reason: None,
             })
             .collect()
     }
@@ -246,13 +282,57 @@ impl CommandItem {
         match self {
             Self::Builtin(cmd) => cmd.command(),
             Self::ServiceTier(command) => &command.name,
+            Self::Skill(skill) => skill
+                .insert_text
+                .strip_prefix('$')
+                .unwrap_or(&skill.insert_text),
         }
     }
 
-    fn description(&self) -> &str {
+    pub(crate) fn slash_command_name(&self) -> Option<&str> {
         match self {
-            Self::Builtin(cmd) => cmd.description(),
-            Self::ServiceTier(command) => &command.description,
+            Self::Builtin(cmd) => Some(cmd.command()),
+            Self::ServiceTier(command) => Some(&command.name),
+            Self::Skill(_) => None,
+        }
+    }
+
+    fn display_name(&self) -> String {
+        match self {
+            Self::Builtin(cmd) => format!("/{}", cmd.command()),
+            Self::ServiceTier(command) => format!("/{}", command.name),
+            Self::Skill(skill) => skill.display_name.clone(),
+        }
+    }
+
+    fn name_prefix_spans(&self) -> Vec<ratatui::text::Span<'static>> {
+        match self {
+            Self::Builtin(_) | Self::ServiceTier(_) => Vec::new(),
+            Self::Skill(_) => vec!["$".dim()],
+        }
+    }
+
+    fn match_indices(&self, indices: Option<Vec<usize>>) -> Option<Vec<usize>> {
+        match self {
+            Self::Builtin(_) | Self::ServiceTier(_) => {
+                indices.map(|v| v.into_iter().map(|i| i + 1).collect())
+            }
+            Self::Skill(_) => indices,
+        }
+    }
+
+    fn description(&self) -> Option<String> {
+        match self {
+            Self::Builtin(cmd) => Some(cmd.description().to_string()),
+            Self::ServiceTier(command) => Some(command.description.clone()),
+            Self::Skill(skill) => skill.description.clone(),
+        }
+    }
+
+    fn category_tag(&self) -> Option<String> {
+        match self {
+            Self::Builtin(_) | Self::ServiceTier(_) => None,
+            Self::Skill(_) => Some("[Skill]".to_string()),
         }
     }
 }
@@ -279,9 +359,21 @@ mod tests {
     use super::*;
     use pretty_assertions::assert_eq;
 
+    fn skill_item(display_name: &str, skill_name: &str) -> MentionItem {
+        MentionItem {
+            display_name: display_name.to_string(),
+            description: Some(format!("{display_name} skill")),
+            insert_text: format!("${skill_name}"),
+            search_terms: vec![skill_name.to_string(), display_name.to_string()],
+            path: Some(format!("/tmp/{skill_name}/SKILL.md")),
+            category_tag: Some("[Skill]".to_string()),
+            sort_rank: 1,
+        }
+    }
+
     #[test]
     fn filter_includes_init_when_typing_prefix() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         // Simulate the composer line starting with '/in' so the popup filters
         // matching commands by prefix.
         popup.on_composer_text_change("/in".to_string());
@@ -292,6 +384,7 @@ mod tests {
         let has_init = matches.iter().any(|item| match item {
             CommandItem::Builtin(cmd) => cmd.command() == "init",
             CommandItem::ServiceTier(_) => false,
+            CommandItem::Skill(_) => false,
         });
         assert!(
             has_init,
@@ -301,7 +394,7 @@ mod tests {
 
     #[test]
     fn selecting_init_by_exact_match() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/init".to_string());
 
         // When an exact match exists, the selected command should be that
@@ -312,19 +405,23 @@ mod tests {
             Some(CommandItem::ServiceTier(command)) => {
                 panic!("expected init command, got service tier {command:?}")
             }
+            Some(CommandItem::Skill(skill)) => panic!("expected init command, got skill {skill:?}"),
             None => panic!("expected a selected command for exact match"),
         }
     }
 
     #[test]
     fn model_is_first_suggestion_for_mo() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/mo".to_string());
         let matches = popup.filtered_items();
         match matches.first() {
             Some(CommandItem::Builtin(cmd)) => assert_eq!(cmd.command(), "model"),
             Some(CommandItem::ServiceTier(command)) => {
                 panic!("expected model command, got service tier {command:?}")
+            }
+            Some(CommandItem::Skill(skill)) => {
+                panic!("expected model command, got skill {skill:?}")
             }
             None => panic!("expected at least one match for '/mo'"),
         }
@@ -342,6 +439,7 @@ mod tests {
                 name: "fast".to_string(),
                 description: "Fastest inference with increased plan usage".to_string(),
             }],
+            Vec::new(),
         );
         popup.on_composer_text_change("/fa".to_string());
 
@@ -354,6 +452,9 @@ mod tests {
                     description: "Fastest inference with increased plan usage".to_string(),
                 }
             ),
+            Some(CommandItem::Skill(skill)) => {
+                panic!("expected fast service tier to be selected, got skill {skill:?}")
+            }
             other => panic!("expected fast service tier to be selected, got {other:?}"),
         }
         let rows = popup.rows_from_matches(popup.filtered());
@@ -364,8 +465,69 @@ mod tests {
     }
 
     #[test]
+    fn empty_filter_appends_skills_after_commands() {
+        let mut popup = CommandPopup::new(
+            CommandPopupFlags::default(),
+            Vec::new(),
+            vec![
+                skill_item("Zed Skill", "zed"),
+                skill_item("Alpha Skill", "alpha"),
+            ],
+        );
+        popup.on_composer_text_change("/".to_string());
+
+        let items = popup.filtered_items();
+        let first_skill_idx = items
+            .iter()
+            .position(|item| matches!(item, CommandItem::Skill(_)))
+            .expect("expected at least one skill item");
+
+        assert!(first_skill_idx > 0);
+        assert!(
+            items[..first_skill_idx]
+                .iter()
+                .all(|item| !matches!(item, CommandItem::Skill(_))),
+            "expected skills to be appended after commands, got {items:?}"
+        );
+
+        let skill_names = items[first_skill_idx..]
+            .iter()
+            .map(|item| match item {
+                CommandItem::Skill(skill) => skill.display_name.clone(),
+                other => panic!("expected only skill items after first skill, got {other:?}"),
+            })
+            .collect::<Vec<_>>();
+        assert_eq!(
+            skill_names,
+            vec!["Alpha Skill".to_string(), "Zed Skill".to_string()]
+        );
+    }
+
+    #[test]
+    fn skill_matches_are_available_in_slash_filter() {
+        let mut popup = CommandPopup::new(
+            CommandPopupFlags::default(),
+            Vec::new(),
+            vec![skill_item("Firefam Debugger", "firefam-debugger")],
+        );
+        popup.on_composer_text_change("/fire".to_string());
+
+        match popup.selected_item() {
+            Some(CommandItem::Skill(skill)) => {
+                assert_eq!(skill.insert_text, "$firefam-debugger");
+            }
+            other => panic!("expected matching skill to be selected, got {other:?}"),
+        }
+
+        let rows = popup.rows_from_matches(popup.filtered());
+        let row = rows.first().expect("expected one matching row");
+        assert_eq!(row.name, "Firefam Debugger");
+        assert_eq!(row.category_tag.as_deref(), Some("[Skill]"));
+    }
+
+    #[test]
     fn filtered_commands_keep_presentation_order_for_prefix() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/m".to_string());
 
         let cmds: Vec<String> = popup
@@ -374,6 +536,7 @@ mod tests {
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
         assert_eq!(
@@ -389,7 +552,7 @@ mod tests {
 
     #[test]
     fn prefix_filter_limits_matches_for_ac() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/ac".to_string());
 
         let cmds: Vec<String> = popup
@@ -398,6 +561,7 @@ mod tests {
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
         assert!(
@@ -408,7 +572,7 @@ mod tests {
 
     #[test]
     fn quit_hidden_in_empty_filter_but_shown_for_prefix() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/".to_string());
         let items = popup.filtered_items();
         assert!(!items.contains(&CommandItem::Builtin(SlashCommand::Quit)));
@@ -420,7 +584,7 @@ mod tests {
 
     #[test]
     fn plan_command_hidden_when_collaboration_modes_disabled() {
-        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let mut popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         popup.on_composer_text_change("/".to_string());
 
         let cmds: Vec<String> = popup
@@ -429,6 +593,7 @@ mod tests {
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
         assert!(
@@ -453,6 +618,7 @@ mod tests {
                 side_conversation_active: false,
             },
             Vec::new(),
+            Vec::new(),
         );
         popup.on_composer_text_change("/plan".to_string());
 
@@ -461,6 +627,7 @@ mod tests {
             Some(CommandItem::ServiceTier(command)) => {
                 panic!("expected plan command, got service tier {command:?}")
             }
+            Some(CommandItem::Skill(skill)) => panic!("expected plan command, got skill {skill:?}"),
             other => panic!("expected plan to be selected for exact match, got {other:?}"),
         }
     }
@@ -481,6 +648,7 @@ mod tests {
                 side_conversation_active: false,
             },
             Vec::new(),
+            Vec::new(),
         );
         popup.on_composer_text_change("/pers".to_string());
 
@@ -490,6 +658,7 @@ mod tests {
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
         assert!(
@@ -514,6 +683,7 @@ mod tests {
                 side_conversation_active: false,
             },
             Vec::new(),
+            Vec::new(),
         );
         popup.on_composer_text_change("/personality".to_string());
 
@@ -521,6 +691,9 @@ mod tests {
             Some(CommandItem::Builtin(cmd)) => assert_eq!(cmd.command(), "personality"),
             Some(CommandItem::ServiceTier(command)) => {
                 panic!("expected personality command, got service tier {command:?}")
+            }
+            Some(CommandItem::Skill(skill)) => {
+                panic!("expected personality command, got skill {skill:?}")
             }
             other => panic!("expected personality to be selected for exact match, got {other:?}"),
         }
@@ -542,6 +715,7 @@ mod tests {
                 side_conversation_active: false,
             },
             Vec::new(),
+            Vec::new(),
         );
         popup.on_composer_text_change("/aud".to_string());
 
@@ -551,6 +725,7 @@ mod tests {
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
 
@@ -562,13 +737,14 @@ mod tests {
 
     #[test]
     fn debug_commands_are_hidden_from_popup() {
-        let popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new());
+        let popup = CommandPopup::new(CommandPopupFlags::default(), Vec::new(), Vec::new());
         let cmds: Vec<String> = popup
             .filtered_items()
             .into_iter()
             .map(|item| match item {
                 CommandItem::Builtin(cmd) => cmd.command().to_string(),
                 CommandItem::ServiceTier(command) => command.name,
+                CommandItem::Skill(skill) => skill.display_name,
             })
             .collect();
 

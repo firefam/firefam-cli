@@ -17,7 +17,7 @@ use crate::render::RectExt;
 use crate::text_formatting::truncate_text;
 use firefam_utils_fuzzy_match::fuzzy_match;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct MentionItem {
     pub(crate) display_name: String,
     pub(crate) description: Option<String>,
@@ -29,6 +29,49 @@ pub(crate) struct MentionItem {
 }
 
 const MENTION_NAME_TRUNCATE_LEN: usize = 28;
+
+pub(crate) fn match_mention_item(
+    mention: &MentionItem,
+    filter: &str,
+) -> Option<(Option<Vec<usize>>, i32)> {
+    if filter.is_empty() {
+        return Some((None, 0));
+    }
+
+    if let Some((indices, score)) = fuzzy_match(&mention.display_name, filter) {
+        Some((Some(indices), score))
+    } else {
+        mention
+            .search_terms
+            .iter()
+            .filter(|term| *term != &mention.display_name)
+            .filter_map(|term| fuzzy_match(term, filter).map(|(_indices, score)| score))
+            .min()
+            .map(|score| (None, score))
+    }
+}
+
+pub(crate) fn sort_mention_matches(
+    matches: &mut [(usize, Option<Vec<usize>>, i32)],
+    mentions: &[MentionItem],
+    filter: &str,
+) {
+    matches.sort_by(|a, b| {
+        if filter.is_empty() {
+            mentions[a.0].sort_rank.cmp(&mentions[b.0].sort_rank)
+        } else {
+            a.1.is_none()
+                .cmp(&b.1.is_none())
+                .then_with(|| a.2.cmp(&b.2))
+                .then_with(|| mentions[a.0].sort_rank.cmp(&mentions[b.0].sort_rank))
+        }
+        .then_with(|| {
+            let an = mentions[a.0].display_name.as_str();
+            let bn = mentions[b.0].display_name.as_str();
+            an.cmp(bn)
+        })
+    });
+}
 
 pub(crate) struct SkillPopup {
     query: String,
@@ -132,50 +175,12 @@ impl SkillPopup {
         let mut out: Vec<(usize, Option<Vec<usize>>, i32)> = Vec::new();
 
         for (idx, mention) in self.mentions.iter().enumerate() {
-            if filter.is_empty() {
-                out.push((idx, None, 0));
-                continue;
-            }
-
-            let best_match =
-                if let Some((indices, score)) = fuzzy_match(&mention.display_name, filter) {
-                    Some((Some(indices), score))
-                } else {
-                    mention
-                        .search_terms
-                        .iter()
-                        .filter(|term| *term != &mention.display_name)
-                        .filter_map(|term| fuzzy_match(term, filter).map(|(_indices, score)| score))
-                        .min()
-                        .map(|score| (None, score))
-                };
-
-            if let Some((indices, score)) = best_match {
+            if let Some((indices, score)) = match_mention_item(mention, filter) {
                 out.push((idx, indices, score));
             }
         }
 
-        out.sort_by(|a, b| {
-            if filter.is_empty() {
-                self.mentions[a.0]
-                    .sort_rank
-                    .cmp(&self.mentions[b.0].sort_rank)
-            } else {
-                a.1.is_none()
-                    .cmp(&b.1.is_none())
-                    .then_with(|| a.2.cmp(&b.2))
-                    .then_with(|| {
-                        self.mentions[a.0]
-                            .sort_rank
-                            .cmp(&self.mentions[b.0].sort_rank)
-                    })
-            }
-            .then_with(|| {
-                let an = self.mentions[a.0].display_name.as_str();
-                let bn = self.mentions[b.0].display_name.as_str();
-                an.cmp(bn)
-            })
-        });
+        sort_mention_matches(&mut out, &self.mentions, filter);
 
         out
     }
